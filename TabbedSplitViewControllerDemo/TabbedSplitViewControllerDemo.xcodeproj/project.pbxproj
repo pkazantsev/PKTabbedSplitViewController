@@ -13,6 +13,7 @@
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
+		9D50953D1B417791009D40C1 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		9D50952B1B417592009D40C1 /* TabbedSplitViewControllerDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabbedSplitViewControllerDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
+		9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 		9D50953B1B4175F5009D40C1 /* TabbedSplitViewController */ = {
 			isa = PBXGroup;
 			children = (
+				9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */,
 			);
 			name = TabbedSplitViewController;
 			path = ../TabbedSplitViewController;
@@ -222,6 +225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D50951E1B417592009D40C1 /* ViewController.swift in Sources */,
+				9D50953D1B417791009D40C1 /* TabbedSplitViewController.swift in Sources */,
 				9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
