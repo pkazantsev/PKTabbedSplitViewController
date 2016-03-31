@@ -168,6 +168,8 @@
 		9D50950E1B417592009D40C1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftMigration = 0700;
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "Pavel Kazantsev";
 				TargetAttributes = {
@@ -426,6 +428,7 @@
 				9D5095371B417592009D40C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		9D5095381B417592009D40C1 /* Build configuration list for PBXNativeTarget "TabbedSplitViewControllerDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -434,6 +437,7 @@
 				9D50953A1B417592009D40C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

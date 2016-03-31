@@ -16,13 +16,17 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
     @IBInspectable
-    var masterViewWidth: CGFloat = 320 {
+    var masterViewWidth: CGFloat = 300 {
         didSet {
             self.mainView.masterViewWidth = masterViewWidth
         }
     }
     @IBInspectable
-    var tabBarBackgroundColor: UIColor = UIColor.whiteColor()
+    var tabBarBackgroundColor: UIColor = UIColor.whiteColor() {
+        didSet {
+            self.tabBar.backgroundColor = tabBarBackgroundColor
+        }
+    }
 
     var hideMasterInPortrait = false
 
@@ -43,7 +47,7 @@ public class TabbedSplitViewController: UIViewController {
         tabBar.items = tabBarItems
     }
 
-    public required init(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(coder: aDecoder)
@@ -56,9 +60,21 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
+        self.addChildViewController(tabBar)
+        self.addChildViewController(masterVC)
+        self.addChildViewController(detailVC)
+
         self.view.backgroundColor = UIColor.grayColor()
 
-        // Show master if view size is appropriate
+    }
+
+    public override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        // Show detail if view size is appropriate
+        if 320 < view.bounds.size.width - masterViewWidth - tabBarWidth {
+            // Hide detail
+        }
     }
 
     // This method compiles with the rest of your code 
@@ -67,6 +83,10 @@ public class TabbedSplitViewController: UIViewController {
         //
         self.tabBar.view.backgroundColor = UIColor.purpleColor()
         self.masterVC.view.backgroundColor = UIColor.greenColor()
+    }
+
+    public func addTabBarItem(item: PKTabBarItem) {
+        self.tabBar.items.append(item)
     }
 
 }
@@ -78,7 +98,7 @@ public class PKTabbedSplitView: UIView {
             tabBarWidthConstraint.constant = tabBarWidth
         }
     }
-    private var masterViewWidth: CGFloat = 320 {
+    private var masterViewWidth: CGFloat = 300 {
         didSet {
             masterViewWidthConstraint.constant = masterViewWidth
         }
@@ -95,19 +115,23 @@ public class PKTabbedSplitView: UIView {
         tabBarView.addConstraint(tabBarWidthConstraint)
         masterView.addConstraint(masterViewWidthConstraint)
 
-        detailView.preservesSuperviewLayoutMargins = true
-        masterView.preservesSuperviewLayoutMargins = true
-        tabBarView.preservesSuperviewLayoutMargins = true
-        self.setTranslatesAutoresizingMaskIntoConstraints(false)
-        detailView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        masterView.setTranslatesAutoresizingMaskIntoConstraints(false)
-        tabBarView.setTranslatesAutoresizingMaskIntoConstraints(false)
+        if #available(iOS 8.0, *) {
+            detailView.preservesSuperviewLayoutMargins = true
+            masterView.preservesSuperviewLayoutMargins = true
+            tabBarView.preservesSuperviewLayoutMargins = true
+        } else {
+            // Fallback on earlier versions
+        }
+        self.translatesAutoresizingMaskIntoConstraints = false
+        detailView.translatesAutoresizingMaskIntoConstraints = false
+        masterView.translatesAutoresizingMaskIntoConstraints = false
+        tabBarView.translatesAutoresizingMaskIntoConstraints = false
 
         self.addSubview(detailView)
         self.addSubview(masterView)
         self.addSubview(tabBarView)
 
-        var views = ["detailView": detailView, "masterView": masterView, "tabBarView": tabBarView]
+        let views = ["detailView": detailView, "masterView": masterView, "tabBarView": tabBarView]
 
         self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|-0-[tabBarView]-0-[masterView]-0-[detailView]-0-|", options: .DirectionLeadingToTrailing, metrics: [:], views: views))
         self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-[tabBarView]-|", options: .DirectionLeadingToTrailing, metrics: [:], views: views))
@@ -115,21 +139,88 @@ public class PKTabbedSplitView: UIView {
         self.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|-[detailView]-|", options: .DirectionLeadingToTrailing, metrics: [:], views: views))
     }
 
-    public required init(coder aDecoder: NSCoder) {
+    public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
-        //
+}
+
+private let pkTabBarItemCellIdentifier = "PkTabBarItemCellIdentifier"
+
+private class PKTabBar: UITableViewController {
+    private var items = [PKTabBarItem]() {
+        didSet {
+            self.tableView.reloadData()
+        }
+    }
+    var backgroundColor: UIColor = UIColor.whiteColor() {
+        didSet {
+            self.view.backgroundColor = backgroundColor
+        }
+    }
+
+    private override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.tableView.scrollEnabled = false
+        self.tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40));
+        self.tableView.estimatedRowHeight = 40
+        self.tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0)
+//        self.tableView.separatorStyle = .None
+        self.tableView.registerClass(PkTabBarItemTableViewCell.self, forCellReuseIdentifier: pkTabBarItemCellIdentifier)
+    }
+
+    private override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return items.count
+    }
+
+    private override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(pkTabBarItemCellIdentifier, forIndexPath: indexPath) as! PkTabBarItemTableViewCell
+
+        if items.count > indexPath.row {
+            let item = self.items[indexPath.row]
+            cell.titleLabel.text = item.title
+            cell.iconImageView.image = item.image
+        }
+
+        return cell;
+    }
+}
+
+private class PkTabBarItemTableViewCell: UITableViewCell {
+    private let titleLabel = UILabel()
+    private let iconImageView = UIImageView()
+
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        titleLabel.font = UIFont.systemFontOfSize(10)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.setContentHuggingPriority(249, forAxis: .Vertical)
+        titleLabel.textAlignment = .Center
+
+        iconImageView.contentMode = .Center
+        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+
+        self.contentView.addSubview(titleLabel)
+        self.contentView.addSubview(iconImageView)
+
+        let views = ["titleLabel": titleLabel, "iconImageView": iconImageView]
+
+//        self.contentView.preservesSuperviewLayoutMargins = true
+        let constraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: .DirectionLeadingToTrailing, metrics: nil, views: views)
+        self.contentView.addConstraints(constraints)
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[iconImageView]|", options: .DirectionLeadingToTrailing, metrics: nil, views: views));
+        self.contentView.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("H:|[titleLabel]|", options: .DirectionLeadingToTrailing, metrics: nil, views: views));
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
 }
 
-private class PKTabBar: UITableViewController {
-    private var items = [PKTabBarItem]()
-}
-
-struct PKTabBarItem {
+public struct PKTabBarItem {
     let title: String
     let image: UIImage
     let selectedImage: UIImage?
@@ -150,7 +241,7 @@ private class PKMasterViewController: UIViewController {
         self.view.backgroundColor = UIColor.greenColor()
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
@@ -159,10 +250,10 @@ private class PKDetailViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-        self.view.backgroundColor = UIColor.whiteColor()
+        self.view.backgroundColor = UIColor.grayColor()
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
