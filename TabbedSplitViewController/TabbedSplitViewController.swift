@@ -14,7 +14,7 @@ public struct PKTabBarItem {
     let image: UIImage
     /// Item image – selected state
     let selectedImage: UIImage?
-    /// View controller that should be open by tap on the item
+    /// View controller that should be opened by tap on the item
     let viewController: UIViewController
 
     init(viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
@@ -27,26 +27,41 @@ public struct PKTabBarItem {
 
 public class TabbedSplitViewController: UIViewController {
 
-    @IBInspectable
-    var tabBarWidth: CGFloat = 70 {
-        didSet {
-            mainView.tabBarWidth = tabBarWidth
+    public struct Configuration {
+        /// Width of a vertical TabBar. **Default – 70**.
+        var tabBarWidth: CGFloat = 70
+        /// Width of a master view. **Default – 320**.
+        var masterViewWidth: CGFloat = 320
+        /// Minimal width of a detail view. **Default – 320**.
+        ///
+        /// If there is no space for a detail view it is hidden to be presented as a modal view.
+        var detailViewMinWidth: CGFloat = 320
+        /// Color of a vertical TabBar. **Default – .white**.
+        var tabBarBackgroundColor: UIColor = .white
+
+        /// Called when ether size or traits collection of the view is changed
+        ///   to determine if master view should be hidden from main view and shown
+        ///   as a slidable side bar.
+        var showMasterAsSideBarWithSizeChange: ((CGSize, UITraitCollection, Configuration) -> Bool)?
+        /// Called when ether size or traits collection of the view is changed
+        ///   to determine if detail view should be hidden from main view and shown
+        ///   as a modal view.
+        var showDetailAsModalWithSizeChange: ((CGSize, UITraitCollection, Configuration) -> Bool)?
+
+        fileprivate func widthChanged(old oldValue: Configuration) -> Bool {
+            return tabBarWidth != oldValue.tabBarWidth
+                || masterViewWidth != oldValue.masterViewWidth
+                || detailViewMinWidth != oldValue.detailViewMinWidth
         }
-    }
-    @IBInspectable
-    var masterViewWidth: CGFloat = 300 {
-        didSet {
-            mainView.masterViewWidth = masterViewWidth
-        }
-    }
-    @IBInspectable
-    var tabBarBackgroundColor: UIColor = .white {
-        didSet {
-            tabBar.backgroundColor = tabBarBackgroundColor
-        }
+
+        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
-    var hideMasterInPortrait = false
+    var config = Configuration() {
+        didSet {
+            update(oldConfig: oldValue)
+        }
+    }
 
     private(set) var masterViewController: UIViewController?
     private var detailViewController: UIViewController?
@@ -56,6 +71,24 @@ public class TabbedSplitViewController: UIViewController {
     private let tabBar = PKTabBar()
     private let mainView: PKTabbedSplitView
     private var masterViewIsHidden: Bool = false
+
+    private var futureTraits: UITraitCollection?
+
+    private var hideDetailView: Bool = false {
+        didSet {
+            if hideDetailView != detailVC.view.isHidden {
+                detailVC.view.isHidden = !detailVC.view.isHidden
+            }
+            masterVC.widthConstraint?.isActive = !hideDetailView
+        }
+    }
+    private var hideMasterView: Bool = false {
+        didSet {
+            if hideMasterView != masterVC.view.isHidden {
+                masterVC.view.isHidden = !masterVC.view.isHidden
+            }
+        }
+    }
 
     init(items: [PKTabBarItem]) {
         mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
@@ -82,47 +115,81 @@ public class TabbedSplitViewController: UIViewController {
         addChildViewController(masterVC)
         addChildViewController(detailVC)
 
+        masterVC.setWidthConstraint(mainView.masterViewWidthConstraint)
+
+        update(oldConfig: .zero)
+
         view.backgroundColor = .gray
 
+        tabBar.view.backgroundColor = .purple
+        masterVC.view.backgroundColor = .green
+        detailVC.view.backgroundColor = .blue
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // Show detail if view size is appropriate
-        if 320 < view.bounds.size.width - masterViewWidth - tabBarWidth {
-            // Hide detail
+        // Hide detail from main view if there is not enough width
+        if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
+            hideDetailView = hideDetail
+        }
+        if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
+            hideMasterView = hideMaster
         }
     }
 
-    // This method compiles with the rest of your code 
-    // but is only executed when your view is being prepared for display in Interface Builder.
-    public override func prepareForInterfaceBuilder() {
-        //
-        tabBar.view.backgroundColor = .purple
-        masterVC.view.backgroundColor = .green
+    public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        print("\(#function) -> \(newCollection)")
+        futureTraits = newCollection
+    }
+    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        print("\(#function) -> \(size)")
+        let traits = futureTraits ?? traitCollection
+        if let hideDetailFunc = config.showDetailAsModalWithSizeChange {
+            let hideDetail = hideDetailFunc(size, traits, config)
+            print("hide detail view: \(hideDetail)")
+            hideDetailView = hideDetail
+        }
+        if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
+            let hideMaster = hideMasterFunc(size, traits, config)
+            print("hide master view: \(hideMaster)")
+            hideMasterView = hideMaster
+        }
+        futureTraits = nil
     }
 
     public func add(_ item: PKTabBarItem) {
         tabBar.items.append(item)
     }
 
+    private func update(oldConfig: Configuration) {
+        if config.tabBarWidth != oldConfig.tabBarWidth {
+            mainView.tabBarWidth = config.tabBarWidth
+        }
+        if config.masterViewWidth != oldConfig.masterViewWidth {
+            mainView.masterViewWidth = config.masterViewWidth
+        }
+        if config.tabBarBackgroundColor != oldConfig.tabBarBackgroundColor {
+            tabBar.backgroundColor = config.tabBarBackgroundColor
+        }
+    }
+
 }
 
 @IBDesignable
 public class PKTabbedSplitView: UIView {
-    fileprivate var tabBarWidth: CGFloat = 70 {
+    fileprivate var tabBarWidth: CGFloat = 0 {
         didSet {
             tabBarWidthConstraint.constant = tabBarWidth
         }
     }
-    fileprivate var masterViewWidth: CGFloat = 300 {
+    fileprivate var masterViewWidth: CGFloat = 0 {
         didSet {
             masterViewWidthConstraint.constant = masterViewWidth
         }
     }
-    private let tabBarWidthConstraint: NSLayoutConstraint!
-    private let masterViewWidthConstraint: NSLayoutConstraint!
+    fileprivate let tabBarWidthConstraint: NSLayoutConstraint
+    fileprivate let masterViewWidthConstraint: NSLayoutConstraint
 
     public init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
         tabBarWidthConstraint = NSLayoutConstraint(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
@@ -142,16 +209,16 @@ public class PKTabbedSplitView: UIView {
         masterView.translatesAutoresizingMaskIntoConstraints = false
         tabBarView.translatesAutoresizingMaskIntoConstraints = false
 
-        addSubview(detailView)
-        addSubview(masterView)
-        addSubview(tabBarView)
+        let stackView = UIStackView(arrangedSubviews: [tabBarView, masterView, detailView])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        stackView.axis = .horizontal
+        stackView.spacing = 0
+        addSubview(stackView)
 
-        let views = ["detailView": detailView, "masterView": masterView, "tabBarView": tabBarView]
-
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|-0-[tabBarView]-0-[masterView]-0-[detailView]-0-|", options: .directionLeadingToTrailing, metrics: [:], views: views))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-[tabBarView]-|", options: .directionLeadingToTrailing, metrics: [:], views: views))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-[masterView]-|", options: .directionLeadingToTrailing, metrics: [:], views: views))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-[detailView]-|", options: .directionLeadingToTrailing, metrics: [:], views: views))
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
+        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -236,13 +303,20 @@ private class PkTabBarItemTableViewCell: UITableViewCell {
 
 private class PKMasterViewController: UIViewController {
 
+    private(set) var widthConstraint: NSLayoutConstraint!
+
     init() {
         super.init(nibName: nil, bundle: nil)
-        view.backgroundColor = .green
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    fileprivate func setWidthConstraint(_ constraint: NSLayoutConstraint) {
+        if widthConstraint != nil {
+            widthConstraint = constraint
+        }
     }
 
 }
@@ -250,7 +324,6 @@ private class PKDetailViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
-        view.backgroundColor = .gray
     }
 
     required init?(coder aDecoder: NSCoder) {
