@@ -16,15 +16,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         if let viewController = self.window?.rootViewController as? TabbedSplitViewController {
-            viewController.config.masterViewWidth = 320
-            /// Use on iPad in portrait
-            viewController.config.showMasterAsSideBarWithSizeChange = { size, traits, config in
-                return traits.userInterfaceIdiom == .pad && size.width <= 768
+            var config = viewController.config
+            config.showMasterAsSideBarWithSizeChange = { size, traits, config in
+                /// Master should be hidden on iPad in Portrait or in multi-tasking mode unless it's iPhone-width.
+                return traits.userInterfaceIdiom == .pad && size.width <= 768 && size.width > 370
             }
-            /// Use on iPhone except Plus models in landscape
-            viewController.config.showDetailAsModalWithSizeChange = { size, traits, config in
-                return traits.horizontalSizeClass == .compact
+            config.showDetailAsModalWithSizeChange = { size, traits, config in
+                /// Use on iPad in compact mode and on iPhone except Plus models in landscape
+                return traits.horizontalSizeClass == .compact && size.width <= 370
             }
+            config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
+                /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
+                return traits.horizontalSizeClass == .compact && size.width <= 320
+            }
+
+            viewController.config = config
             viewController.add(PKTabBarItem(viewController: ViewController(), title: "Controller", image: UIImage(named: "Peotr")!))
         }
 

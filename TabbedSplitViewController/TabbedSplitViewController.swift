@@ -9,15 +9,15 @@ import UIKit
 
 public struct PKTabBarItem {
     /// Item title
-    let title: String
+    public let title: String
     /// Item image (up to 60pt)
-    let image: UIImage
+    public let image: UIImage
     /// Item image – selected state
-    let selectedImage: UIImage?
+    public let selectedImage: UIImage?
     /// View controller that should be opened by tap on the item
-    let viewController: UIViewController
+    public let viewController: UIViewController
 
-    init(viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
+    public init(viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
         self.title = title
         self.image = image
         self.selectedImage = selectedImage;
@@ -27,26 +27,36 @@ public struct PKTabBarItem {
 
 public class TabbedSplitViewController: UIViewController {
 
+    public typealias SizeChangedCallback = ((CGSize, UITraitCollection, Configuration) -> Bool)
+
     public struct Configuration {
         /// Width of a vertical TabBar. **Default – 70**.
-        var tabBarWidth: CGFloat = 70
+        public var tabBarWidth: CGFloat = 70
         /// Width of a master view. **Default – 320**.
-        var masterViewWidth: CGFloat = 320
+        public var masterViewWidth: CGFloat = 320
         /// Minimal width of a detail view. **Default – 320**.
         ///
         /// If there is no space for a detail view it is hidden to be presented as a modal view.
-        var detailViewMinWidth: CGFloat = 320
+        public var detailViewMinWidth: CGFloat = 320
         /// Color of a vertical TabBar. **Default – .white**.
-        var tabBarBackgroundColor: UIColor = .white
+        public var tabBarBackgroundColor: UIColor = .white
 
+        /// Called when ether size or traits collection of the view is changed
+        ///  to determine if tab bar should be hidden from main view and shown
+        ///   as a slidable side bar.
+        public var showTabBarAsSideBarWithSizeChange: SizeChangedCallback?
         /// Called when ether size or traits collection of the view is changed
         ///   to determine if master view should be hidden from main view and shown
         ///   as a slidable side bar.
-        var showMasterAsSideBarWithSizeChange: ((CGSize, UITraitCollection, Configuration) -> Bool)?
+        ///
+        /// **Should not return true when** `showTabBarAsSideBarWithSizeChange` **callback returns true!**
+        public var showMasterAsSideBarWithSizeChange: SizeChangedCallback?
         /// Called when ether size or traits collection of the view is changed
         ///   to determine if detail view should be hidden from main view and shown
         ///   as a modal view.
-        var showDetailAsModalWithSizeChange: ((CGSize, UITraitCollection, Configuration) -> Bool)?
+        ///
+        /// **Should not return true when** `showMasterAsSideBarWithSizeChange` **callback returns true!**
+        public var showDetailAsModalWithSizeChange: SizeChangedCallback?
 
         fileprivate func widthChanged(old oldValue: Configuration) -> Bool {
             return tabBarWidth != oldValue.tabBarWidth
@@ -54,7 +64,7 @@ public class TabbedSplitViewController: UIViewController {
                 || detailViewMinWidth != oldValue.detailViewMinWidth
         }
 
-        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
+        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
     var config = Configuration() {
@@ -74,23 +84,24 @@ public class TabbedSplitViewController: UIViewController {
 
     private var futureTraits: UITraitCollection?
 
-    private var hideDetailView: Bool = false {
+    private var hideTabBarView: Bool = false {
         didSet {
-            if hideDetailView != detailVC.view.isHidden {
-                detailVC.view.isHidden = !detailVC.view.isHidden
-            }
-            masterVC.widthConstraint?.isActive = !hideDetailView
+            tabBar.view.isHidden = hideTabBarView
         }
     }
     private var hideMasterView: Bool = false {
         didSet {
-            if hideMasterView != masterVC.view.isHidden {
-                masterVC.view.isHidden = !masterVC.view.isHidden
-            }
+            masterVC.view.isHidden = hideMasterView
+        }
+    }
+    private var hideDetailView: Bool = false {
+        didSet {
+            detailVC.view.isHidden = hideDetailView
+            masterVC.widthConstraint?.isActive = !hideDetailView
         }
     }
 
-    init(items: [PKTabBarItem]) {
+    public init(items: [PKTabBarItem]) {
         mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(nibName: nil, bundle: nil)
@@ -129,12 +140,15 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        // Hide detail from main view if there is not enough width
-        if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
-            hideDetailView = hideDetail
+        if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
+            hideTabBarView = hideTabBar
         }
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
             hideMasterView = hideMaster
+        }
+        // Hide detail from main view if there is not enough width
+        if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
+            hideDetailView = hideDetail
         }
     }
 
@@ -154,6 +168,11 @@ public class TabbedSplitViewController: UIViewController {
             let hideMaster = hideMasterFunc(size, traits, config)
             print("hide master view: \(hideMaster)")
             hideMasterView = hideMaster
+        }
+        if let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
+            let hideTabBar = hideTabBarFunc(size, traits, config)
+            print("hide Tab Bar: \(hideTabBar)")
+            hideTabBarView = hideTabBar
         }
         futureTraits = nil
     }
@@ -309,6 +328,20 @@ private class PKMasterViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
 
+    private override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.text = "Master"
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(label)
+
+        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
+        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    }
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -324,6 +357,21 @@ private class PKDetailViewController: UIViewController {
 
     init() {
         super.init(nibName: nil, bundle: nil)
+    }
+
+    private override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16)
+        label.textColor = .white
+        label.text = "Detail"
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(label)
+
+        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
+        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
 
     required init?(coder aDecoder: NSCoder) {

@@ -14,6 +14,7 @@
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
 		9D50953D1B417791009D40C1 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */; };
+		C85A27161D98284600C57331 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = C85A27151D98284600C57331 /* Debug.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +39,7 @@
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
 		9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
+		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 			isa = PBXGroup;
 			children = (
 				9D50951A1B417592009D40C1 /* Info.plist */,
+				C85A27151D98284600C57331 /* Debug.xcconfig */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -175,6 +178,8 @@
 				TargetAttributes = {
 					9D5095151B417592009D40C1 = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = Q55Z242J3Y;
+						ProvisioningStyle = Automatic;
 					};
 					9D50952A1B417592009D40C1 = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -206,6 +211,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C85A27161D98284600C57331 /* Debug.xcconfig in Resources */,
 				9D5095211B417592009D40C1 /* Main.storyboard in Resources */,
 				9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */,
 				9D5095231B417592009D40C1 /* Images.xcassets in Resources */,
@@ -361,8 +367,10 @@
 		};
 		9D5095361B417592009D40C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C85A27151D98284600C57331 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = TabbedSplitViewControllerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
@@ -374,6 +382,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = TabbedSplitViewControllerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
