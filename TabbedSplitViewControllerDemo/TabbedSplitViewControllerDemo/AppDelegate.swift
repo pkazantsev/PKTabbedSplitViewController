@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import TabbedSplitViewController
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

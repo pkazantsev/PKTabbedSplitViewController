@@ -8,7 +8,7 @@
         <!--Tab bar split view controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController title="Tab bar split view controller" id="BYZ-38-t0r" customClass="TabbedSplitViewController" customModule="TabbedSplitViewControllerDemo" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Tab bar split view controller" id="BYZ-38-t0r" customClass="TabbedSplitViewController" customModule="TabbedSplitViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>

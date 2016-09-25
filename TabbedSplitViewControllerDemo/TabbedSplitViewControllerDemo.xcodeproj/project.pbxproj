@@ -13,8 +13,8 @@
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
-		9D50953D1B417791009D40C1 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */; };
 		C85A27161D98284600C57331 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = C85A27151D98284600C57331 /* Debug.xcconfig */; };
+		C85A274D1D9864E800C57331 /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,8 +38,8 @@
 		9D50952B1B417592009D40C1 /* TabbedSplitViewControllerDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabbedSplitViewControllerDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
-		9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TabbedSplitViewController.framework; path = "../../../../Library/Developer/Xcode/DerivedData/TabbedSplitViewController-gpxhywtxplqjksbmpgxcfxidqfsj/Build/Products/Debug-iphonesimulator/TabbedSplitViewController.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +47,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C85A274D1D9864E800C57331 /* TabbedSplitViewController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,10 +64,10 @@
 		9D50950D1B417592009D40C1 = {
 			isa = PBXGroup;
 			children = (
-				9D50953B1B4175F5009D40C1 /* TabbedSplitViewController */,
 				9D5095181B417592009D40C1 /* TabbedSplitViewControllerDemo */,
 				9D50952E1B417592009D40C1 /* TabbedSplitViewControllerDemoTests */,
 				9D5095171B417592009D40C1 /* Products */,
+				C85A274B1D9864E800C57331 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -118,13 +119,12 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		9D50953B1B4175F5009D40C1 /* TabbedSplitViewController */ = {
+		C85A274B1D9864E800C57331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				9D50953C1B417791009D40C1 /* TabbedSplitViewController.swift */,
+				C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */,
 			);
-			name = TabbedSplitViewController;
-			path = ../TabbedSplitViewController;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -233,7 +233,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D50951E1B417592009D40C1 /* ViewController.swift in Sources */,
-				9D50953D1B417791009D40C1 /* TabbedSplitViewController.swift in Sources */,
 				9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

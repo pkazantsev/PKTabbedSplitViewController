@@ -67,7 +67,7 @@ public class TabbedSplitViewController: UIViewController {
         fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
-    var config = Configuration() {
+    public var config = Configuration() {
         didSet {
             update(oldConfig: oldValue)
         }
@@ -196,7 +196,7 @@ public class TabbedSplitViewController: UIViewController {
 }
 
 @IBDesignable
-public class PKTabbedSplitView: UIView {
+private class PKTabbedSplitView: UIView {
     fileprivate var tabBarWidth: CGFloat = 0 {
         didSet {
             tabBarWidthConstraint.constant = tabBarWidth
@@ -210,7 +210,7 @@ public class PKTabbedSplitView: UIView {
     fileprivate let tabBarWidthConstraint: NSLayoutConstraint
     fileprivate let masterViewWidthConstraint: NSLayoutConstraint
 
-    public init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
+    fileprivate init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
         tabBarWidthConstraint = NSLayoutConstraint(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
         masterViewWidthConstraint = NSLayoutConstraint(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
 
@@ -292,7 +292,7 @@ private class PkTabBarItemTableViewCell: UITableViewCell {
     fileprivate let titleLabel = UILabel()
     fileprivate let iconImageView = UIImageView()
 
-    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         titleLabel.font = .systemFont(ofSize: 10)
@@ -324,7 +324,7 @@ private class PKMasterViewController: UIViewController {
 
     private(set) var widthConstraint: NSLayoutConstraint!
 
-    init() {
+    fileprivate init() {
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -355,7 +355,7 @@ private class PKMasterViewController: UIViewController {
 }
 private class PKDetailViewController: UIViewController {
 
-    init() {
+    fileprivate init() {
         super.init(nibName: nil, bundle: nil)
     }
 
