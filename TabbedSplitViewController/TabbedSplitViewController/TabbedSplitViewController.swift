@@ -84,23 +84,6 @@ public class TabbedSplitViewController: UIViewController {
 
     private var futureTraits: UITraitCollection?
 
-    private var hideTabBarView: Bool = false {
-        didSet {
-            tabBar.view.isHidden = hideTabBarView
-        }
-    }
-    private var hideMasterView: Bool = false {
-        didSet {
-            masterVC.view.isHidden = hideMasterView
-        }
-    }
-    private var hideDetailView: Bool = false {
-        didSet {
-            detailVC.view.isHidden = hideDetailView
-            masterVC.widthConstraint?.isActive = !hideDetailView
-        }
-    }
-
     public init(items: [PKTabBarItem]) {
         mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
 
@@ -141,14 +124,18 @@ public class TabbedSplitViewController: UIViewController {
         super.viewWillAppear(animated)
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            hideTabBarView = hideTabBar
+            mainView.hideTabBarView = hideTabBar
         }
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            hideMasterView = hideMaster
+            mainView.hideMasterView = hideMaster
+            if hideMaster {
+                self.mainView.remove(.master)
+                self.mainView.addMasterSideBar()
+            }
         }
         // Hide detail from main view if there is not enough width
         if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
-            hideDetailView = hideDetail
+            mainView.hideDetailView = hideDetail
         }
     }
 
@@ -158,21 +145,66 @@ public class TabbedSplitViewController: UIViewController {
     }
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         print("\(#function) -> \(size)")
+        var hideDetail = false
+        var hideMaster = false
+        var hideTabBar = false
+
         let traits = futureTraits ?? traitCollection
         if let hideDetailFunc = config.showDetailAsModalWithSizeChange {
-            let hideDetail = hideDetailFunc(size, traits, config)
+            hideDetail = hideDetailFunc(size, traits, config)
             print("hide detail view: \(hideDetail)")
-            hideDetailView = hideDetail
+
+            if mainView.hideDetailView != hideDetail {
+                if hideDetail {
+                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                        self.mainView.remove(.detail)
+                    })
+                } else {
+                    coordinator.animate(alongsideTransition: { (_) in
+                        self.mainView.add(.detail)
+                    }, completion: nil)
+                }
+            }
+
+            mainView.hideDetailView = hideDetail
         }
-        if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
-            let hideMaster = hideMasterFunc(size, traits, config)
+        if !hideDetail, let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
+            hideMaster = hideMasterFunc(size, traits, config)
             print("hide master view: \(hideMaster)")
-            hideMasterView = hideMaster
+
+            if mainView.hideMasterView != hideMaster {
+                if hideMaster {
+                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                        self.mainView.remove(.master)
+                        self.mainView.addMasterSideBar()
+                    })
+                } else {
+                    coordinator.animate(alongsideTransition: { (_) in
+                        self.mainView.removeMasterSideBar()
+                        self.mainView.add(.master)
+                    }, completion: nil)
+                }
+            }
+
+            mainView.hideMasterView = hideMaster
         }
-        if let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
-            let hideTabBar = hideTabBarFunc(size, traits, config)
+        if !(hideDetail && hideMaster), let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
+            hideTabBar = hideTabBarFunc(size, traits, config)
             print("hide Tab Bar: \(hideTabBar)")
-            hideTabBarView = hideTabBar
+
+            if mainView.hideTabBarView != hideTabBar {
+                if hideTabBar {
+                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                        self.mainView.remove(.tabBar)
+                    })
+                } else {
+                    coordinator.animate(alongsideTransition: { (_) in
+                        self.mainView.add(.tabBar)
+                    }, completion: nil)
+                }
+            }
+
+            mainView.hideTabBarView = hideTabBar
         }
         futureTraits = nil
     }
@@ -195,6 +227,16 @@ public class TabbedSplitViewController: UIViewController {
 
 }
 
+private enum StackViewItem: Int {
+    case tabBar
+    case master
+    case detail
+
+    var index: Int {
+        return rawValue
+    }
+}
+
 @IBDesignable
 private class PKTabbedSplitView: UIView {
     fileprivate var tabBarWidth: CGFloat = 0 {
@@ -210,9 +252,43 @@ private class PKTabbedSplitView: UIView {
     fileprivate let tabBarWidthConstraint: NSLayoutConstraint
     fileprivate let masterViewWidthConstraint: NSLayoutConstraint
 
+    fileprivate var hideTabBarView: Bool = false {
+        didSet {
+            stackViewItems[StackViewItem.tabBar.index].isHidden = hideTabBarView
+        }
+    }
+    fileprivate var hideMasterView: Bool = false {
+        didSet {
+            stackViewItems[StackViewItem.master.index].isHidden = hideMasterView
+        }
+    }
+    fileprivate var hideDetailView: Bool = false {
+        didSet {
+            stackViewItems[StackViewItem.detail.index].isHidden = hideDetailView
+            // When detail view is hidden the master view takes all available space
+            masterViewWidthConstraint.isActive = !hideDetailView
+        }
+    }
+
+    private var sideBarGestRecHelper: SideBarGestureRecognizerHelper?
+
+    private let stackView: UIStackView = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.alignment = .fill
+        $0.distribution = .fill
+        $0.axis = .horizontal
+        $0.spacing = 0
+
+        return $0
+    }(UIStackView())
+    /// Views saved here for us to be able to remove them from stack view and add back
+    private let stackViewItems: [UIView]
+
     fileprivate init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
         tabBarWidthConstraint = NSLayoutConstraint(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
         masterViewWidthConstraint = NSLayoutConstraint(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
+
+        stackViewItems = [tabBarView, masterView, detailView]
 
         super.init(frame: CGRect())
 
@@ -228,12 +304,13 @@ private class PKTabbedSplitView: UIView {
         masterView.translatesAutoresizingMaskIntoConstraints = false
         tabBarView.translatesAutoresizingMaskIntoConstraints = false
 
-        let stackView = UIStackView(arrangedSubviews: [tabBarView, masterView, detailView])
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.alignment = .fill
-        stackView.distribution = .fill
-        stackView.axis = .horizontal
-        stackView.spacing = 0
+        stackView.addSubview(detailView)
+        stackView.addSubview(masterView)
+        stackView.addSubview(tabBarView)
+
+        stackView.addArrangedSubview(tabBarView)
+        stackView.addArrangedSubview(masterView)
+        stackView.addArrangedSubview(detailView)
         addSubview(stackView)
 
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
@@ -242,6 +319,38 @@ private class PKTabbedSplitView: UIView {
 
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    fileprivate func add(_ item: StackViewItem) {
+        let view = stackViewItems[item.index]
+        if item.index >= stackView.arrangedSubviews.count {
+            stackView.addArrangedSubview(view)
+        } else {
+            stackView.insertArrangedSubview(view, at: item.index)
+        }
+    }
+    fileprivate func remove(_ item: StackViewItem) {
+        let view = stackViewItems[item.index]
+        stackView.removeArrangedSubview(view)
+    }
+
+    /// Creates a side bar then adds a master view there.
+    /// Should be called after removing the view from the stack view!
+    fileprivate func addMasterSideBar() {
+        let view = stackViewItems[StackViewItem.master.index]
+
+        view.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+
+        let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
+        leadingConstraint.isActive = true
+
+        let helper = SideBarGestureRecognizerHelper(source: self, target: view, targetX: leadingConstraint, targetViewWidth: masterViewWidth, tabBarWidth: tabBarWidth)
+        sideBarGestRecHelper = helper
+    }
+
+    fileprivate func removeMasterSideBar() {
+        sideBarGestRecHelper = nil
     }
 
 }
@@ -376,6 +485,91 @@ private class PKDetailViewController: UIViewController {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+}
+
+private class SideBarGestureRecognizerHelper {
+
+    private let sourceView: UIView
+    private let targetView: UIView
+    private let xConstraint: NSLayoutConstraint
+    private let viewWidth: CGFloat
+    private let leftOffset: CGFloat
+
+    fileprivate let openViewRec: UIGestureRecognizer
+    fileprivate let closeViewRec: UIGestureRecognizer
+    fileprivate var didOpen: (() -> Void)?
+
+    private var startingPoint: CGFloat = 0
+
+    fileprivate init(source: UIView, target: UIView, targetX: NSLayoutConstraint, targetViewWidth: CGFloat, tabBarWidth: CGFloat) {
+        sourceView = source
+        targetView = target
+        xConstraint = targetX
+        viewWidth = targetViewWidth
+        leftOffset = tabBarWidth
+
+        let rec1 = UIScreenEdgePanGestureRecognizer()
+        sourceView.addGestureRecognizer(rec1)
+        openViewRec = rec1
+
+        let rec2 = UIPanGestureRecognizer()
+        targetView.addGestureRecognizer(rec2)
+        closeViewRec = rec2
+
+        rec1.edges = .left
+        rec1.addTarget(self, action: #selector(handleGesture(_:)))
+        rec2.addTarget(self, action: #selector(handleGesture(_:)))
+    }
+    deinit {
+        sourceView.removeGestureRecognizer(openViewRec)
+        targetView.removeGestureRecognizer(closeViewRec)
+        xConstraint.isActive = false
+    }
+
+    @objc private func handleGesture(_ rec: UIGestureRecognizer) {
+        let isOpenGestRec = (rec == openViewRec)
+        switch rec.state {
+        case .began:
+            let point = rec.location(ofTouch: 0, in: sourceView).x
+            //print("\((isOpenGestRec ? "Open" : "Close")): gesture began: \(point)")
+            startingPoint = point
+            targetView.isHidden = false
+            break
+        case .changed:
+            let point = rec.location(ofTouch: 0, in: sourceView).x
+            //print("\((isOpenGestRec ? "Open" : "Close")): gesture changed: \(point)")
+            if isOpenGestRec {
+                let maxPoint = viewWidth + startingPoint
+                xConstraint.constant = ((point < maxPoint) ? point - startingPoint - viewWidth : 0) + leftOffset
+            } else {
+                xConstraint.constant = ((point < startingPoint) ? point - startingPoint : 0) + leftOffset
+            }
+            //print("    constraint: \(xConstraint.constant)")
+        case .ended:
+            //print("\((isOpenGestRec ? "Open" : "Close")): gesture ended")
+            let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
+            //print("    Should open: \(shouldOpen) (\(xConstraint.constant), \(abs(xConstraint.constant - leftOffset)))")
+            let duration = 0.35 * ((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2))
+            xConstraint.constant = (shouldOpen ? 0 : -viewWidth) + leftOffset
+            //print("    constraint: \(xConstraint.constant)")
+            UIView.animate(withDuration: TimeInterval(duration)) {
+                self.sourceView.layoutIfNeeded()
+            }
+            if shouldOpen && isOpenGestRec {
+                openViewRec.isEnabled = false
+                didOpen?()
+            }
+            if !shouldOpen && !isOpenGestRec {
+                openViewRec.isEnabled = true
+            }
+        case .cancelled:
+            //print("gesture cancelled")
+            break
+        default:
+            break
+        }
     }
 
 }
