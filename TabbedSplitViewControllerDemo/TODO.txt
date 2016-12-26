@@ -1,0 +1,5 @@
+
+
+[ ] iPad: Add opening of master view in portrait after tap on an tab bar item
+[ ] iPad: Add an overlay over a detail view when master view is open, animating opacity while opening
+[•] iPhone: Opening of a modal detail view

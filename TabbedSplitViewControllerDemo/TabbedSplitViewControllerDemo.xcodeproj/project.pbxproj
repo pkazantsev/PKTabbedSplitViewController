@@ -13,8 +13,9 @@
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
-		C85A27161D98284600C57331 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = C85A27151D98284600C57331 /* Debug.xcconfig */; };
 		C85A274D1D9864E800C57331 /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */; };
+		C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CF86D71E104535000D2B4B /* DetailController.swift */; };
+		C8E573861E11CE6700534598 /* TODO.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E573851E11CE6700534598 /* TODO.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,8 @@
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TabbedSplitViewController.framework; path = "../../../../Library/Developer/Xcode/DerivedData/TabbedSplitViewController-gpxhywtxplqjksbmpgxcfxidqfsj/Build/Products/Debug-iphonesimulator/TabbedSplitViewController.framework"; sourceTree = "<group>"; };
+		C8CF86D71E104535000D2B4B /* DetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
+		C8E573851E11CE6700534598 /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,7 @@
 				9D50952E1B417592009D40C1 /* TabbedSplitViewControllerDemoTests */,
 				9D5095171B417592009D40C1 /* Products */,
 				C85A274B1D9864E800C57331 /* Frameworks */,
+				C8E573851E11CE6700534598 /* TODO.txt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -84,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				9D50951B1B417592009D40C1 /* AppDelegate.swift */,
+				C8CF86D71E104535000D2B4B /* DetailController.swift */,
 				9D50951D1B417592009D40C1 /* ViewController.swift */,
 				9D50951F1B417592009D40C1 /* Main.storyboard */,
 				9D5095221B417592009D40C1 /* Images.xcassets */,
@@ -173,7 +178,7 @@
 			attributes = {
 				LastSwiftMigration = 0700;
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0820;
 				ORGANIZATIONNAME = "Pavel Kazantsev";
 				TargetAttributes = {
 					9D5095151B417592009D40C1 = {
@@ -211,7 +216,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C85A27161D98284600C57331 /* Debug.xcconfig in Resources */,
+				C8E573861E11CE6700534598 /* TODO.txt in Resources */,
 				9D5095211B417592009D40C1 /* Main.storyboard in Resources */,
 				9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */,
 				9D5095231B417592009D40C1 /* Images.xcassets in Resources */,
@@ -233,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D50951E1B417592009D40C1 /* ViewController.swift in Sources */,
+				C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */,
 				9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

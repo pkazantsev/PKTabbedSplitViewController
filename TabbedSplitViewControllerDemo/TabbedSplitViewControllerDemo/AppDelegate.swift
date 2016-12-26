@@ -24,15 +24,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             config.showDetailAsModalWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                return traits.horizontalSizeClass == .compact && size.width <= 370
+                return traits.horizontalSizeClass == .compact //&& size.width <= 370
             }
             config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
                 return traits.horizontalSizeClass == .compact && size.width <= 320
             }
 
+            let vc1 = ViewController()
+            vc1.screenText = "Screen 1111"
+            vc1.onButtonPressed = { [unowned viewController] text in
+                let controller = DetailController(text: "Button: \(text)")
+                viewController.showDetailViewController(controller, sender: nil)
+            }
+            let vc2 = ViewController()
+            vc2.onButtonPressed = { [unowned viewController] text in
+                let controller = DetailController(text: "Button: \(text)")
+                viewController.showDetailViewController(controller, sender: nil)
+            }
+            vc2.screenText = "Screen 22222"
+
             viewController.config = config
-            viewController.add(PKTabBarItem(viewController: ViewController(), title: "Controller", image: UIImage(named: "Peotr")!))
+            viewController.add(PKTabBarItem(with: vc1, title: "Screen 1", image: #imageLiteral(resourceName: "Peotr")))
+            viewController.add(PKTabBarItem(with: vc2, title: "Screen 2", image: #imageLiteral(resourceName: "Peotr")))
         }
 
         return true

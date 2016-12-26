@@ -17,12 +17,19 @@ public struct PKTabBarItem {
     /// View controller that should be opened by tap on the item
     public let viewController: UIViewController
 
-    public init(viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
+    ///
+    public init(with viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
         self.title = title
         self.image = image
         self.selectedImage = selectedImage;
         self.viewController = viewController
     }
+}
+
+public protocol PKDetailViewControllerPresenter {
+
+    var viewController: UIViewController? { get set }
+
 }
 
 public class TabbedSplitViewController: UIViewController {
@@ -73,14 +80,17 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
-    private(set) var masterViewController: UIViewController?
+    private(set) var masterViewController: UIViewController? {
+        didSet {
+            self.masterVC.viewController = masterViewController
+        }
+    }
     private var detailViewController: UIViewController?
 
     private let masterVC = PKMasterViewController()
     private let detailVC = PKDetailViewController()
     private let tabBar = PKTabBar()
     private let mainView: PKTabbedSplitView
-    private var masterViewIsHidden: Bool = false
 
     private var futureTraits: UITraitCollection?
 
@@ -104,6 +114,11 @@ public class TabbedSplitViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+
+        tabBar.didSelectCallback = { [unowned self] item in
+            let controller = item.viewController
+            self.masterViewController = controller
+        }
 
         addChildViewController(tabBar)
         addChildViewController(masterVC)
@@ -137,6 +152,8 @@ public class TabbedSplitViewController: UIViewController {
         if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
             mainView.hideDetailView = hideDetail
         }
+
+        tabBar.selectedItemIndex = 0
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -207,6 +224,12 @@ public class TabbedSplitViewController: UIViewController {
             mainView.hideTabBarView = hideTabBar
         }
         futureTraits = nil
+    }
+
+    public override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
+        detailVC.viewController = vc
+
+        // Show Detail screen if needed
     }
 
     public func add(_ item: PKTabBarItem) {
@@ -292,25 +315,22 @@ private class PKTabbedSplitView: UIView {
 
         super.init(frame: CGRect())
 
+        translatesAutoresizingMaskIntoConstraints = false
         tabBarView.addConstraint(tabBarWidthConstraint)
         masterView.addConstraint(masterViewWidthConstraint)
 
-        detailView.preservesSuperviewLayoutMargins = true
-        masterView.preservesSuperviewLayoutMargins = true
-        tabBarView.preservesSuperviewLayoutMargins = true
-
-        translatesAutoresizingMaskIntoConstraints = false
-        detailView.translatesAutoresizingMaskIntoConstraints = false
-        masterView.translatesAutoresizingMaskIntoConstraints = false
-        tabBarView.translatesAutoresizingMaskIntoConstraints = false
-
+        // Different order from stackViewItems order due to layers order
+        // (details view should be at the bottom, then master view, tab bar should be at the top)
         stackView.addSubview(detailView)
         stackView.addSubview(masterView)
         stackView.addSubview(tabBarView)
 
-        stackView.addArrangedSubview(tabBarView)
-        stackView.addArrangedSubview(masterView)
-        stackView.addArrangedSubview(detailView)
+        for view in stackViewItems {
+            view.preservesSuperviewLayoutMargins = true
+            view.translatesAutoresizingMaskIntoConstraints = false
+            stackView.addArrangedSubview(view)
+        }
+
         addSubview(stackView)
 
         addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
@@ -369,7 +389,22 @@ private class PKTabBar: UITableViewController {
         }
     }
 
-    private override func viewDidLoad() {
+    /// Initial value: -1, don't select anything. Can not set -1 anytime later.
+    fileprivate var selectedItemIndex: Int = -1 {
+        didSet {
+            guard selectedItemIndex != oldValue else { return }
+
+            if selectedItemIndex >= 0 || selectedItemIndex < items.count {
+                didSelectCallback?(items[selectedItemIndex])
+            } else {
+                selectedItemIndex = 0
+            }
+        }
+    }
+
+    fileprivate var didSelectCallback: ((PKTabBarItem) -> Void)?
+
+    fileprivate override func viewDidLoad() {
         super.viewDidLoad()
 
         tableView.isScrollEnabled = false
@@ -380,11 +415,11 @@ private class PKTabBar: UITableViewController {
         tableView.register(PkTabBarItemTableViewCell.self, forCellReuseIdentifier: pkTabBarItemCellIdentifier)
     }
 
-    private override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    fileprivate override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return items.count
     }
 
-    private override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    fileprivate override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: pkTabBarItemCellIdentifier, for: indexPath) as! PkTabBarItemTableViewCell
 
         if items.count > indexPath.row {
@@ -395,6 +430,11 @@ private class PKTabBar: UITableViewController {
 
         return cell;
     }
+
+    fileprivate override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        didSelectCallback?(items[indexPath.row])
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
 }
 
 private class PkTabBarItemTableViewCell: UITableViewCell {
@@ -403,6 +443,8 @@ private class PkTabBarItemTableViewCell: UITableViewCell {
 
     fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+        selectionStyle = .none
 
         titleLabel.font = .systemFont(ofSize: 10)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -431,26 +473,20 @@ private class PkTabBarItemTableViewCell: UITableViewCell {
 
 private class PKMasterViewController: UIViewController {
 
+    fileprivate var viewController: UIViewController? {
+        didSet {
+            oldValue?.view.removeFromSuperview()
+            if let newViewController = viewController {
+                addChildViewController(newViewController)
+                addChildView(newViewController.view)
+            }
+        }
+    }
     private(set) var widthConstraint: NSLayoutConstraint!
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
     }
-
-    private override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
-        label.text = "Master"
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(label)
-
-        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-    }
-
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -462,27 +498,21 @@ private class PKMasterViewController: UIViewController {
     }
 
 }
-private class PKDetailViewController: UIViewController {
+private class PKDetailViewController: UIViewController, PKDetailViewControllerPresenter {
+
+    fileprivate var viewController: UIViewController? {
+        didSet {
+            oldValue?.view.removeFromSuperview()
+            if let newViewController = viewController {
+                addChildViewController(newViewController)
+                addChildView(newViewController.view)
+            }
+        }
+    }
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
     }
-
-    private override func viewDidLoad() {
-        super.viewDidLoad()
-
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
-        label.textColor = .white
-        label.text = "Detail"
-        label.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(label)
-
-        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-    }
-
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -570,6 +600,27 @@ private class SideBarGestureRecognizerHelper {
         default:
             break
         }
+    }
+
+}
+
+fileprivate extension UIViewController {
+
+    /// Add a view as a child to this view controller's view
+    ///  attaching all sides.
+    ///
+    /// - Parameter childView: a child view that will take all parent's space
+    fileprivate func addChildView(_ childView: UIView) {
+        view.addSubview(childView)
+
+        childView.translatesAutoresizingMaskIntoConstraints = false
+        let constraints = [
+            childView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            childView.topAnchor.constraint(equalTo: view.topAnchor),
+            childView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            childView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ]
+        view.addConstraints(constraints)
     }
 
 }
