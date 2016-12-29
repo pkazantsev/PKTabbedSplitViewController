@@ -122,7 +122,7 @@ public class TabbedSplitViewController: UIViewController {
 
         addChildViewController(tabBar)
         addChildViewController(masterVC)
-        addChildViewController(detailVC)
+        //addChildViewController(detailVC)
 
         masterVC.setWidthConstraint(mainView.masterViewWidthConstraint)
 
@@ -151,6 +151,9 @@ public class TabbedSplitViewController: UIViewController {
         // Hide detail from main view if there is not enough width
         if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
             mainView.hideDetailView = hideDetail
+            if !hideDetail {
+                addChildViewController(detailVC)
+            }
         }
 
         tabBar.selectedItemIndex = 0
@@ -230,6 +233,10 @@ public class TabbedSplitViewController: UIViewController {
         detailVC.viewController = vc
 
         // Show Detail screen if needed
+        if mainView.hideDetailView {
+//            present(detailVC, animated: true)
+            show(detailVC, sender: nil)
+        }
     }
 
     public func add(_ item: PKTabBarItem) {
@@ -257,6 +264,13 @@ private enum StackViewItem: Int {
 
     var index: Int {
         return rawValue
+    }
+    var hierarchyIndex: Int {
+        switch self {
+        case .tabBar: return 2
+        case .master: return 1
+        case .detail: return 0
+        }
     }
 }
 
@@ -287,9 +301,17 @@ private class PKTabbedSplitView: UIView {
     }
     fileprivate var hideDetailView: Bool = false {
         didSet {
-            stackViewItems[StackViewItem.detail.index].isHidden = hideDetailView
+            let detailView = stackViewItems[StackViewItem.detail.index]
+            if hideDetailView {
+                stackView.removeArrangedSubview(detailView)
+                detailView.removeFromSuperview()
+            } else if detailView.superview == nil {
+                stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
+                stackView.insertArrangedSubview(detailView, at: StackViewItem.detail.index)
+            }
             // When detail view is hidden the master view takes all available space
             masterViewWidthConstraint.isActive = !hideDetailView
+            //detailView.translatesAutoresizingMaskIntoConstraints = hideDetailView
         }
     }
 
@@ -308,14 +330,13 @@ private class PKTabbedSplitView: UIView {
     private let stackViewItems: [UIView]
 
     fileprivate init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
-        tabBarWidthConstraint = NSLayoutConstraint(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
-        masterViewWidthConstraint = NSLayoutConstraint(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
+        tabBarWidthConstraint = .init(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
+        masterViewWidthConstraint = .init(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
 
         stackViewItems = [tabBarView, masterView, detailView]
 
         super.init(frame: CGRect())
 
-        translatesAutoresizingMaskIntoConstraints = false
         tabBarView.addConstraint(tabBarWidthConstraint)
         masterView.addConstraint(masterViewWidthConstraint)
 
@@ -326,15 +347,13 @@ private class PKTabbedSplitView: UIView {
         stackView.addSubview(tabBarView)
 
         for view in stackViewItems {
-            view.preservesSuperviewLayoutMargins = true
-            view.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(view)
         }
 
         addSubview(stackView)
 
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
-        addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
+        addConstraints(.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
+        addConstraints(.constraints(withVisualFormat: "H:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -343,6 +362,7 @@ private class PKTabbedSplitView: UIView {
 
     fileprivate func add(_ item: StackViewItem) {
         let view = stackViewItems[item.index]
+        stackView.insertSubview(view, at: item.hierarchyIndex)
         if item.index >= stackView.arrangedSubviews.count {
             stackView.addArrangedSubview(view)
         } else {
@@ -352,12 +372,14 @@ private class PKTabbedSplitView: UIView {
     fileprivate func remove(_ item: StackViewItem) {
         let view = stackViewItems[item.index]
         stackView.removeArrangedSubview(view)
+        view.removeFromSuperview()
     }
 
     /// Creates a side bar then adds a master view there.
     /// Should be called after removing the view from the stack view!
     fileprivate func addMasterSideBar() {
         let view = stackViewItems[StackViewItem.master.index]
+        stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
         view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
@@ -371,6 +393,8 @@ private class PKTabbedSplitView: UIView {
 
     fileprivate func removeMasterSideBar() {
         sideBarGestRecHelper = nil
+        let view = stackViewItems[StackViewItem.master.index]
+        view.removeFromSuperview()
     }
 
 }
@@ -406,6 +430,8 @@ private class PKTabBar: UITableViewController {
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
+
+        view.accessibilityIdentifier = "Tab Bar View"
 
         tableView.isScrollEnabled = false
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40));
@@ -460,9 +486,9 @@ private class PkTabBarItemTableViewCell: UITableViewCell {
         let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
 
 //        self.contentView.preservesSuperviewLayoutMargins = true
-        contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-        contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
-        contentView.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
+        contentView.addConstraints(.constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+        contentView.addConstraints(.constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
+        contentView.addConstraints(.constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -491,6 +517,12 @@ private class PKMasterViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    fileprivate override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.accessibilityIdentifier = "Master View"
+    }
+
     fileprivate func setWidthConstraint(_ constraint: NSLayoutConstraint) {
         if widthConstraint != nil {
             widthConstraint = constraint
@@ -515,6 +547,12 @@ private class PKDetailViewController: UIViewController, PKDetailViewControllerPr
     }
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    fileprivate override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.accessibilityIdentifier = "Detail View"
     }
 
 }
@@ -623,4 +661,11 @@ fileprivate extension UIViewController {
         view.addConstraints(constraints)
     }
 
+}
+
+extension Array where Element: NSLayoutConstraint {
+
+    static func constraints(withVisualFormat format: String, options opts: NSLayoutFormatOptions = [], metrics: [String : Any]?, views: [String : Any]) -> [NSLayoutConstraint] {
+        return NSLayoutConstraint.constraints(withVisualFormat: format, options: opts, metrics: metrics, views: views)
+    }
 }

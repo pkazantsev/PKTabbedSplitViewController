@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             config.showDetailAsModalWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                return traits.horizontalSizeClass == .compact //&& size.width <= 370
+                return traits.horizontalSizeClass == .compact && size.width <= 370
             }
             config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
@@ -35,12 +35,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             vc1.screenText = "Screen 1111"
             vc1.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
-                viewController.showDetailViewController(controller, sender: nil)
+                let navController = UINavigationController(rootViewController: controller)
+                viewController.showDetailViewController(navController, sender: nil)
             }
             let vc2 = ViewController()
             vc2.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
-                viewController.showDetailViewController(controller, sender: nil)
+                let navController = UINavigationController(rootViewController: controller)
+                viewController.showDetailViewController(navController, sender: nil)
             }
             vc2.screenText = "Screen 22222"
 

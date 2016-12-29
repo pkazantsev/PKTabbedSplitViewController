@@ -24,6 +24,8 @@ class DetailController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
+
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = text
@@ -32,6 +34,10 @@ class DetailController: UIViewController {
 
         label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+    }
+
+    @objc private func close(_ sender: UIBarButtonItem) {
+        presentingViewController?.dismiss(animated: true)
     }
 
 }
