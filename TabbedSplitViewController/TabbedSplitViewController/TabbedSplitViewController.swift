@@ -144,8 +144,7 @@ public class TabbedSplitViewController: UIViewController {
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
             mainView.hideMasterView = hideMaster
             if hideMaster {
-                self.mainView.remove(.master)
-                self.mainView.addMasterSideBar()
+                mainView.addMasterSideBar()
             }
         }
         // Hide detail from main view if there is not enough width
@@ -173,40 +172,24 @@ public class TabbedSplitViewController: UIViewController {
         if let hideDetailFunc = config.showDetailAsModalWithSizeChange {
             hideDetail = hideDetailFunc(size, traits, config)
             print("hide detail view: \(hideDetail)")
-
-            if mainView.hideDetailView != hideDetail {
-                if hideDetail {
-                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                        self.mainView.remove(.detail)
-                    })
-                } else {
-                    coordinator.animate(alongsideTransition: { (_) in
-                        self.mainView.add(.detail)
-                    }, completion: nil)
-                }
-            }
-
-            mainView.hideDetailView = hideDetail
         }
-        if !hideDetail, let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
+        if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
             hideMaster = hideMasterFunc(size, traits, config)
             print("hide master view: \(hideMaster)")
 
             if mainView.hideMasterView != hideMaster {
-                if hideMaster {
-                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                        self.mainView.remove(.master)
-                        self.mainView.addMasterSideBar()
-                    })
-                } else {
+                if !hideMaster {
                     coordinator.animate(alongsideTransition: { (_) in
                         self.mainView.removeMasterSideBar()
-                        self.mainView.add(.master)
+                        self.mainView.hideMasterView = false
                     }, completion: nil)
+                } else if !hideDetail {
+                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                        self.mainView.hideMasterView = true
+                        self.mainView.addMasterSideBar()
+                    })
                 }
             }
-
-            mainView.hideMasterView = hideMaster
         }
         if !(hideDetail && hideMaster), let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
             hideTabBar = hideTabBarFunc(size, traits, config)
@@ -215,17 +198,32 @@ public class TabbedSplitViewController: UIViewController {
             if mainView.hideTabBarView != hideTabBar {
                 if hideTabBar {
                     coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                        self.mainView.remove(.tabBar)
+                        self.mainView.hideTabBarView = true
                     })
                 } else {
                     coordinator.animate(alongsideTransition: { (_) in
-                        self.mainView.add(.tabBar)
+                        self.mainView.hideTabBarView = false
                     }, completion: nil)
                 }
             }
-
-            mainView.hideTabBarView = hideTabBar
         }
+
+        if mainView.hideDetailView != hideDetail {
+            if hideDetail {
+                coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                    self.mainView.removeDetailView()
+                })
+            } else {
+                coordinator.animate(alongsideTransition: { (_) in
+                    self.mainView.addDetailView()
+                }, completion: nil)
+            }
+            mainView.hideDetailView = hideDetail
+            if hideDetail {
+                detailVC.removeFromParentViewController()
+            }
+        }
+
         futureTraits = nil
     }
 
@@ -303,15 +301,12 @@ private class PKTabbedSplitView: UIView {
         didSet {
             let detailView = stackViewItems[StackViewItem.detail.index]
             if hideDetailView {
-                stackView.removeArrangedSubview(detailView)
-                detailView.removeFromSuperview()
+                removeDetailView()
             } else if detailView.superview == nil {
-                stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
-                stackView.insertArrangedSubview(detailView, at: StackViewItem.detail.index)
+                addDetailView()
             }
             // When detail view is hidden the master view takes all available space
             masterViewWidthConstraint.isActive = !hideDetailView
-            //detailView.translatesAutoresizingMaskIntoConstraints = hideDetailView
         }
     }
 
@@ -360,7 +355,8 @@ private class PKTabbedSplitView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    fileprivate func add(_ item: StackViewItem) {
+    fileprivate func addDetailView() {
+        let item = StackViewItem.detail
         let view = stackViewItems[item.index]
         stackView.insertSubview(view, at: item.hierarchyIndex)
         if item.index >= stackView.arrangedSubviews.count {
@@ -369,8 +365,8 @@ private class PKTabbedSplitView: UIView {
             stackView.insertArrangedSubview(view, at: item.index)
         }
     }
-    fileprivate func remove(_ item: StackViewItem) {
-        let view = stackViewItems[item.index]
+    fileprivate func removeDetailView() {
+        let view = stackViewItems[StackViewItem.detail.index]
         stackView.removeArrangedSubview(view)
         view.removeFromSuperview()
     }
@@ -379,6 +375,7 @@ private class PKTabbedSplitView: UIView {
     /// Should be called after removing the view from the stack view!
     fileprivate func addMasterSideBar() {
         let view = stackViewItems[StackViewItem.master.index]
+        stackView.removeArrangedSubview(view)
         stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -394,7 +391,10 @@ private class PKTabbedSplitView: UIView {
     fileprivate func removeMasterSideBar() {
         sideBarGestRecHelper = nil
         let view = stackViewItems[StackViewItem.master.index]
+        view.isHidden = true
         view.removeFromSuperview()
+        stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
+        stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
     }
 
 }
