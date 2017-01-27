@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		C85A27411D98637B00C57331 /* TabbedSplitViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */; };
+		C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +17,7 @@
 		C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TabbedSplitViewController.h; sourceTree = "<group>"; };
 		C85A27401D98637B00C57331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
+		C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitMainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 		C85A273E1D98637B00C57331 /* TabbedSplitViewController */ = {
 			isa = PBXGroup;
 			children = (
+				C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */,
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
 				C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */,
 				C85A27401D98637B00C57331 /* Info.plist */,
@@ -136,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */,
 				C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

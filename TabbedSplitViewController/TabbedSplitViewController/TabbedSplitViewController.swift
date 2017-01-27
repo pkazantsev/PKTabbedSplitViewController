@@ -10,19 +10,26 @@ import UIKit
 public struct PKTabBarItem {
     /// Item title
     public let title: String
-    /// Item image (up to 60pt)
+    /// Tab Bar item image
     public let image: UIImage
-    /// Item image – selected state
+    /// Tab Bar item image – selected state
     public let selectedImage: UIImage?
+    /// Navigation Bar item image
+    public let navigationBarImage: UIImage?
+    /// Navigation Bar item image – selected state
+    public let navigationBarSelectedImage: UIImage?
     /// View controller that should be opened by tap on the item
     public let viewController: UIViewController
 
     ///
-    public init(with viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil) {
+    public init(with viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil) {
         self.title = title
         self.image = image
-        self.selectedImage = selectedImage;
+        self.selectedImage = selectedImage
         self.viewController = viewController
+
+        self.navigationBarImage = navigationBarImage
+        self.navigationBarSelectedImage = navigationBarSelectedImage
     }
 }
 
@@ -74,10 +81,22 @@ public class TabbedSplitViewController: UIViewController {
         fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
+    /// Tabbed Split View Controller Configuration
     public var config = Configuration() {
         didSet {
             update(oldConfig: oldValue)
         }
+    }
+
+    /// This block returns a configured View Controller for a case when
+    /// a tab bar is hidden and a slidable navigation bar is used instead.
+    /// Accepts an array of items to configure the navigation view controller,
+    /// and a callback that should be called when an item is selected
+    public var configureNavigationBar: (_ items: [PKTabBarItem], _ didSelectCallback: @escaping (PKTabBarItem) -> Void) -> UIViewController = { items, callback in
+        let vc = PKTabBarAsSideBar()
+        vc.items = items
+        vc.didSelectCallback = callback
+        return vc
     }
 
     private(set) var masterViewController: UIViewController? {
@@ -93,6 +112,8 @@ public class TabbedSplitViewController: UIViewController {
     private let mainView: PKTabbedSplitView
 
     private var futureTraits: UITraitCollection?
+
+    private var sideNavigationBarViewController: UIViewController?
 
     public init(items: [PKTabBarItem]) {
         mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
@@ -140,6 +161,9 @@ public class TabbedSplitViewController: UIViewController {
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
             mainView.hideTabBarView = hideTabBar
+            if hideTabBar {
+                addNavigationSideBar()
+            }
         }
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
             mainView.hideMasterView = hideMaster
@@ -198,11 +222,13 @@ public class TabbedSplitViewController: UIViewController {
             if mainView.hideTabBarView != hideTabBar {
                 if hideTabBar {
                     coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                        self.addNavigationSideBar()
                         self.mainView.hideTabBarView = true
                     })
                 } else {
                     coordinator.animate(alongsideTransition: { (_) in
                         self.mainView.hideTabBarView = false
+                        self.removeNavigationSideBar()
                     }, completion: nil)
                 }
             }
@@ -225,6 +251,20 @@ public class TabbedSplitViewController: UIViewController {
         }
 
         futureTraits = nil
+    }
+
+    private func addNavigationSideBar() {
+        let navVC = configureNavigationBar(tabBar.items, tabBar.didSelectCallback!)
+        sideNavigationBarViewController = navVC
+        addChildViewController(navVC)
+        mainView.addNavigationBar(navVC.view)
+    }
+    private func removeNavigationSideBar() {
+        guard let navVC = sideNavigationBarViewController else { return }
+
+        navVC.removeFromParentViewController()
+        self.mainView.removeNavigationBar(navVC.view)
+        sideNavigationBarViewController = nil
     }
 
     public override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
@@ -255,151 +295,9 @@ public class TabbedSplitViewController: UIViewController {
 
 }
 
-private enum StackViewItem: Int {
-    case tabBar
-    case master
-    case detail
-
-    var index: Int {
-        return rawValue
-    }
-    var hierarchyIndex: Int {
-        switch self {
-        case .tabBar: return 2
-        case .master: return 1
-        case .detail: return 0
-        }
-    }
-}
-
-@IBDesignable
-private class PKTabbedSplitView: UIView {
-    fileprivate var tabBarWidth: CGFloat = 0 {
-        didSet {
-            tabBarWidthConstraint.constant = tabBarWidth
-        }
-    }
-    fileprivate var masterViewWidth: CGFloat = 0 {
-        didSet {
-            masterViewWidthConstraint.constant = masterViewWidth
-        }
-    }
-    fileprivate let tabBarWidthConstraint: NSLayoutConstraint
-    fileprivate let masterViewWidthConstraint: NSLayoutConstraint
-
-    fileprivate var hideTabBarView: Bool = false {
-        didSet {
-            stackViewItems[StackViewItem.tabBar.index].isHidden = hideTabBarView
-        }
-    }
-    fileprivate var hideMasterView: Bool = false {
-        didSet {
-            stackViewItems[StackViewItem.master.index].isHidden = hideMasterView
-        }
-    }
-    fileprivate var hideDetailView: Bool = false {
-        didSet {
-            let detailView = stackViewItems[StackViewItem.detail.index]
-            if hideDetailView {
-                removeDetailView()
-            } else if detailView.superview == nil {
-                addDetailView()
-            }
-            // When detail view is hidden the master view takes all available space
-            masterViewWidthConstraint.isActive = !hideDetailView
-        }
-    }
-
-    private var sideBarGestRecHelper: SideBarGestureRecognizerHelper?
-
-    private let stackView: UIStackView = {
-        $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.alignment = .fill
-        $0.distribution = .fill
-        $0.axis = .horizontal
-        $0.spacing = 0
-
-        return $0
-    }(UIStackView())
-    /// Views saved here for us to be able to remove them from stack view and add back
-    private let stackViewItems: [UIView]
-
-    fileprivate init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
-        tabBarWidthConstraint = .init(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
-        masterViewWidthConstraint = .init(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
-
-        stackViewItems = [tabBarView, masterView, detailView]
-
-        super.init(frame: CGRect())
-
-        tabBarView.addConstraint(tabBarWidthConstraint)
-        masterView.addConstraint(masterViewWidthConstraint)
-
-        // Different order from stackViewItems order due to layers order
-        // (details view should be at the bottom, then master view, tab bar should be at the top)
-        stackView.addSubview(detailView)
-        stackView.addSubview(masterView)
-        stackView.addSubview(tabBarView)
-
-        for view in stackViewItems {
-            stackView.addArrangedSubview(view)
-        }
-
-        addSubview(stackView)
-
-        addConstraints(.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
-        addConstraints(.constraints(withVisualFormat: "H:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
-    }
-
-    public required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    fileprivate func addDetailView() {
-        let item = StackViewItem.detail
-        let view = stackViewItems[item.index]
-        stackView.insertSubview(view, at: item.hierarchyIndex)
-        if item.index >= stackView.arrangedSubviews.count {
-            stackView.addArrangedSubview(view)
-        } else {
-            stackView.insertArrangedSubview(view, at: item.index)
-        }
-    }
-    fileprivate func removeDetailView() {
-        let view = stackViewItems[StackViewItem.detail.index]
-        stackView.removeArrangedSubview(view)
-        view.removeFromSuperview()
-    }
-
-    /// Creates a side bar then adds a master view there.
-    /// Should be called after removing the view from the stack view!
-    fileprivate func addMasterSideBar() {
-        let view = stackViewItems[StackViewItem.master.index]
-        stackView.removeArrangedSubview(view)
-        stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
-
-        view.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-
-        let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
-        leadingConstraint.isActive = true
-
-        let helper = SideBarGestureRecognizerHelper(source: self, target: view, targetX: leadingConstraint, targetViewWidth: masterViewWidth, tabBarWidth: tabBarWidth)
-        sideBarGestRecHelper = helper
-    }
-
-    fileprivate func removeMasterSideBar() {
-        sideBarGestRecHelper = nil
-        let view = stackViewItems[StackViewItem.master.index]
-        view.isHidden = true
-        view.removeFromSuperview()
-        stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
-        stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
-    }
-
-}
 
 private let pkTabBarItemCellIdentifier = "PkTabBarItemCellIdentifier"
+private let pkSideBarTabBarItemCellIdentifier = "PkSideBarTabBarItemCellIdentifier"
 
 private class PKTabBar: UITableViewController {
     fileprivate var items = [PKTabBarItem]() {
@@ -434,11 +332,16 @@ private class PKTabBar: UITableViewController {
         view.accessibilityIdentifier = "Tab Bar View"
 
         tableView.isScrollEnabled = false
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40));
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40))
         tableView.estimatedRowHeight = 40
         tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0)
-//        self.tableView.separatorStyle = .None
-        tableView.register(PkTabBarItemTableViewCell.self, forCellReuseIdentifier: pkTabBarItemCellIdentifier)
+//        self.tableView.separatorStyle = .none
+
+        registerCells()
+    }
+
+    fileprivate func registerCells() {
+        tableView.register(PKTabBarItemTableViewCell.self, forCellReuseIdentifier: pkTabBarItemCellIdentifier)
     }
 
     fileprivate override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -446,15 +349,16 @@ private class PKTabBar: UITableViewController {
     }
 
     fileprivate override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: pkTabBarItemCellIdentifier, for: indexPath) as! PkTabBarItemTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: pkTabBarItemCellIdentifier, for: indexPath) as! PKTabBarItemTableViewCell
 
         if items.count > indexPath.row {
             let item = items[indexPath.row]
             cell.titleLabel.text = item.title
             cell.iconImageView.image = item.image
+            // TODO: Add an image for selected state
         }
 
-        return cell;
+        return cell
     }
 
     fileprivate override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -463,36 +367,99 @@ private class PKTabBar: UITableViewController {
     }
 }
 
-private class PkTabBarItemTableViewCell: UITableViewCell {
-    fileprivate let titleLabel = UILabel()
-    fileprivate let iconImageView = UIImageView()
+private class PKTabBarAsSideBar: PKTabBar {
+
+    fileprivate override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.accessibilityIdentifier = "Tab Bar Side Bar View"
+    }
+
+    fileprivate override func registerCells() {
+        tableView.register(PKSideTabBarItemTableViewCell.self, forCellReuseIdentifier: pkSideBarTabBarItemCellIdentifier)
+    }
+
+    fileprivate override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: pkSideBarTabBarItemCellIdentifier, for: indexPath) as! PKSideTabBarItemTableViewCell
+
+        if items.count > indexPath.row {
+            let item = items[indexPath.row]
+            cell.titleLabel.text = item.title
+            cell.iconImageView.image = item.navigationBarImage ?? item.image
+            // TODO: Add an image for selected state
+        }
+
+        return cell
+    }
+}
+
+private class PKTabBarItemTableViewCell: UITableViewCell {
+    fileprivate let titleLabel = UILabel().then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
+    fileprivate let iconImageView = UIImageView().then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+    }
 
     fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
-        selectionStyle = .none
-
-        titleLabel.font = .systemFont(ofSize: 10)
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.setContentHuggingPriority(249, for: .vertical)
-        titleLabel.textAlignment = .center
-
-        iconImageView.contentMode = .center
-        iconImageView.translatesAutoresizingMaskIntoConstraints = false
+        configureLabel()
+        configureImageView()
 
         contentView.addSubview(titleLabel)
         contentView.addSubview(iconImageView)
 
-        let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
+        addConstraints()
 
-//        self.contentView.preservesSuperviewLayoutMargins = true
-        contentView.addConstraints(.constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-        contentView.addConstraints(.constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
-        contentView.addConstraints(.constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, metrics: nil, views: views));
+        configureCell()
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    fileprivate func configureCell() {
+        selectionStyle = .none
+    }
+
+    fileprivate func configureLabel() {
+        titleLabel.font = .systemFont(ofSize: 10)
+        titleLabel.setContentHuggingPriority(249, for: .vertical)
+        titleLabel.textAlignment = .center
+    }
+
+    fileprivate func configureImageView() {
+        iconImageView.contentMode = .center
+    }
+
+    fileprivate func addConstraints() {
+        let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
+
+        contentView.addConstraints(.constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: [], metrics: nil, views: views))
+        contentView.addConstraints(.constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+        contentView.addConstraints(.constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+    }
+
+}
+
+private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
+
+    fileprivate override func configureLabel() {
+        titleLabel.font = .systemFont(ofSize: 15)
+        titleLabel.setContentHuggingPriority(249, for: .vertical)
+    }
+
+    fileprivate override func configureImageView() {
+        iconImageView.contentMode = .scaleAspectFit
+    }
+
+    fileprivate override func addConstraints() {
+        let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
+
+        contentView.addConstraints(.constraints(withVisualFormat: "H:|-[iconImageView]-[titleLabel]-|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+        contentView.addConstraints(.constraints(withVisualFormat: "V:|-[iconImageView(24)]-|", options: [], metrics: nil, views: views))
+        contentView.addConstraints(.constraints(withVisualFormat: "V:|-[titleLabel]-|", options: [], metrics: nil, views: views))
     }
 
 }
@@ -557,91 +524,6 @@ private class PKDetailViewController: UIViewController, PKDetailViewControllerPr
 
 }
 
-private class SideBarGestureRecognizerHelper {
-
-    private let sourceView: UIView
-    private let targetView: UIView
-    private let xConstraint: NSLayoutConstraint
-    private let viewWidth: CGFloat
-    private let leftOffset: CGFloat
-
-    fileprivate let openViewRec: UIGestureRecognizer
-    fileprivate let closeViewRec: UIGestureRecognizer
-    fileprivate var didOpen: (() -> Void)?
-
-    private var startingPoint: CGFloat = 0
-
-    fileprivate init(source: UIView, target: UIView, targetX: NSLayoutConstraint, targetViewWidth: CGFloat, tabBarWidth: CGFloat) {
-        sourceView = source
-        targetView = target
-        xConstraint = targetX
-        viewWidth = targetViewWidth
-        leftOffset = tabBarWidth
-
-        let rec1 = UIScreenEdgePanGestureRecognizer()
-        sourceView.addGestureRecognizer(rec1)
-        openViewRec = rec1
-
-        let rec2 = UIPanGestureRecognizer()
-        targetView.addGestureRecognizer(rec2)
-        closeViewRec = rec2
-
-        rec1.edges = .left
-        rec1.addTarget(self, action: #selector(handleGesture(_:)))
-        rec2.addTarget(self, action: #selector(handleGesture(_:)))
-    }
-    deinit {
-        sourceView.removeGestureRecognizer(openViewRec)
-        targetView.removeGestureRecognizer(closeViewRec)
-        xConstraint.isActive = false
-    }
-
-    @objc private func handleGesture(_ rec: UIGestureRecognizer) {
-        let isOpenGestRec = (rec == openViewRec)
-        switch rec.state {
-        case .began:
-            let point = rec.location(ofTouch: 0, in: sourceView).x
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture began: \(point)")
-            startingPoint = point
-            targetView.isHidden = false
-            break
-        case .changed:
-            let point = rec.location(ofTouch: 0, in: sourceView).x
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture changed: \(point)")
-            if isOpenGestRec {
-                let maxPoint = viewWidth + startingPoint
-                xConstraint.constant = ((point < maxPoint) ? point - startingPoint - viewWidth : 0) + leftOffset
-            } else {
-                xConstraint.constant = ((point < startingPoint) ? point - startingPoint : 0) + leftOffset
-            }
-            //print("    constraint: \(xConstraint.constant)")
-        case .ended:
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture ended")
-            let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
-            //print("    Should open: \(shouldOpen) (\(xConstraint.constant), \(abs(xConstraint.constant - leftOffset)))")
-            let duration = 0.35 * ((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2))
-            xConstraint.constant = (shouldOpen ? 0 : -viewWidth) + leftOffset
-            //print("    constraint: \(xConstraint.constant)")
-            UIView.animate(withDuration: TimeInterval(duration)) {
-                self.sourceView.layoutIfNeeded()
-            }
-            if shouldOpen && isOpenGestRec {
-                openViewRec.isEnabled = false
-                didOpen?()
-            }
-            if !shouldOpen && !isOpenGestRec {
-                openViewRec.isEnabled = true
-            }
-        case .cancelled:
-            //print("gesture cancelled")
-            break
-        default:
-            break
-        }
-    }
-
-}
-
 fileprivate extension UIViewController {
 
     /// Add a view as a child to this view controller's view
@@ -669,3 +551,17 @@ extension Array where Element: NSLayoutConstraint {
         return NSLayoutConstraint.constraints(withVisualFormat: format, options: opts, metrics: metrics, views: views)
     }
 }
+
+public protocol Then {}
+
+extension Then where Self: Any {
+
+    public func then(_ block: (inout Self) -> Void) -> Self {
+        var copy = self
+        block(&copy)
+        return copy
+    }
+    
+}
+
+extension NSObject: Then {}
