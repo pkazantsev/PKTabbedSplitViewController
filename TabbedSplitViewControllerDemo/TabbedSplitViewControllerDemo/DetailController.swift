@@ -24,6 +24,8 @@ class DetailController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        title = text
+
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
 
         let label = UILabel()

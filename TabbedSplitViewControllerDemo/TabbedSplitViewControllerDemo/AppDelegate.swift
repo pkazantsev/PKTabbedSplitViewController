@@ -47,12 +47,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             vc2.screenText = "Screen 22222"
 
             viewController.config = config
-            viewController.add(PKTabBarItem(with: vc1, title: "Screen 1", image: #imageLiteral(resourceName: "Peotr")))
-            viewController.add(PKTabBarItem(with: vc2, title: "Screen 2", image: #imageLiteral(resourceName: "Peotr")))
+            viewController.add(PKTabBarItem(with: vc1.embeddedInNavigationController(), title: "Screen 1", image: #imageLiteral(resourceName: "Peotr")))
+            viewController.add(PKTabBarItem(with: vc2.embeddedInNavigationController(), title: "Screen 2", image: #imageLiteral(resourceName: "Peotr")))
         }
 
         return true
     }
 
+}
+
+extension UIViewController {
+
+    /// Returns navigation controller instance with current controller as a root view controller
+    func embeddedInNavigationController() -> UINavigationController {
+        return embeddedInNavigationController(presentationStyle: .none)
+    }
+    /// Returns navigation controller instance with current controller as a root view controller
+    func embeddedInNavigationController(presentationStyle: UIModalPresentationStyle) -> UINavigationController {
+        let navController = UINavigationController(rootViewController: self)
+        navController.modalPresentationStyle = presentationStyle
+        return navController
+    }
+    
 }
 
