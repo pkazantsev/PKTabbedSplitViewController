@@ -13,11 +13,11 @@ public struct PKTabBarItem {
     /// Tab Bar item image
     public let image: UIImage
     /// Tab Bar item image – selected state
-    public let selectedImage: UIImage?
+    public var selectedImage: UIImage?
     /// Navigation Bar item image
-    public let navigationBarImage: UIImage?
+    public var navigationBarImage: UIImage?
     /// Navigation Bar item image – selected state
-    public let navigationBarSelectedImage: UIImage?
+    public var navigationBarSelectedImage: UIImage?
     /// View controller that should be opened by tap on the item
     public let viewController: UIViewController
 
@@ -160,22 +160,33 @@ public class TabbedSplitViewController: UIViewController {
         super.viewWillAppear(animated)
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            mainView.hideTabBarView = hideTabBar
-            if hideTabBar {
-                addNavigationSideBar()
+            if mainView.hideTabBarView != hideTabBar {
+                mainView.hideTabBarView = hideTabBar
+                if hideTabBar {
+                    addNavigationSideBar()
+                }
             }
         }
+        tabBar.didMove(toParentViewController: self)
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            mainView.hideMasterView = hideMaster
-            if hideMaster {
-                mainView.addMasterSideBar()
+            if mainView.hideMasterView != hideMaster {
+                mainView.hideMasterView = hideMaster
+                if hideMaster {
+                    mainView.addMasterSideBar()
+                }
             }
         }
+        masterVC.didMove(toParentViewController: self)
         // Hide detail from main view if there is not enough width
         if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
-            mainView.hideDetailView = hideDetail
-            if !hideDetail {
-                addChildViewController(detailVC)
+            if mainView.hideDetailView != hideDetail {
+                if !hideDetail {
+                    addChildViewController(detailVC)
+                }
+                mainView.hideDetailView = hideDetail
+                if !hideDetail {
+                    detailVC.didMove(toParentViewController: self)
+                }
             }
         }
 
@@ -236,6 +247,7 @@ public class TabbedSplitViewController: UIViewController {
 
         if mainView.hideDetailView != hideDetail {
             if hideDetail {
+                detailVC.willMove(toParentViewController: nil)
                 coordinator.animate(alongsideTransition: nil, completion: { (_) in
                     self.mainView.removeDetailView()
                 })
@@ -258,22 +270,27 @@ public class TabbedSplitViewController: UIViewController {
         sideNavigationBarViewController = navVC
         addChildViewController(navVC)
         mainView.addNavigationBar(navVC.view)
+        navVC.didMove(toParentViewController: self)
     }
     private func removeNavigationSideBar() {
         guard let navVC = sideNavigationBarViewController else { return }
 
-        navVC.removeFromParentViewController()
+        navVC.willMove(toParentViewController: nil)
         self.mainView.removeNavigationBar(navVC.view)
+        navVC.removeFromParentViewController()
         sideNavigationBarViewController = nil
     }
 
     public override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
-        detailVC.viewController = vc
-
         // Show Detail screen if needed
         if mainView.hideDetailView {
-//            present(detailVC, animated: true)
-            show(detailVC, sender: nil)
+            // FIXME: View comes transparent and window is black – does not look good
+            if vc.view.backgroundColor == nil {
+                vc.view.backgroundColor = .white
+            }
+            show(vc, sender: sender)
+        } else {
+            detailVC.viewController = vc
         }
     }
 
@@ -468,10 +485,15 @@ private class PKMasterViewController: UIViewController {
 
     fileprivate var viewController: UIViewController? {
         didSet {
-            oldValue?.view.removeFromSuperview()
-            if let newViewController = viewController {
-                addChildViewController(newViewController)
-                addChildView(newViewController.view)
+            if let prev = oldValue {
+                prev.willMove(toParentViewController: nil)
+                prev.view.removeFromSuperview()
+                prev.removeFromParentViewController()
+            }
+            if let next = viewController {
+                addChildViewController(next)
+                addChildView(next.view)
+                next.didMove(toParentViewController: self)
             }
         }
     }
@@ -501,10 +523,14 @@ private class PKDetailViewController: UIViewController, PKDetailViewControllerPr
 
     fileprivate var viewController: UIViewController? {
         didSet {
-            oldValue?.view.removeFromSuperview()
-            if let newViewController = viewController {
-                addChildViewController(newViewController)
-                addChildView(newViewController.view)
+            if let prev = oldValue {
+                prev.view.removeFromSuperview()
+                prev.removeFromParentViewController()
+            }
+            if let next = viewController {
+                addChildViewController(next)
+                addChildView(next.view)
+                next.didMove(toParentViewController: self)
             }
         }
     }

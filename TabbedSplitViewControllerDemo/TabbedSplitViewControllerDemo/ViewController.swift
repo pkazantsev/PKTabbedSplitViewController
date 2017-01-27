@@ -35,7 +35,7 @@ class ViewController: UIViewController {
         let button1 = UIButton(type: .system)
         button1.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
         button1.tag = 24
-        button1.setTitle("Open Detail 1", for: .normal)
+        button1.setTitle("\(screenText) – Open Detail 1", for: .normal)
         button1.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(button1)
 
@@ -45,7 +45,7 @@ class ViewController: UIViewController {
         let button2 = UIButton(type: .system)
         button2.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
         button2.tag = 25
-        button2.setTitle("Open Detail 2", for: .normal)
+        button2.setTitle("\(screenText) – Open Detail 2", for: .normal)
         button2.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(button2)
 

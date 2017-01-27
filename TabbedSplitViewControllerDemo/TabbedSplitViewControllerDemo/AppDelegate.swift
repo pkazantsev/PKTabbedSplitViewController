@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             config.showDetailAsModalWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                return traits.horizontalSizeClass == .compact && size.width <= 370
+                return traits.horizontalSizeClass == .compact && size.width <= (70 + 320 + 320)
             }
             config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
