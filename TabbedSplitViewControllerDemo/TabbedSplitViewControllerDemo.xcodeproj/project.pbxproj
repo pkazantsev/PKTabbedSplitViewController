@@ -13,7 +13,8 @@
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
-		C85A274D1D9864E800C57331 /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */; };
+		C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; };
+		C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CF86D71E104535000D2B4B /* DetailController.swift */; };
 		C8E573861E11CE6700534598 /* TODO.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E573851E11CE6700534598 /* TODO.txt */; };
 /* End PBXBuildFile section */
@@ -28,6 +29,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		C89ABD981FB84CA20059CA7A /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		9D5095161B417592009D40C1 /* TabbedSplitViewControllerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabbedSplitViewControllerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D50951A1B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -40,7 +55,7 @@
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TabbedSplitViewController.framework; path = "../../../../Library/Developer/Xcode/DerivedData/TabbedSplitViewController-gpxhywtxplqjksbmpgxcfxidqfsj/Build/Products/Debug-iphonesimulator/TabbedSplitViewController.framework"; sourceTree = "<group>"; };
+		C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8CF86D71E104535000D2B4B /* DetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		C8E573851E11CE6700534598 /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -50,7 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C85A274D1D9864E800C57331 /* TabbedSplitViewController.framework in Frameworks */,
+				C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,7 +142,7 @@
 		C85A274B1D9864E800C57331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C85A274C1D9864E800C57331 /* TabbedSplitViewController.framework */,
+				C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -142,6 +157,7 @@
 				9D5095121B417592009D40C1 /* Sources */,
 				9D5095131B417592009D40C1 /* Frameworks */,
 				9D5095141B417592009D40C1 /* Resources */,
+				C89ABD981FB84CA20059CA7A /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
