@@ -450,7 +450,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
     fileprivate func configureLabel() {
         titleLabel.font = .systemFont(ofSize: 10)
-        titleLabel.setContentHuggingPriority(249, for: .vertical)
+        titleLabel.setContentHuggingPriority(UILayoutPriority(rawValue: 249), for: .vertical)
         titleLabel.textAlignment = .center
     }
 
@@ -472,7 +472,7 @@ private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
 
     fileprivate override func configureLabel() {
         titleLabel.font = .systemFont(ofSize: 15)
-        titleLabel.setContentHuggingPriority(249, for: .vertical)
+        titleLabel.setContentHuggingPriority(UILayoutPriority(rawValue: 249), for: .vertical)
     }
 
     fileprivate override func configureImageView() {
