@@ -19,16 +19,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let viewController = self.window?.rootViewController as? TabbedSplitViewController {
             var config = viewController.config
             config.showMasterAsSideBarWithSizeChange = { size, traits, config in
+                print("showMasterAsSideBarWithSizeChange(): traits.userInterfaceIdiom = \(traits.userInterfaceIdiom)")
+                print("showMasterAsSideBarWithSizeChange(): size.width = \(size.width)")
                 /// Master should be hidden on iPad in Portrait or in multi-tasking mode unless it's iPhone-width.
-                return traits.userInterfaceIdiom == .pad && size.width <= 768 && size.width > 370
+                let should = traits.userInterfaceIdiom == .pad && size.width <= 768 && size.width > 512
+                print("showMasterAsSideBarWithSizeChange(): \(should)")
+                return should
             }
             config.showDetailAsModalWithSizeChange = { size, traits, config in
+                print("showDetailAsModalWithSizeChange(): traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
+                print("showDetailAsModalWithSizeChange(): size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                return traits.horizontalSizeClass == .compact && size.width <= (70 + 320 + 320)
+                let should = traits.horizontalSizeClass == .compact && size.width <= (70 + 320 + 320)
+                print("showDetailAsModalWithSizeChange(): \(should)")
+                return should
             }
             config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
+                print("showTabBarAsSideBarWithSizeChange(): traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
+                print("showTabBarAsSideBarWithSizeChange(): size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
-                return traits.horizontalSizeClass == .compact && size.width <= 320
+                let should = traits.horizontalSizeClass == .compact && size.width <= 320
+                print("showTabBarAsSideBarWithSizeChange(): \(should)")
+                return should
             }
 
             let vc1 = ViewController()
