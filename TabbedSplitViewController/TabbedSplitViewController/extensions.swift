@@ -49,3 +49,22 @@ extension Then where Self: Any {
 }
 
 extension NSObject: Then {}
+
+public protocol DebugLogger {
+
+    func log(_ message: @escaping @autoclosure () -> Any?, level: LogLevel, _ file: StaticString, _ line: Int)
+}
+
+extension DebugLogger {
+    func log(_ message: @escaping @autoclosure () -> Any?, _ file: StaticString = #file, _ line: Int = #line) {
+        log(message, level: .debug, file, line)
+    }
+}
+
+
+public enum LogLevel {
+    case debug
+    case info
+    case warning
+    case error
+}
