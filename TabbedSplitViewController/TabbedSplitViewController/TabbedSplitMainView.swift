@@ -25,6 +25,8 @@ private enum StackViewItem: Int {
     }
 }
 
+private let sideBarAnimationDuration: CGFloat = 0.35
+
 @IBDesignable
 class PKTabbedSplitView: UIView {
 
@@ -69,6 +71,8 @@ class PKTabbedSplitView: UIView {
             masterViewWidthConstraint.isActive = !hideDetailView
         }
     }
+
+    var sideBarIsHidden = true
 
     private var sideBarGestRecHelper: SideBarGestureRecognizerHelper?
 
@@ -132,6 +136,7 @@ class PKTabbedSplitView: UIView {
     /// Creates a side bar then adds a master view there.
     /// Should be called after removing the view from the stack view!
     func addMasterSideBar() {
+        sideBarIsHidden = true
         let view = stackViewItems[StackViewItem.master.index]
         stackView.removeArrangedSubview(view)
         stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
@@ -143,9 +148,16 @@ class PKTabbedSplitView: UIView {
         leadingConstraint.isActive = true
 
         let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leadingConstraint, targetWidth: masterViewWidth, leftOffset: tabBarWidth)
+        helper.didOpen = { [unowned self] in
+            self.sideBarIsHidden = false
+        }
+        helper.didClose = { [unowned self] in
+            self.sideBarIsHidden = true
+        }
         sideBarGestRecHelper = helper
     }
     func addNavigationBar(_ view: UIView) {
+        sideBarIsHidden = true
         stackViewItems[StackViewItem.tabBar.index].removeFromSuperview()
         addSubview(view)
 
@@ -160,6 +172,12 @@ class PKTabbedSplitView: UIView {
         leading.isActive = true
 
         let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leading, targetWidth: navigationBarWidth)
+        helper.didOpen = { [unowned self] in
+            self.sideBarIsHidden = false
+        }
+        helper.didClose = { [unowned self] in
+            self.sideBarIsHidden = true
+        }
         sideBarGestRecHelper = helper
     }
 
@@ -180,6 +198,12 @@ class PKTabbedSplitView: UIView {
         stackView.insertSubview(tabBar, at: StackViewItem.tabBar.hierarchyIndex)
         stackView.insertArrangedSubview(tabBar, at: StackViewItem.tabBar.index)
     }
+
+    func hideSideBar() {
+        guard !sideBarIsHidden else { return }
+
+        sideBarGestRecHelper?.close(withDuration: TimeInterval(sideBarAnimationDuration), animated: true, wasClosing: true)
+    }
     
 }
 
@@ -194,6 +218,7 @@ private class SideBarGestureRecognizerHelper {
     fileprivate let openViewRec: UIGestureRecognizer
     fileprivate let closeViewRec: UIGestureRecognizer
     fileprivate var didOpen: (() -> Void)?
+    fileprivate var didClose: (() -> Void)?
 
     private var startingPoint: CGFloat = 0
 
@@ -245,18 +270,12 @@ private class SideBarGestureRecognizerHelper {
             //print("\((isOpenGestRec ? "Open" : "Close")): gesture ended")
             let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
             //print("    Should open: \(shouldOpen) (\(xConstraint.constant), \(abs(xConstraint.constant - leftOffset)))")
-            let duration = 0.35 * ((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2))
-            xConstraint.constant = (shouldOpen ? 0 : -viewWidth) + leftOffset
-            //print("    constraint: \(xConstraint.constant)")
-            UIView.animate(withDuration: TimeInterval(duration)) {
-                self.sourceView.layoutIfNeeded()
-            }
-            if shouldOpen && isOpenGestRec {
-                openViewRec.isEnabled = false
-                didOpen?()
-            }
-            if !shouldOpen && !isOpenGestRec {
-                openViewRec.isEnabled = true
+            let duration = TimeInterval(sideBarAnimationDuration * ((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2)))
+
+            if shouldOpen {
+                open(withDuration: duration, animated: true, wasOpening: isOpenGestRec)
+            } else {
+                close(withDuration: duration, animated: true, wasClosing: !isOpenGestRec)
             }
         case .cancelled:
             //print("gesture cancelled")
@@ -265,5 +284,28 @@ private class SideBarGestureRecognizerHelper {
             break
         }
     }
-    
+
+    func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
+        xConstraint.constant = -viewWidth + leftOffset
+        UIView.animate(withDuration: duration) {
+            self.sourceView.layoutIfNeeded()
+        }
+
+        if wasClosing {
+            openViewRec.isEnabled = true
+            didClose?()
+        }
+    }
+    func open(withDuration duration: TimeInterval, animated: Bool = true, wasOpening: Bool = true) {
+        xConstraint.constant = leftOffset
+        UIView.animate(withDuration: duration) {
+            self.sourceView.layoutIfNeeded()
+        }
+
+        if wasOpening {
+            openViewRec.isEnabled = false
+            didOpen?()
+        }
+    }
+
 }

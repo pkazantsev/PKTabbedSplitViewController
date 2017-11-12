@@ -139,6 +139,11 @@ public class TabbedSplitViewController: UIViewController {
         tabBar.didSelectCallback = { [unowned self] item in
             let controller = item.viewController
             self.masterViewController = controller
+
+            if self.mainView.hideTabBarView {
+                // Hide navigation view while opening a detail
+                self.mainView.hideSideBar()
+            }
         }
 
         addChildViewController(tabBar)
@@ -229,19 +234,18 @@ public class TabbedSplitViewController: UIViewController {
         if !(hideDetail && hideMaster), let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
             hideTabBar = hideTabBarFunc(size, traits, config)
             print("hide Tab Bar: \(hideTabBar)")
-
-            if mainView.hideTabBarView != hideTabBar {
-                if hideTabBar {
-                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                        self.addNavigationSideBar()
-                        self.mainView.hideTabBarView = true
-                    })
-                } else {
-                    coordinator.animate(alongsideTransition: { (_) in
-                        self.mainView.hideTabBarView = false
-                        self.removeNavigationSideBar()
-                    }, completion: nil)
-                }
+        }
+        if mainView.hideTabBarView != hideTabBar {
+            if hideTabBar {
+                coordinator.animate(alongsideTransition: nil, completion: { (_) in
+                    self.addNavigationSideBar()
+                    self.mainView.hideTabBarView = true
+                })
+            } else {
+                coordinator.animate(alongsideTransition: { (_) in
+                    self.mainView.hideTabBarView = false
+                    self.removeNavigationSideBar()
+                }, completion: nil)
             }
         }
 
@@ -288,6 +292,10 @@ public class TabbedSplitViewController: UIViewController {
             if vc.view.backgroundColor == nil {
                 vc.view.backgroundColor = .white
             }
+
+            // Hide master view while opening a detail
+            mainView.hideSideBar()
+
             show(vc, sender: sender)
         } else {
             detailVC.viewController = vc
