@@ -1,5 +1,10 @@
 
-
-[ ] iPad: Add opening of master view in portrait after tap on an tab bar item
 [ ] iPad: Add an overlay over a detail view when master view is open, animating opacity while opening
-[•] iPhone: Opening of a modal detail view
+
+[ ] iPad: When rotating to portrait mode, master view hiding is not animated
+          The same is when in narrow split-screen for tab bar / nav side bar
+[ ] iPad: Detail screen Close button not working
+
+
+[✓] iPhone: Opening of a modal detail view
+[✓] iPad: Add opening of master view in portrait after tap on an tab bar item

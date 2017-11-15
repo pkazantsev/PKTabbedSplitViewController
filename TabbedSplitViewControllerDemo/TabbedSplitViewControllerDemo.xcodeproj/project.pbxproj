@@ -117,11 +117,11 @@
 				9D50951B1B417592009D40C1 /* AppDelegate.swift */,
 				C8CF86D71E104535000D2B4B /* DetailController.swift */,
 				9D50951D1B417592009D40C1 /* ViewController.swift */,
+				C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */,
 				9D50951F1B417592009D40C1 /* Main.storyboard */,
 				9D5095221B417592009D40C1 /* Images.xcassets */,
 				9D5095241B417592009D40C1 /* LaunchScreen.xib */,
 				9D5095191B417592009D40C1 /* Supporting Files */,
-				C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */,
 			);
 			path = TabbedSplitViewControllerDemo;
 			sourceTree = "<group>";
@@ -174,6 +174,7 @@
 				9D5095141B417592009D40C1 /* Resources */,
 				C89ABD981FB84CA20059CA7A /* Embed Frameworks */,
 				C82BE58A1FB896530082CA63 /* Carthage */,
+				C8AE60161FBCD7D600CDE7D9 /* Integrate Reveal Server */,
 			);
 			buildRules = (
 			);
@@ -284,6 +285,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+		C8AE60161FBCD7D600CDE7D9 /* Integrate Reveal Server */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Integrate Reveal Server";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "REVEAL_APP_PATH=$(mdfind kMDItemCFBundleIdentifier=\"com.ittybittyapps.Reveal2\" | head -n 1)\nBUILD_SCRIPT_PATH=\"${REVEAL_APP_PATH}/Contents/SharedSupport/Scripts/reveal_server_build_phase.sh\"\nif [ \"${REVEAL_APP_PATH}\" -a -e \"${BUILD_SCRIPT_PATH}\" ]; then\n\"${BUILD_SCRIPT_PATH}\"\nelse\necho \"Reveal Server not loaded: Cannot find a compatible Reveal app.\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 

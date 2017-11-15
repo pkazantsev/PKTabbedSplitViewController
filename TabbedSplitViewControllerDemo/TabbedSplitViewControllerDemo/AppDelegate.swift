@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         if let viewController = self.window?.rootViewController as? TabbedSplitViewController {
+            viewController.logger = Logger()
             var config = viewController.config
             config.showMasterAsSideBarWithSizeChange = { size, traits, config in
                 print("showMasterAsSideBarWithSizeChange(): traits.userInterfaceIdiom = \(traits.userInterfaceIdiom)")

@@ -99,6 +99,12 @@ public class TabbedSplitViewController: UIViewController {
         return vc
     }
 
+    public var logger: DebugLogger? {
+        didSet {
+            mainView.logger = logger
+        }
+    }
+
     private(set) var masterViewController: UIViewController? {
         didSet {
             self.masterVC.viewController = masterViewController
@@ -140,9 +146,16 @@ public class TabbedSplitViewController: UIViewController {
             let controller = item.viewController
             self.masterViewController = controller
 
+            self.logger?.log(self.mainView)
+            self.logger?.log(self.mainView.hideTabBarView)
+            self.logger?.log(self.mainView.hideMasterView)
             if self.mainView.hideTabBarView {
                 // Hide navigation view while opening a detail
                 self.mainView.hideSideBar()
+            }
+            else if self.mainView.hideMasterView {
+                // Show master view when switching
+                self.mainView.showSideBar()
             }
         }
 
@@ -298,6 +311,10 @@ public class TabbedSplitViewController: UIViewController {
 
             show(vc, sender: sender)
         } else {
+            if mainView.hideMasterView {
+                // Hide master view while opening a detail
+                mainView.hideSideBar()
+            }
             detailVC.viewController = vc
         }
     }

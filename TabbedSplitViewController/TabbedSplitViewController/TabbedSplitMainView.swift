@@ -25,7 +25,7 @@ private enum StackViewItem: Int {
     }
 }
 
-private let sideBarAnimationDuration: CGFloat = 0.35
+private let sideBarAnimationDuration: TimeInterval = 0.35
 
 @IBDesignable
 class PKTabbedSplitView: UIView {
@@ -72,8 +72,9 @@ class PKTabbedSplitView: UIView {
         }
     }
 
-    var sideBarIsHidden = true
     var logger: DebugLogger?
+
+    private var sideBarIsHidden = true
 
     private var sideBarGestRecHelper: SideBarGestureRecognizerHelper?
 
@@ -137,6 +138,7 @@ class PKTabbedSplitView: UIView {
     /// Creates a side bar then adds a master view there.
     /// Should be called after removing the view from the stack view!
     func addMasterSideBar() {
+        logger?.log("Entered")
         sideBarIsHidden = true
         let view = stackViewItems[StackViewItem.master.index]
         stackView.removeArrangedSubview(view)
@@ -144,6 +146,7 @@ class PKTabbedSplitView: UIView {
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
         view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        view.isHidden = false
 
         let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
         leadingConstraint.isActive = true
@@ -158,6 +161,7 @@ class PKTabbedSplitView: UIView {
         sideBarGestRecHelper = helper
     }
     func addNavigationBar(_ view: UIView) {
+        logger?.log("Entered")
         sideBarIsHidden = true
         stackViewItems[StackViewItem.tabBar.index].removeFromSuperview()
         addSubview(view)
@@ -183,6 +187,7 @@ class PKTabbedSplitView: UIView {
     }
 
     func removeMasterSideBar() {
+        logger?.log("Entered")
         sideBarGestRecHelper = nil
         let view = stackViewItems[StackViewItem.master.index]
         view.isHidden = true
@@ -191,6 +196,7 @@ class PKTabbedSplitView: UIView {
         stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
     }
     func removeNavigationBar(_ view: UIView) {
+        logger?.log("Entered")
         sideBarGestRecHelper = nil
         view.isHidden = true
         view.removeFromSuperview()
@@ -202,8 +208,13 @@ class PKTabbedSplitView: UIView {
 
     func hideSideBar() {
         guard !sideBarIsHidden else { return }
-
-        sideBarGestRecHelper?.close(withDuration: TimeInterval(sideBarAnimationDuration), animated: true, wasClosing: true)
+        logger?.log("Closing side bar")
+        sideBarGestRecHelper?.close(withDuration: sideBarAnimationDuration, animated: true, wasClosing: true)
+    }
+    func showSideBar() {
+        guard sideBarIsHidden else { return }
+        logger?.log("Opening side bar")
+        sideBarGestRecHelper?.open(withDuration: sideBarAnimationDuration, animated: true, wasOpening: true)
     }
     
 }
@@ -256,7 +267,6 @@ private class SideBarGestureRecognizerHelper {
             //print("\((isOpenGestRec ? "Open" : "Close")): gesture began: \(point)")
             startingPoint = point
             targetView.isHidden = false
-            break
         case .changed:
             let point = rec.location(ofTouch: 0, in: sourceView).x
             //print("\((isOpenGestRec ? "Open" : "Close")): gesture changed: \(point)")
@@ -271,7 +281,7 @@ private class SideBarGestureRecognizerHelper {
             //print("\((isOpenGestRec ? "Open" : "Close")): gesture ended")
             let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
             //print("    Should open: \(shouldOpen) (\(xConstraint.constant), \(abs(xConstraint.constant - leftOffset)))")
-            let duration = TimeInterval(sideBarAnimationDuration * ((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2)))
+            let duration = sideBarAnimationDuration * TimeInterval(((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2)))
 
             if shouldOpen {
                 open(withDuration: duration, animated: true, wasOpening: isOpenGestRec)

@@ -27,8 +27,8 @@ class Logger: DebugLogger {
                   fileLevel: nil)
     }
 
-    func log(_ message: @escaping @autoclosure () -> Any?, level: LogLevel, _ file: StaticString, _ line: Int) {
-        log.logln(message, level: level.xcgLevel, fileName: file, lineNumber: line)
+    func log(_ message: @escaping @autoclosure () -> Any?, level: LogLevel, _ function: StaticString, _ line: Int) {
+        log.logln(level.xcgLevel, functionName: function, lineNumber: line, closure: message)
     }
 
 }

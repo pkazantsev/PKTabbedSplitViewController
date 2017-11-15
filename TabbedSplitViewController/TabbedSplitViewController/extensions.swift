@@ -52,12 +52,12 @@ extension NSObject: Then {}
 
 public protocol DebugLogger {
 
-    func log(_ message: @escaping @autoclosure () -> Any?, level: LogLevel, _ file: StaticString, _ line: Int)
+    func log(_ message: @escaping @autoclosure () -> Any?, level: LogLevel, _ function: StaticString, _ line: Int)
 }
 
 extension DebugLogger {
-    func log(_ message: @escaping @autoclosure () -> Any?, _ file: StaticString = #file, _ line: Int = #line) {
-        log(message, level: .debug, file, line)
+    func log(_ message: @escaping @autoclosure () -> Any?, _ function: StaticString = #function, _ line: Int = #line) {
+        log(message, level: .debug, function, line)
     }
 }
 
