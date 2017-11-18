@@ -228,21 +228,6 @@ public class TabbedSplitViewController: UIViewController {
         if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
             hideMaster = hideMasterFunc(size, traits, config)
             logger?.log("hide master view: \(hideMaster)")
-
-            if mainView.hideMasterView != hideMaster {
-                if !hideMaster {
-                    self.mainView.hideMasterView = false
-                    coordinator.animate(alongsideTransition: { _ in
-                        self.mainView.removeMasterSideBar()
-                    })
-                } else if !hideDetail {
-                    coordinator.animate(alongsideTransition: { _ in
-                        self.mainView.addMasterSideBar()
-                    }, completion: { _ in
-                        self.mainView.hideMasterView = true
-                    })
-                }
-            }
         }
         if hideDetail && hideMaster {
             logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
@@ -250,32 +235,50 @@ public class TabbedSplitViewController: UIViewController {
             hideTabBar = hideTabBarFunc(size, traits, config)
             logger?.log("hide Tab Bar: \(hideTabBar)")
         }
-        if mainView.hideTabBarView != hideTabBar {
-            coordinator.animate(alongsideTransition: { _ in
-                if hideTabBar {
-                    self.addNavigationSideBar()
-                } else {
-                    self.removeNavigationSideBar()
-                    self.mainView.hideTabBarView = false
-                }
-            }, completion: { _ in
-                if hideTabBar {
-                    self.mainView.hideTabBarView = hideTabBar
-                }
-            })
+        let updateDetail = mainView.hideDetailView != hideDetail
+        let updateMaster = mainView.hideMasterView != hideMaster
+        let updateTabBar = mainView.hideTabBarView != hideTabBar
+
+        guard updateDetail || updateMaster || updateTabBar else { return }
+
+        if updateMaster, !hideMaster {
+            mainView.hideMasterView = false
+        }
+        if updateDetail, hideDetail {
+            detailVC.willMove(toParentViewController: nil)
         }
 
-        if mainView.hideDetailView != hideDetail {
-            if hideDetail {
-                detailVC.willMove(toParentViewController: nil)
-                coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                    self.mainView.removeDetailView()
-                })
-            } else {
-                coordinator.animate(alongsideTransition: { (_) in
-                    self.mainView.addDetailView()
-                }, completion: nil)
+        coordinator.animate(alongsideTransition: { _ in
+            // First, adding to the Stack view
+            if updateTabBar, !hideTabBar {
+                self.removeNavigationSideBar()
             }
+            if updateMaster, !hideMaster {
+                self.mainView.removeMasterSideBar()
+            }
+            if updateDetail, !hideDetail {
+                self.mainView.addDetailView()
+            }
+            // Then, removing from the stack view
+            if updateTabBar, hideTabBar {
+                self.addNavigationSideBar()
+            }
+            if updateMaster, hideMaster, !hideDetail {
+                self.mainView.addMasterSideBar()
+            }
+        }, completion: { _ in
+            if updateMaster, hideMaster, !hideDetail {
+                self.mainView.hideMasterView = true
+            }
+            if updateTabBar {
+                self.mainView.hideTabBarView = hideTabBar
+            }
+            if updateDetail, hideDetail {
+                self.mainView.removeDetailView()
+            }
+        })
+
+        if updateDetail {
             mainView.hideDetailView = hideDetail
             if hideDetail {
                 detailVC.removeFromParentViewController()

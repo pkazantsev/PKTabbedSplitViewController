@@ -2,11 +2,11 @@ Task status indicators: [ ] [•] [✓]
 
 -- Tasks: --
 [ ] iPad: Add an overlay over a detail view when master view is open, animating opacity while opening
+[ ] iPad: Add arrows to an active tab bar item when master view is in a side bar,
+          looking inwards when the master view is shown and outwards when it's hidden.
 
 -- Bugs: --
 [ ] iPad: Detail screen Close button not working
-[ ] iPad: When going from narrow split-screen to wide split-screen, master view stays shown
-          though it should be hidden (check constraint).
 [ ] iPad: When we have detail open but go to split-screen where it's hidden,
           should we open it as a modal?
 
@@ -14,3 +14,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPhone: Opening of a modal detail view
 [✓] iPad: Add opening of master view in portrait after tap on an tab bar item
 [✓] iPad: When rotating to portrait mode, master view hiding is not animated
+[✓] iPad: When going from narrow split-screen to wide split-screen, master view stays shown.

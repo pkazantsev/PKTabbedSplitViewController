@@ -134,6 +134,7 @@ class PKTabbedSplitView: UIView {
         sideBarIsHidden = true
         let view = stackViewItems[StackViewItem.master.index]
         stackView.removeArrangedSubview(view)
+        view.removeFromSuperview()
         stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
@@ -143,6 +144,7 @@ class PKTabbedSplitView: UIView {
         leadingConstraint.isActive = true
 
         let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leadingConstraint, targetWidth: masterViewWidth, leftOffset: tabBarWidth)
+        helper.logger = logger
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false
         }
@@ -168,6 +170,7 @@ class PKTabbedSplitView: UIView {
         leading.isActive = true
 
         let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leading, targetWidth: navigationBarWidth)
+        helper.logger = logger
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false
         }
@@ -186,7 +189,7 @@ class PKTabbedSplitView: UIView {
         stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
     }
     func removeNavigationBar(_ view: UIView) {
-        logger?.log("Entered")
+        logger?.log("\(view)")
         sideBarGestRecHelper = nil
         view.removeFromSuperview()
 
@@ -223,6 +226,8 @@ private class SideBarGestureRecognizerHelper {
 
     private var startingPoint: CGFloat = 0
 
+    var logger: DebugLogger?
+
     fileprivate init(base: UIView, target: UIView, targetX: NSLayoutConstraint, targetWidth: CGFloat, leftOffset: CGFloat = 0) {
         sourceView = base
         targetView = target
@@ -246,6 +251,7 @@ private class SideBarGestureRecognizerHelper {
         sourceView.removeGestureRecognizer(openViewRec)
         targetView.removeGestureRecognizer(closeViewRec)
         xConstraint.isActive = false
+        logger?.log("Deinit \(type(of: self))")
     }
 
     @objc private func handleGesture(_ rec: UIGestureRecognizer) {
@@ -280,6 +286,7 @@ private class SideBarGestureRecognizerHelper {
 
     func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
         xConstraint.constant = -viewWidth + leftOffset
+        logger?.log("Constant: \(self.xConstraint.constant)")
         UIView.animate(withDuration: duration) {
             self.sourceView.layoutIfNeeded()
         }
@@ -291,6 +298,7 @@ private class SideBarGestureRecognizerHelper {
     }
     func open(withDuration duration: TimeInterval, animated: Bool = true, wasOpening: Bool = true) {
         xConstraint.constant = leftOffset
+        logger?.log("Constant: \(self.xConstraint.constant)")
         UIView.animate(withDuration: duration) {
             self.sourceView.layoutIfNeeded()
         }
