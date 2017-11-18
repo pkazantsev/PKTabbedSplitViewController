@@ -146,9 +146,8 @@ public class TabbedSplitViewController: UIViewController {
             let controller = item.viewController
             self.masterViewController = controller
 
-            self.logger?.log(self.mainView)
-            self.logger?.log(self.mainView.hideTabBarView)
-            self.logger?.log(self.mainView.hideMasterView)
+            self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
+            self.logger?.log("Hide master view: \(self.mainView.hideMasterView)")
             if self.mainView.hideTabBarView {
                 // Hide navigation view while opening a detail
                 self.mainView.hideSideBar()
@@ -212,11 +211,11 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-        print("\(#function) -> \(newCollection)")
+        logger?.log("\(newCollection)")
         futureTraits = newCollection
     }
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        print("\(#function) -> \(size)")
+        logger?.log("\(size)")
         var hideDetail = false
         var hideMaster = false
         var hideTabBar = false
@@ -224,42 +223,46 @@ public class TabbedSplitViewController: UIViewController {
         let traits = futureTraits ?? traitCollection
         if let hideDetailFunc = config.showDetailAsModalWithSizeChange {
             hideDetail = hideDetailFunc(size, traits, config)
-            print("hide detail view: \(hideDetail)")
+            logger?.log("hide detail view: \(hideDetail)")
         }
         if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
             hideMaster = hideMasterFunc(size, traits, config)
-            print("hide master view: \(hideMaster)")
+            logger?.log("hide master view: \(hideMaster)")
 
             if mainView.hideMasterView != hideMaster {
                 if !hideMaster {
-                    coordinator.animate(alongsideTransition: { (_) in
+                    self.mainView.hideMasterView = false
+                    coordinator.animate(alongsideTransition: { _ in
                         self.mainView.removeMasterSideBar()
-                        self.mainView.hideMasterView = false
-                    }, completion: nil)
+                    })
                 } else if !hideDetail {
-                    coordinator.animate(alongsideTransition: nil, completion: { (_) in
-                        self.mainView.hideMasterView = true
+                    coordinator.animate(alongsideTransition: { _ in
                         self.mainView.addMasterSideBar()
+                    }, completion: { _ in
+                        self.mainView.hideMasterView = true
                     })
                 }
             }
         }
-        if !(hideDetail && hideMaster), let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
+        if hideDetail && hideMaster {
+            logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
+        } else if let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
             hideTabBar = hideTabBarFunc(size, traits, config)
-            print("hide Tab Bar: \(hideTabBar)")
+            logger?.log("hide Tab Bar: \(hideTabBar)")
         }
         if mainView.hideTabBarView != hideTabBar {
-            if hideTabBar {
-                coordinator.animate(alongsideTransition: nil, completion: { (_) in
+            coordinator.animate(alongsideTransition: { _ in
+                if hideTabBar {
                     self.addNavigationSideBar()
-                    self.mainView.hideTabBarView = true
-                })
-            } else {
-                coordinator.animate(alongsideTransition: { (_) in
-                    self.mainView.hideTabBarView = false
+                } else {
                     self.removeNavigationSideBar()
-                }, completion: nil)
-            }
+                    self.mainView.hideTabBarView = false
+                }
+            }, completion: { _ in
+                if hideTabBar {
+                    self.mainView.hideTabBarView = hideTabBar
+                }
+            })
         }
 
         if mainView.hideDetailView != hideDetail {

@@ -49,16 +49,8 @@ class PKTabbedSplitView: UIView {
     let masterViewWidthConstraint: NSLayoutConstraint
     private(set) var navigationBarWidthConstraint: NSLayoutConstraint?
 
-    var hideTabBarView: Bool = false {
-        didSet {
-            stackViewItems[StackViewItem.tabBar.index].isHidden = hideTabBarView
-        }
-    }
-    var hideMasterView: Bool = false {
-        didSet {
-            stackViewItems[StackViewItem.master.index].isHidden = hideMasterView
-        }
-    }
+    var hideTabBarView: Bool = false
+    var hideMasterView: Bool = false
     var hideDetailView: Bool = false {
         didSet {
             let detailView = stackViewItems[StackViewItem.detail.index]
@@ -146,7 +138,6 @@ class PKTabbedSplitView: UIView {
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
         view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        view.isHidden = false
 
         let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
         leadingConstraint.isActive = true
@@ -190,7 +181,6 @@ class PKTabbedSplitView: UIView {
         logger?.log("Entered")
         sideBarGestRecHelper = nil
         let view = stackViewItems[StackViewItem.master.index]
-        view.isHidden = true
         view.removeFromSuperview()
         stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
         stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
@@ -198,7 +188,6 @@ class PKTabbedSplitView: UIView {
     func removeNavigationBar(_ view: UIView) {
         logger?.log("Entered")
         sideBarGestRecHelper = nil
-        view.isHidden = true
         view.removeFromSuperview()
 
         let tabBar = stackViewItems[StackViewItem.tabBar.index]
@@ -264,23 +253,17 @@ private class SideBarGestureRecognizerHelper {
         switch rec.state {
         case .began:
             let point = rec.location(ofTouch: 0, in: sourceView).x
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture began: \(point)")
             startingPoint = point
-            targetView.isHidden = false
         case .changed:
             let point = rec.location(ofTouch: 0, in: sourceView).x
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture changed: \(point)")
             if isOpenGestRec {
                 let maxPoint = viewWidth + startingPoint
                 xConstraint.constant = ((point < maxPoint) ? point - startingPoint - viewWidth : 0) + leftOffset
             } else {
                 xConstraint.constant = ((point < startingPoint) ? point - startingPoint : 0) + leftOffset
             }
-        //print("    constraint: \(xConstraint.constant)")
         case .ended:
-            //print("\((isOpenGestRec ? "Open" : "Close")): gesture ended")
             let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
-            //print("    Should open: \(shouldOpen) (\(xConstraint.constant), \(abs(xConstraint.constant - leftOffset)))")
             let duration = sideBarAnimationDuration * TimeInterval(((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2)))
 
             if shouldOpen {
@@ -289,7 +272,6 @@ private class SideBarGestureRecognizerHelper {
                 close(withDuration: duration, animated: true, wasClosing: !isOpenGestRec)
             }
         case .cancelled:
-            //print("gesture cancelled")
             break
         default:
             break
