@@ -48,12 +48,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             vc1.screenText = "Screen 1111"
             vc1.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
+                controller.onCloseButtonPressed = viewController.dismissDetailViewController
                 let navController = UINavigationController(rootViewController: controller)
                 viewController.showDetailViewController(navController, sender: nil)
             }
             let vc2 = ViewController()
             vc2.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
+                controller.onCloseButtonPressed = viewController.dismissDetailViewController
                 let navController = UINavigationController(rootViewController: controller)
                 viewController.showDetailViewController(navController, sender: nil)
             }

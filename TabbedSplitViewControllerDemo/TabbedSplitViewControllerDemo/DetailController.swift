@@ -12,6 +12,8 @@ class DetailController: UIViewController {
 
     private let text: String
 
+    var onCloseButtonPressed: ((_ animated: Bool) -> Void)?
+
     init(text: String) {
         self.text = text
 
@@ -26,7 +28,9 @@ class DetailController: UIViewController {
 
         title = text
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
+        if onCloseButtonPressed != nil {
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
+        }
 
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -39,7 +43,7 @@ class DetailController: UIViewController {
     }
 
     @objc private func close(_ sender: UIBarButtonItem) {
-        presentingViewController?.dismiss(animated: true)
+        onCloseButtonPressed?(true)
     }
 
 }

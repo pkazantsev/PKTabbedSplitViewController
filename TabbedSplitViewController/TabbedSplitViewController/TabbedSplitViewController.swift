@@ -105,13 +105,6 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
-    private(set) var masterViewController: UIViewController? {
-        didSet {
-            self.masterVC.viewController = masterViewController
-        }
-    }
-    private var detailViewController: UIViewController?
-
     private let masterVC = PKMasterViewController()
     private let detailVC = PKDetailViewController()
     private let tabBar = PKTabBar()
@@ -144,7 +137,7 @@ public class TabbedSplitViewController: UIViewController {
 
         tabBar.didSelectCallback = { [unowned self] item in
             let controller = item.viewController
-            self.masterViewController = controller
+            self.masterVC.viewController = controller
 
             self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
             self.logger?.log("Hide master view: \(self.mainView.hideMasterView)")
@@ -322,6 +315,16 @@ public class TabbedSplitViewController: UIViewController {
                 mainView.hideSideBar()
             }
             detailVC.viewController = vc
+        }
+    }
+
+    public func dismissDetailViewController(animated flag: Bool = true) {
+        if mainView.hideDetailView {
+            dismiss(animated: flag)
+        }
+        else if detailVC.viewController != nil {
+            logger?.log("Removing presented detail VC from parent VC")
+            detailVC.viewController = nil
         }
     }
 
@@ -555,6 +558,7 @@ private class PKDetailViewController: UIViewController, PKDetailViewControllerPr
     fileprivate var viewController: UIViewController? {
         didSet {
             if let prev = oldValue {
+                prev.willMove(toParentViewController: nil)
                 prev.view.removeFromSuperview()
                 prev.removeFromParentViewController()
             }
