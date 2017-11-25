@@ -105,6 +105,8 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
+    private weak var detailViewController: UIViewController?
+
     private let masterVC = PKMasterViewController()
     private let detailVC = PKDetailViewController()
     private let tabBar = PKTabBar()
@@ -237,8 +239,10 @@ public class TabbedSplitViewController: UIViewController {
         if updateMaster, !hideMaster {
             mainView.hideMasterView = false
         }
-        if updateDetail, hideDetail {
-            detailVC.willMove(toParentViewController: nil)
+        if updateDetail, !hideDetail, let detail = detailViewController {
+            dismiss(animated: false) {
+                self.detailVC.viewController = detail
+            }
         }
 
         coordinator.animate(alongsideTransition: { _ in
@@ -266,19 +270,24 @@ public class TabbedSplitViewController: UIViewController {
             if updateTabBar {
                 self.mainView.hideTabBarView = hideTabBar
             }
-            if updateDetail, hideDetail {
-                self.mainView.removeDetailView()
+            if updateDetail {
+                self.mainView.hideDetailView = hideDetail
+                if hideDetail {
+                    self.mainView.removeDetailView()
+                    self.presentDetailAsModal()
+                }
             }
         })
 
-        if updateDetail {
-            mainView.hideDetailView = hideDetail
-            if hideDetail {
-                detailVC.removeFromParentViewController()
-            }
-        }
-
         futureTraits = nil
+    }
+
+    private func presentDetailAsModal() {
+        guard let detail = detailViewController else { return }
+
+        detailVC.viewController = nil
+        detail.view.translatesAutoresizingMaskIntoConstraints = true
+        self.present(detail, animated: true)
     }
 
     private func addNavigationSideBar() {
@@ -316,6 +325,7 @@ public class TabbedSplitViewController: UIViewController {
             }
             detailVC.viewController = vc
         }
+        detailViewController = vc
     }
 
     public func dismissDetailViewController(animated flag: Bool = true) {

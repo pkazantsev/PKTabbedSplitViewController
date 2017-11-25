@@ -53,12 +53,6 @@ class PKTabbedSplitView: UIView {
     var hideMasterView: Bool = false
     var hideDetailView: Bool = false {
         didSet {
-            let detailView = stackViewItems[StackViewItem.detail.index]
-            if hideDetailView {
-                removeDetailView()
-            } else if detailView.superview == nil {
-                addDetailView()
-            }
             // When detail view is hidden the master view takes all available space
             masterViewWidthConstraint.isActive = !hideDetailView
         }

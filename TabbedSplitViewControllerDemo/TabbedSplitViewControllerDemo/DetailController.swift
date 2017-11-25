@@ -27,6 +27,7 @@ class DetailController: UIViewController {
         super.viewDidLoad()
 
         title = text
+        view.backgroundColor = .white
 
         if onCloseButtonPressed != nil {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
