@@ -7,7 +7,8 @@ Task status indicators: [ ] [•] [✓]
 [ ] iPad: Animate opening / closing of detail view.
 
 -- Bugs: --
-[ ] iPad: Detail view instead of Master view when the app opened in narrow split-screen
+[ ] iPad: Remove animation during first screen presentation.
+          Views should have proper size before being presentsd
 
 -- Resolved: --
 [✓] iPhone: Opening of a modal detail view
@@ -17,3 +18,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: Detail screen Close button not working
 [✓] iPad: When we have detail open but go to split-screen where it's hidden, we should open it as a modal.
           And close modal when switching from narrow split-screen to full-size or wide split-screen.
+[✓] iPad: Detail view is opened instead of Master view when the app opened in narrow split-screen

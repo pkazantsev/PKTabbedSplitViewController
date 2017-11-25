@@ -113,6 +113,7 @@ public class TabbedSplitViewController: UIViewController {
     private let mainView: PKTabbedSplitView
 
     private var futureTraits: UITraitCollection?
+    private var futureSize: CGSize?
 
     private var sideNavigationBarViewController: UIViewController?
 
@@ -155,7 +156,7 @@ public class TabbedSplitViewController: UIViewController {
 
         addChildViewController(tabBar)
         addChildViewController(masterVC)
-        //addChildViewController(detailVC)
+        addChildViewController(detailVC)
 
         masterVC.setWidthConstraint(mainView.masterViewWidthConstraint)
 
@@ -171,36 +172,33 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            if mainView.hideTabBarView != hideTabBar {
-                mainView.hideTabBarView = hideTabBar
-                if hideTabBar {
-                    addNavigationSideBar()
-                }
+        let screenSize = futureSize ?? view.frame.size
+        let traits = futureTraits ?? traitCollection
+
+        if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(screenSize, traits, config) {
+            mainView.hideTabBarView = hideTabBar
+            if hideTabBar {
+                addNavigationSideBar()
             }
         }
         tabBar.didMove(toParentViewController: self)
-        if let hideMaster = config.showMasterAsSideBarWithSizeChange?(view.frame.size, traitCollection, config) {
-            if mainView.hideMasterView != hideMaster {
-                mainView.hideMasterView = hideMaster
-                if hideMaster {
-                    mainView.addMasterSideBar()
-                }
+
+        if let hideMaster = config.showMasterAsSideBarWithSizeChange?(screenSize, traits, config) {
+            mainView.hideMasterView = hideMaster
+            if hideMaster {
+                mainView.addMasterSideBar()
             }
         }
         masterVC.didMove(toParentViewController: self)
+
         // Hide detail from main view if there is not enough width
-        if let hideDetail = config.showDetailAsModalWithSizeChange?(view.frame.size, traitCollection, config) {
-            if mainView.hideDetailView != hideDetail {
-                if !hideDetail {
-                    addChildViewController(detailVC)
-                }
-                mainView.hideDetailView = hideDetail
-                if !hideDetail {
-                    detailVC.didMove(toParentViewController: self)
-                }
+        if let hideDetail = config.showDetailAsModalWithSizeChange?(screenSize, traits, config) {
+            mainView.hideDetailView = hideDetail
+            if hideDetail {
+                mainView.removeDetailView()
             }
         }
+        detailVC.didMove(toParentViewController: self)
 
         tabBar.selectedItemIndex = 0
     }
@@ -211,6 +209,7 @@ public class TabbedSplitViewController: UIViewController {
     }
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         logger?.log("\(size)")
+        futureSize = size
         var hideDetail = false
         var hideMaster = false
         var hideTabBar = false
@@ -287,7 +286,7 @@ public class TabbedSplitViewController: UIViewController {
 
         detailVC.viewController = nil
         detail.view.translatesAutoresizingMaskIntoConstraints = true
-        self.present(detail, animated: true)
+        self.present(detail, animated: false)
     }
 
     private func addNavigationSideBar() {
