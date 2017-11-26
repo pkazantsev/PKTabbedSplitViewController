@@ -170,37 +170,53 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        let shouldAnimate = UIView.areAnimationsEnabled
+        // Disable animations so that first layout is not animated.
+        UIView.setAnimationsEnabled(false)
 
         let screenSize = futureSize ?? view.frame.size
         let traits = futureTraits ?? traitCollection
 
+        // This method will be called also when user changes the split-screen mode
+        //   from narrow to wide, if there was detail view open as a modal.
+
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(screenSize, traits, config) {
-            mainView.hideTabBarView = hideTabBar
-            if hideTabBar {
-                addNavigationSideBar()
+            // Update only if it's changed
+            if mainView.hideTabBarView != hideTabBar {
+                mainView.hideTabBarView = hideTabBar
+                if hideTabBar {
+                    addNavigationSideBar()
+                }
             }
         }
         tabBar.didMove(toParentViewController: self)
 
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(screenSize, traits, config) {
-            mainView.hideMasterView = hideMaster
-            if hideMaster {
-                mainView.addMasterSideBar()
+            // Update only if it's changed
+            if mainView.hideMasterView != hideMaster {
+                mainView.hideMasterView = hideMaster
+                if hideMaster {
+                    mainView.addMasterSideBar()
+                }
             }
         }
         masterVC.didMove(toParentViewController: self)
 
         // Hide detail from main view if there is not enough width
         if let hideDetail = config.showDetailAsModalWithSizeChange?(screenSize, traits, config) {
-            mainView.hideDetailView = hideDetail
-            if hideDetail {
-                mainView.removeDetailView()
+            if mainView.hideDetailView != hideDetail {
+                mainView.hideDetailView = hideDetail
+                if hideDetail {
+                    mainView.removeDetailView()
+                }
             }
         }
         detailVC.didMove(toParentViewController: self)
 
         tabBar.selectedItemIndex = 0
+
+        UIView.setAnimationsEnabled(shouldAnimate)
+        super.viewWillAppear(animated)
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -308,11 +324,6 @@ public class TabbedSplitViewController: UIViewController {
     public override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
         // Show Detail screen if needed
         if mainView.hideDetailView {
-            // FIXME: View comes transparent and window is black – does not look good
-            if vc.view.backgroundColor == nil {
-                vc.view.backgroundColor = .white
-            }
-
             // Hide master view while opening a detail
             mainView.hideSideBar()
 
@@ -536,6 +547,7 @@ private class PKMasterViewController: UIViewController {
             if let next = viewController {
                 addChildViewController(next)
                 addChildView(next.view)
+                next.view.layoutIfNeeded()
                 next.didMove(toParentViewController: self)
             }
         }

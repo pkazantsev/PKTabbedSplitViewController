@@ -5,10 +5,10 @@ Task status indicators: [ ] [•] [✓]
 [ ] iPad: Add arrows to an active tab bar item when master view is in a side bar,
           looking inwards when the master view is shown and outwards when it's hidden.
 [ ] iPad: Animate opening / closing of detail view.
+[ ] iPad: Add separator lines between tab bar, master view and detail view
+[ ] iPad: Hide master view by selecting the same open tab in wide split-screen
 
 -- Bugs: --
-[ ] iPad: Remove animation during first screen presentation.
-          Views should have proper size before being presentsd
 
 -- Resolved: --
 [✓] iPhone: Opening of a modal detail view
@@ -19,3 +19,5 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: When we have detail open but go to split-screen where it's hidden, we should open it as a modal.
           And close modal when switching from narrow split-screen to full-size or wide split-screen.
 [✓] iPad: Detail view is opened instead of Master view when the app opened in narrow split-screen
+[✓] iPad: Remove animation during first screen presentation.
+          Views should have proper size before being presented
