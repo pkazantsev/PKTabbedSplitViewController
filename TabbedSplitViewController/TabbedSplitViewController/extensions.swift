@@ -18,13 +18,13 @@ extension UIViewController {
         view.addSubview(childView)
 
         childView.translatesAutoresizingMaskIntoConstraints = false
-        let constraints = [
+        NSLayoutConstraint.activate([
             childView.leftAnchor.constraint(equalTo: view.leftAnchor),
             childView.topAnchor.constraint(equalTo: view.topAnchor),
             childView.rightAnchor.constraint(equalTo: view.rightAnchor),
             childView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ]
-        view.addConstraints(constraints)
+        ])
+        view.setNeedsLayout()
     }
 
 }

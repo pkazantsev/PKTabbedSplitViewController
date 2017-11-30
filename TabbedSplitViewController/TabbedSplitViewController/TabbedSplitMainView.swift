@@ -60,7 +60,7 @@ class PKTabbedSplitView: UIView {
 
     var logger: DebugLogger?
 
-    private var sideBarIsHidden = true
+    private(set) var sideBarIsHidden = true
 
     private var sideBarGestRecHelper: SideBarGestureRecognizerHelper?
 

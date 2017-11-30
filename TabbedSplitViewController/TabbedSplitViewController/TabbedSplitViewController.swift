@@ -139,18 +139,23 @@ public class TabbedSplitViewController: UIViewController {
         super.viewDidLoad()
 
         tabBar.didSelectCallback = { [unowned self] item in
-            let controller = item.viewController
-            self.masterVC.viewController = controller
+            let isTheSameItem = (item.viewController == self.masterVC.viewController)
+            if !isTheSameItem {
+                self.masterVC.viewController = item.viewController
 
-            self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
-            self.logger?.log("Hide master view: \(self.mainView.hideMasterView)")
+                self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
+                self.logger?.log("Hide master view: \(self.mainView.hideMasterView)")
+            }
             if self.mainView.hideTabBarView {
                 // Hide navigation view while opening a detail
                 self.mainView.hideSideBar()
             }
             else if self.mainView.hideMasterView {
-                // Show master view when switching
-                self.mainView.showSideBar()
+                if self.mainView.sideBarIsHidden {
+                    self.mainView.showSideBar()
+                } else if isTheSameItem {
+                    self.mainView.hideSideBar()
+                }
             }
         }
 
@@ -385,8 +390,6 @@ private class PKTabBar: UITableViewController {
     /// Initial value: -1, don't select anything. Can not set -1 anytime later.
     fileprivate var selectedItemIndex: Int = -1 {
         didSet {
-            guard selectedItemIndex != oldValue else { return }
-
             if selectedItemIndex >= 0 || selectedItemIndex < items.count {
                 didSelectCallback?(items[selectedItemIndex])
             } else {
@@ -547,7 +550,7 @@ private class PKMasterViewController: UIViewController {
             if let next = viewController {
                 addChildViewController(next)
                 addChildView(next.view)
-                next.view.layoutIfNeeded()
+                view.layoutIfNeeded()
                 next.didMove(toParentViewController: self)
             }
         }
