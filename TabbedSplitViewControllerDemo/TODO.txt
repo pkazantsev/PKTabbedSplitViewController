@@ -5,7 +5,6 @@ Task status indicators: [ ] [•] [✓]
 [ ] iPad: Add arrows to an active tab bar item when master view is in a side bar,
           looking inwards when the master view is shown and outwards when it's hidden.
 [ ] iPad: Animate opening / closing of detail view.
-[ ] iPad: Add separator lines between tab bar, master view and detail view
 
 -- Bugs: --
 
@@ -21,3 +20,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: Remove animation during first screen presentation.
           Views should have proper size before being presented
 [✓] iPad: Hide master view by selecting the same open tab in wide split-screen
+[✓] iPad: Add separator lines between tab bar, master view and detail view

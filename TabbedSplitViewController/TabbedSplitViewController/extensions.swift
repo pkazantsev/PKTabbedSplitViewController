@@ -26,7 +26,32 @@ extension UIViewController {
         ])
         view.setNeedsLayout()
     }
+}
 
+extension UIView {
+
+    /// Adds a passed view as a vertical separator, setting a passed color (or `.gray` as a default value),
+    /// and a passed width (or 1 screen pixel).
+    ///
+    /// The passed view will be alignet to the right side of this view with equal height.
+    ///
+    /// - Parameters:
+    ///   - separator: view that will be set as a separator
+    ///   - color: separator color
+    ///   - width: separator width
+    func addVerticalSeparator(_ separator: UIView, color: UIColor = .gray, width: CGFloat? = nil) {
+        addSubview(separator)
+        let lineWidth = width ?? 1.0 / UIScreen.main.nativeScale
+        separator.translatesAutoresizingMaskIntoConstraints = false
+        separator.backgroundColor = color
+        separator.accessibilityIdentifier = "Vertical Separator"
+        NSLayoutConstraint.activate([
+            separator.widthAnchor.constraint(equalToConstant: lineWidth),
+            separator.topAnchor.constraint(equalTo: topAnchor),
+            separator.rightAnchor.constraint(equalTo: rightAnchor),
+            separator.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
+    }
 }
 
 extension Array where Element: NSLayoutConstraint {

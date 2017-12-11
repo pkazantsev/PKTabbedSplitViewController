@@ -54,6 +54,11 @@ public class TabbedSplitViewController: UIViewController {
         public var detailViewMinWidth: CGFloat = 320
         /// Color of a vertical TabBar. **Default – .white**.
         public var tabBarBackgroundColor: UIColor = .white
+        /// Color of a vertical separator between tab bar and master view,
+        ///   between master view and detail view.
+        ///
+        /// **Default – .white**.
+        public var verticalSeparatorColor: UIColor = .gray
 
         /// Called when ether size or traits collection of the view is changed
         ///  to determine if tab bar should be hidden from main view and shown
@@ -78,7 +83,7 @@ public class TabbedSplitViewController: UIViewController {
                 || detailViewMinWidth != oldValue.detailViewMinWidth
         }
 
-        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
+        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, verticalSeparatorColor: .gray, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
     /// Tabbed Split View Controller Configuration
@@ -109,7 +114,7 @@ public class TabbedSplitViewController: UIViewController {
 
     private let masterVC = PKMasterViewController()
     private let detailVC = PKDetailViewController()
-    private let tabBar = PKTabBar()
+    private let tabBarVC = PKTabBar()
     private let mainView: PKTabbedSplitView
 
     private var futureTraits: UITraitCollection?
@@ -118,15 +123,15 @@ public class TabbedSplitViewController: UIViewController {
     private var sideNavigationBarViewController: UIViewController?
 
     public init(items: [PKTabBarItem]) {
-        mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
+        mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(nibName: nil, bundle: nil)
 
-        tabBar.items = items
+        tabBarVC.tabBar.items = items
     }
 
     public required init?(coder aDecoder: NSCoder) {
-        mainView = PKTabbedSplitView(tabBarView: tabBar.view, masterView: masterVC.view, detailView: detailVC.view)
+        mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(coder: aDecoder)
     }
@@ -138,7 +143,7 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        tabBar.didSelectCallback = { [unowned self] item in
+        tabBarVC.tabBar.didSelectCallback = { [unowned self] item in
             let isTheSameItem = (item.viewController == self.masterVC.viewController)
             if !isTheSameItem {
                 self.masterVC.viewController = item.viewController
@@ -159,7 +164,7 @@ public class TabbedSplitViewController: UIViewController {
             }
         }
 
-        addChildViewController(tabBar)
+        addChildViewController(tabBarVC)
         addChildViewController(masterVC)
         addChildViewController(detailVC)
 
@@ -169,7 +174,7 @@ public class TabbedSplitViewController: UIViewController {
 
         view.backgroundColor = .gray
 
-        tabBar.view.backgroundColor = .purple
+        tabBarVC.backgroundColor = .purple
         masterVC.view.backgroundColor = .green
         detailVC.view.backgroundColor = .blue
     }
@@ -194,7 +199,7 @@ public class TabbedSplitViewController: UIViewController {
                 }
             }
         }
-        tabBar.didMove(toParentViewController: self)
+        tabBarVC.didMove(toParentViewController: self)
 
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(screenSize, traits, config) {
             // Update only if it's changed
@@ -218,7 +223,7 @@ public class TabbedSplitViewController: UIViewController {
         }
         detailVC.didMove(toParentViewController: self)
 
-        tabBar.selectedItemIndex = 0
+        tabBarVC.tabBar.selectedItemIndex = 0
 
         UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
@@ -311,7 +316,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func addNavigationSideBar() {
-        let navVC = configureNavigationBar(tabBar.items, tabBar.didSelectCallback!)
+        let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.tabBar.didSelectCallback!)
         sideNavigationBarViewController = navVC
         addChildViewController(navVC)
         mainView.addNavigationBar(navVC.view)
@@ -354,7 +359,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public func add(_ item: PKTabBarItem) {
-        tabBar.items.append(item)
+        tabBarVC.tabBar.items.append(item)
     }
 
     private func update(oldConfig: Configuration) {
@@ -365,7 +370,11 @@ public class TabbedSplitViewController: UIViewController {
             mainView.masterViewWidth = config.masterViewWidth
         }
         if config.tabBarBackgroundColor != oldConfig.tabBarBackgroundColor {
-            tabBar.backgroundColor = config.tabBarBackgroundColor
+            tabBarVC.backgroundColor = config.tabBarBackgroundColor
+        }
+        if config.verticalSeparatorColor != oldConfig.verticalSeparatorColor {
+            tabBarVC.verticalSeparatorColor = config.verticalSeparatorColor
+            masterVC.verticalSeparatorColor = config.verticalSeparatorColor
         }
     }
 
@@ -375,15 +384,39 @@ public class TabbedSplitViewController: UIViewController {
 private let pkTabBarItemCellIdentifier = "PkTabBarItemCellIdentifier"
 private let pkSideBarTabBarItemCellIdentifier = "PkSideBarTabBarItemCellIdentifier"
 
-private class PKTabBar: UITableViewController {
-    fileprivate var items = [PKTabBarItem]() {
-        didSet {
-            tableView.reloadData()
-        }
-    }
+private class PKTabBar: UIViewController {
+
+    fileprivate let tabBar = PKTabBarTabsList()
+
+    fileprivate var shouldAddVerticalSeparator: Bool = true
+    fileprivate var verticalSeparatorColor: UIColor = .gray
     fileprivate var backgroundColor: UIColor = .white {
         didSet {
             view.backgroundColor = backgroundColor
+        }
+    }
+
+    private let verticalSeparator = UIView()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        view.backgroundColor = nil
+
+        addChildViewController(tabBar)
+        addChildView(tabBar.view)
+        view.layoutIfNeeded()
+        tabBar.didMove(toParentViewController: self)
+
+        if shouldAddVerticalSeparator {
+            view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
+        }
+    }
+}
+private class PKTabBarTabsList: UITableViewController {
+    fileprivate var items = [PKTabBarItem]() {
+        didSet {
+            tableView.reloadData()
         }
     }
 
@@ -403,6 +436,7 @@ private class PKTabBar: UITableViewController {
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
 
+        view.backgroundColor = nil
         view.accessibilityIdentifier = "Tab Bar View"
 
         tableView.isScrollEnabled = false
@@ -441,7 +475,7 @@ private class PKTabBar: UITableViewController {
     }
 }
 
-private class PKTabBarAsSideBar: PKTabBar {
+private class PKTabBarAsSideBar: PKTabBarTabsList {
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
@@ -550,12 +584,18 @@ private class PKMasterViewController: UIViewController {
             if let next = viewController {
                 addChildViewController(next)
                 addChildView(next.view)
+                if shouldAddVerticalSeparator {
+                    view.addVerticalSeparator(verticalSeparator)
+                }
                 view.layoutIfNeeded()
                 next.didMove(toParentViewController: self)
             }
         }
     }
     private(set) var widthConstraint: NSLayoutConstraint!
+    fileprivate var shouldAddVerticalSeparator: Bool = true
+    fileprivate var verticalSeparatorColor: UIColor = .gray
+    private let verticalSeparator = UIView()
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
@@ -566,6 +606,10 @@ private class PKMasterViewController: UIViewController {
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
+
+        if shouldAddVerticalSeparator {
+            view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
+        }
 
         view.accessibilityIdentifier = "Master View"
     }
