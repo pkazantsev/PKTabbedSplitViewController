@@ -263,8 +263,10 @@ private class SideBarGestureRecognizerHelper {
                 xConstraint.constant = ((point < startingPoint) ? point - startingPoint : 0) + leftOffset
             }
         case .ended:
-            let shouldOpen = abs(xConstraint.constant - leftOffset) < viewWidth / 2
-            let duration = sideBarAnimationDuration * TimeInterval(((abs(xConstraint.constant - leftOffset) / 2) / (viewWidth / 2)))
+            let openRemainder = abs(xConstraint.constant - leftOffset)
+            let shouldOpen = openRemainder < viewWidth / 2
+            let remainder = ((openRemainder / 2) / (viewWidth / 2))
+            let duration = sideBarAnimationDuration * TimeInterval(remainder)
 
             if shouldOpen {
                 open(withDuration: duration, animated: true, wasOpening: isOpenGestRec)
