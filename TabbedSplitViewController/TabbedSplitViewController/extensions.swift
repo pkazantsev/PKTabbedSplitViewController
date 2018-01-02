@@ -6,7 +6,7 @@
 //  Copyright © 2017 PaKaz.net. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 extension UIViewController {
 

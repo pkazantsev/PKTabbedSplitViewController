@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DA50E1E3BC8FA005883C7 /* extensions.swift */; };
-		C85A27411D98637B00C57331 /* TabbedSplitViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */; };
 		C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */; };
 /* End PBXBuildFile section */
@@ -16,7 +15,6 @@
 /* Begin PBXFileReference section */
 		C82DA50E1E3BC8FA005883C7 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		C85A273C1D98637B00C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TabbedSplitViewController.h; sourceTree = "<group>"; };
 		C85A27401D98637B00C57331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
 		C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitMainView.swift; sourceTree = "<group>"; };
@@ -54,7 +52,6 @@
 			children = (
 				C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */,
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
-				C85A273F1D98637B00C57331 /* TabbedSplitViewController.h */,
 				C82DA50E1E3BC8FA005883C7 /* extensions.swift */,
 				C85A27401D98637B00C57331 /* Info.plist */,
 			);
@@ -68,7 +65,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C85A27411D98637B00C57331 /* TabbedSplitViewController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

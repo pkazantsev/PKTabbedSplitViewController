@@ -40,12 +40,6 @@ public struct PKTabBarItem<T> {
     }
 }
 
-public protocol PKDetailViewControllerPresenter {
-
-    var viewController: UIViewController? { get set }
-
-}
-
 public class TabbedSplitViewController: UIViewController {
 
     public typealias SizeChangedCallback = ((CGSize, UITraitCollection, Configuration) -> Bool)
@@ -432,7 +426,7 @@ private class PKTabBar: UIViewController {
         actionsBar.isCompact = true
 
         addChildViewController(tabBar)
-        addChildView(tabBar.view, bottom: false)
+        addChildView(tabBar.view)
         addChildViewController(actionsBar)
         addChildView(actionsBar.view, top: false)
 
@@ -713,7 +707,7 @@ private class PKMasterViewController: UIViewController {
     }
 
 }
-private class PKDetailViewController: UIViewController, PKDetailViewControllerPresenter {
+private class PKDetailViewController: UIViewController {
 
     fileprivate var viewController: UIViewController? {
         didSet {
