@@ -17,30 +17,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         if let viewController = self.window?.rootViewController as? TabbedSplitViewController {
-            viewController.logger = Logger()
+            let logger = Logger()
+            viewController.logger = logger
             var config = viewController.config
             config.showMasterAsSideBarWithSizeChange = { size, traits, config in
-                print("showMasterAsSideBarWithSizeChange(): traits.userInterfaceIdiom = \(traits.userInterfaceIdiom)")
-                print("showMasterAsSideBarWithSizeChange(): size.width = \(size.width)")
+                logger.log("hideMaster: traits.userInterfaceIdiom = \(traits.userInterfaceIdiom)")
+                logger.log("hideMaster: size.width = \(size.width)")
                 /// Master should be hidden on iPad in Portrait or in multi-tasking mode unless it's iPhone-width.
                 let should = traits.userInterfaceIdiom == .pad && size.width <= 768 && size.width > 512
-                print("showMasterAsSideBarWithSizeChange(): \(should)")
+                logger.log("hideMaster: \(should)")
                 return should
             }
             config.showDetailAsModalWithSizeChange = { size, traits, config in
-                print("showDetailAsModalWithSizeChange(): traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
-                print("showDetailAsModalWithSizeChange(): size.width = \(size.width)")
+                logger.log("hideDetail: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
+                logger.log("hideDetail: size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
                 let should = traits.horizontalSizeClass == .compact && size.width <= (70 + 320 + 320)
-                print("showDetailAsModalWithSizeChange(): \(should)")
+                logger.log("hideDetail: \(should)")
                 return should
             }
             config.showTabBarAsSideBarWithSizeChange = { size, traits, config in
-                print("showTabBarAsSideBarWithSizeChange(): traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
-                print("showTabBarAsSideBarWithSizeChange(): size.width = \(size.width)")
+                logger.log("hideTabBar: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
+                logger.log("hideTabBar: size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
                 let should = traits.horizontalSizeClass == .compact && size.width <= 320
-                print("showTabBarAsSideBarWithSizeChange(): \(should)")
+                logger.log("hideTabBar: \(should)")
                 return should
             }
 

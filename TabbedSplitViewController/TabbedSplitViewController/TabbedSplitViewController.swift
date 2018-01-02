@@ -426,7 +426,7 @@ private class PKTabBar: UIViewController {
         actionsBar.isCompact = true
 
         addChildViewController(tabBar)
-        addChildView(tabBar.view)
+        addChildView(tabBar.view, bottom: false)
         addChildViewController(actionsBar)
         addChildView(actionsBar.view, top: false)
 
