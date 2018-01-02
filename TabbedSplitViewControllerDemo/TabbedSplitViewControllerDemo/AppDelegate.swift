@@ -62,8 +62,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             vc2.screenText = "Screen 22222"
 
             viewController.config = config
-            viewController.add(PKTabBarItem(with: vc1.embeddedInNavigationController(), title: "Screen 1", image: #imageLiteral(resourceName: "Peotr")))
-            viewController.add(PKTabBarItem(with: vc2.embeddedInNavigationController(), title: "Screen 2", image: #imageLiteral(resourceName: "Peotr")))
+            // Main tab bar – view controllers
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), action: vc1.embeddedInNavigationController()))
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: #imageLiteral(resourceName: "Peotr"), action: vc2.embeddedInNavigationController()))
+            // Actions bar – closures
+            viewController.addToActionBar(PKTabBarItem(title: "About", image: #imageLiteral(resourceName: "Peotr")) { [unowned viewController] in
+                let alert = UIAlertController(title: "About", message: "TabbedSplitViewController v0.1", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Close", style: .default))
+                viewController.present(alert, animated: true)
+            })
+
         }
 
         return true

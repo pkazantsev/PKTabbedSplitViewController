@@ -21,3 +21,4 @@ Task status indicators: [ ] [•] [✓]
           Views should have proper size before being presented
 [✓] iPad: Hide master view by selecting the same open tab in wide split-screen
 [✓] iPad: Add separator lines between tab bar, master view and detail view
+[✓] iPad: Add bottom action buttons

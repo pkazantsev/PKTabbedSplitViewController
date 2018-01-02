@@ -14,16 +14,18 @@ extension UIViewController {
     ///  attaching all sides.
     ///
     /// - Parameter childView: a child view that will take all parent's space
-    func addChildView(_ childView: UIView) {
+    func addChildView(_ childView: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
         view.addSubview(childView)
 
         childView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            childView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            childView.topAnchor.constraint(equalTo: view.topAnchor),
-            childView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            childView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        var constraints: [NSLayoutConstraint] = []
+
+        if top { constraints.append(childView.topAnchor.constraint(equalTo: view.topAnchor)) }
+        if bottom { constraints.append(childView.bottomAnchor.constraint(equalTo: view.bottomAnchor)) }
+        if leading { constraints.append(childView.leadingAnchor.constraint(equalTo: view.leadingAnchor)) }
+        if trailing { constraints.append(childView.trailingAnchor.constraint(equalTo: view.trailingAnchor)) }
+
+        NSLayoutConstraint.activate(constraints)
         view.setNeedsLayout()
     }
 }

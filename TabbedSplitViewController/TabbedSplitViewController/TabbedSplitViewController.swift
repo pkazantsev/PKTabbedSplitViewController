@@ -7,7 +7,11 @@
 
 import UIKit
 
-public struct PKTabBarItem {
+public typealias TabBarAction = () -> Void
+public typealias ConfigureNavigationBar = ([PKTabBarItem<UIViewController>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<UIViewController>) -> Void, ((PKTabBarItem<TabBarAction>) -> Void)?) -> UIViewController
+
+public struct PKTabBarItem<T> {
+
     /// Item title
     public let title: String
     /// Tab Bar item image
@@ -18,15 +22,18 @@ public struct PKTabBarItem {
     public var navigationBarImage: UIImage?
     /// Navigation Bar item image – selected state
     public var navigationBarSelectedImage: UIImage?
-    /// View controller that should be opened by tap on the item
-    public let viewController: UIViewController
+    /// An action value that will be passed to the `OnSelection` callback
+    ///
+    /// Default types are `UIViewController` for the main tab bar and
+    ///   `TabBarAction` closure for the action bar.
+    public let action: T
 
     ///
-    public init(with viewController: UIViewController, title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil) {
+    public init(title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil, action: T) {
         self.title = title
         self.image = image
         self.selectedImage = selectedImage
-        self.viewController = viewController
+        self.action = action
 
         self.navigationBarImage = navigationBarImage
         self.navigationBarSelectedImage = navigationBarSelectedImage
@@ -97,10 +104,12 @@ public class TabbedSplitViewController: UIViewController {
     /// a tab bar is hidden and a slidable navigation bar is used instead.
     /// Accepts an array of items to configure the navigation view controller,
     /// and a callback that should be called when an item is selected
-    public var configureNavigationBar: (_ items: [PKTabBarItem], _ didSelectCallback: @escaping (PKTabBarItem) -> Void) -> UIViewController = { items, callback in
+    public var configureNavigationBar: ConfigureNavigationBar = { items, actionItems, callback, actionCallback in
         let vc = PKTabBarAsSideBar()
         vc.items = items
+        vc.actionItems = actionItems
         vc.didSelectCallback = callback
+        vc.actionSelectedCallback = actionCallback
         return vc
     }
 
@@ -122,12 +131,13 @@ public class TabbedSplitViewController: UIViewController {
 
     private var sideNavigationBarViewController: UIViewController?
 
-    public init(items: [PKTabBarItem]) {
+    public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = []) {
         mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(nibName: nil, bundle: nil)
 
         tabBarVC.tabBar.items = items
+        tabBarVC.actionsBar.items = actionItems
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -144,9 +154,9 @@ public class TabbedSplitViewController: UIViewController {
         super.viewDidLoad()
 
         tabBarVC.tabBar.didSelectCallback = { [unowned self] item in
-            let isTheSameItem = (item.viewController == self.masterVC.viewController)
+            let isTheSameItem = (item.action == self.masterVC.viewController)
             if !isTheSameItem {
-                self.masterVC.viewController = item.viewController
+                self.masterVC.viewController = item.action
 
                 self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
                 self.logger?.log("Hide master view: \(self.mainView.hideMasterView)")
@@ -162,6 +172,12 @@ public class TabbedSplitViewController: UIViewController {
                     self.mainView.hideSideBar()
                 }
             }
+        }
+        tabBarVC.actionsBar.didSelectCallback = { [unowned self] item in
+            if self.mainView.hideTabBarView {
+                self.mainView.hideSideBar()
+            }
+            item.action()
         }
 
         addChildViewController(tabBarVC)
@@ -316,7 +332,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func addNavigationSideBar() {
-        let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.tabBar.didSelectCallback!)
+        let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.actionsBar.items, tabBarVC.tabBar.didSelectCallback!, tabBarVC.actionsBar.didSelectCallback!)
         sideNavigationBarViewController = navVC
         addChildViewController(navVC)
         mainView.addNavigationBar(navVC.view)
@@ -358,8 +374,17 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
-    public func add(_ item: PKTabBarItem) {
+    /// Add an item with a view controller to open to the main tab bar
+    /// - parameters:
+    ///   - item: A tab bar item with a view controller as an action
+    public func addToTabBar(_ item: PKTabBarItem<UIViewController>) {
         tabBarVC.tabBar.items.append(item)
+    }
+    /// Add an item with a closure to the bottom action bar
+    /// - parameters:
+    ///   - item: A tab bar item with a closure as an action
+    public func addToActionBar(_ item: PKTabBarItem<TabBarAction>) {
+        tabBarVC.actionsBar.items.append(item)
     }
 
     private func update(oldConfig: Configuration) {
@@ -386,7 +411,8 @@ private let pkSideBarTabBarItemCellIdentifier = "PkSideBarTabBarItemCellIdentifi
 
 private class PKTabBar: UIViewController {
 
-    fileprivate let tabBar = PKTabBarTabsList()
+    fileprivate let tabBar = PKTabBarTabsList<UIViewController>()
+    fileprivate let actionsBar = PKTabBarTabsList<TabBarAction>()
 
     fileprivate var shouldAddVerticalSeparator: Bool = true
     fileprivate var verticalSeparatorColor: UIColor = .gray
@@ -403,18 +429,29 @@ private class PKTabBar: UIViewController {
 
         view.backgroundColor = nil
 
+        actionsBar.isCompact = true
+
         addChildViewController(tabBar)
-        addChildView(tabBar.view)
+        addChildView(tabBar.view, bottom: false)
+        addChildViewController(actionsBar)
+        addChildView(actionsBar.view, top: false)
+
+        tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: 8.0).isActive = true
+
         view.layoutIfNeeded()
         tabBar.didMove(toParentViewController: self)
+        actionsBar.didMove(toParentViewController: self)
+
+        tabBar.view.backgroundColor = nil
+        actionsBar.view.backgroundColor = nil
 
         if shouldAddVerticalSeparator {
             view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
         }
     }
 }
-private class PKTabBarTabsList: UITableViewController {
-    fileprivate var items = [PKTabBarItem]() {
+private class PKTabBarTabsList<Action>: UITableViewController {
+    fileprivate var items = [PKTabBarItem<Action>]() {
         didSet {
             tableView.reloadData()
         }
@@ -430,13 +467,15 @@ private class PKTabBarTabsList: UITableViewController {
             }
         }
     }
+    /// The view is shrinked to the size of the tabs
+    fileprivate var isCompact: Bool = false
+    fileprivate var didSelectCallback: ((PKTabBarItem<Action>) -> Void)?
 
-    fileprivate var didSelectCallback: ((PKTabBarItem) -> Void)?
+    private var heightConstraint: NSLayoutConstraint? = nil
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = nil
         view.accessibilityIdentifier = "Tab Bar View"
 
         tableView.isScrollEnabled = false
@@ -445,7 +484,24 @@ private class PKTabBarTabsList: UITableViewController {
         tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0)
 //        self.tableView.separatorStyle = .none
 
+        if isCompact {
+            heightConstraint = view.heightAnchor.constraint(equalToConstant: 44.0)
+            heightConstraint?.isActive = true
+        }
+
         registerCells()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        if isCompact, let constraint = heightConstraint {
+            let newHeight = tableView.contentSize.height + 8.0
+            if constraint.constant != newHeight {
+                constraint.constant = newHeight
+                view.setNeedsLayout()
+            }
+        }
     }
 
     fileprivate func registerCells() {
@@ -475,7 +531,10 @@ private class PKTabBarTabsList: UITableViewController {
     }
 }
 
-private class PKTabBarAsSideBar: PKTabBarTabsList {
+private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
+
+    fileprivate var actionItems: [PKTabBarItem<TabBarAction>] = []
+    fileprivate var actionSelectedCallback: ((PKTabBarItem<TabBarAction>) -> Void)?
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
@@ -487,17 +546,50 @@ private class PKTabBarAsSideBar: PKTabBarTabsList {
         tableView.register(PKSideTabBarItemTableViewCell.self, forCellReuseIdentifier: pkSideBarTabBarItemCellIdentifier)
     }
 
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return actionItems.isEmpty ? 1 : 2
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return super.tableView(tableView, numberOfRowsInSection: section)
+        }
+        return actionItems.count
+    }
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 1 {
+            return "___"
+        }
+        return nil
+    }
+
     fileprivate override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: pkSideBarTabBarItemCellIdentifier, for: indexPath) as! PKSideTabBarItemTableViewCell
 
-        if items.count > indexPath.row {
+        if indexPath.section == 0, items.count > indexPath.row {
             let item = items[indexPath.row]
-            cell.titleLabel.text = item.title
-            cell.iconImageView.image = item.navigationBarImage ?? item.image
-            // TODO: Add an image for selected state
+            configureCell(cell, for: item)
+        }
+        if indexPath.section == 1, actionItems.count > indexPath.row {
+            let item = actionItems[indexPath.row]
+            configureCell(cell, for: item)
         }
 
         return cell
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.section == 0 {
+            super.tableView(tableView, didSelectRowAt: indexPath)
+        } else if actionItems.count > indexPath.row {
+            let item = actionItems[indexPath.row]
+            actionSelectedCallback?(item)
+        }
+    }
+
+    private func configureCell<T>(_ cell: PKSideTabBarItemTableViewCell, for item: PKTabBarItem<T>) {
+        cell.titleLabel.text = item.title
+        cell.iconImageView.image = item.navigationBarImage ?? item.image
+        // TODO: Add an image for selected state
     }
 }
 
