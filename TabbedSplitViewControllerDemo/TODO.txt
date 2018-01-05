@@ -1,7 +1,6 @@
 Task status indicators: [ ] [•] [✓]
 
 -- Tasks: --
-[ ] iPad: Add an overlay over a detail view when master view is open, animating opacity while opening
 [ ] iPad: Add arrows to an active tab bar item when master view is in a side bar,
           looking inwards when the master view is shown and outwards when it's hidden.
 [ ] iPad: Animate opening / closing of detail view.
@@ -22,3 +21,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: Hide master view by selecting the same open tab in wide split-screen
 [✓] iPad: Add separator lines between tab bar, master view and detail view
 [✓] iPad: Add bottom action buttons
+[✓] iPad: Add an overlay over a detail view when master view is open, animating opacity while opening

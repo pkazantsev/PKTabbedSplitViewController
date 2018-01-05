@@ -95,10 +95,7 @@ class PKTabbedSplitView: UIView {
             stackView.addArrangedSubview(view)
         }
 
-        addSubview(stackView)
-
-        addConstraints(.constraints(withVisualFormat: "V:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
-        addConstraints(.constraints(withVisualFormat: "H:|[stack]|", options: [], metrics: [:], views: ["stack": stackView]))
+        addChildView(stackView)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -205,6 +202,9 @@ class PKTabbedSplitView: UIView {
     
 }
 
+private let maxOverlayAlpha: CGFloat = 0.25
+private let minOverlayAlpha: CGFloat = 0.0
+
 private class SideBarGestureRecognizerHelper {
 
     private let sourceView: UIView
@@ -219,6 +219,13 @@ private class SideBarGestureRecognizerHelper {
     fileprivate var didClose: (() -> Void)?
 
     private var startingPoint: CGFloat = 0
+
+    private let overlayView = UIView().then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.isHidden = true
+        $0.backgroundColor = .black
+        $0.alpha = minOverlayAlpha
+    }
 
     var logger: DebugLogger?
 
@@ -240,8 +247,12 @@ private class SideBarGestureRecognizerHelper {
         rec1.edges = .left
         rec1.addTarget(self, action: #selector(handleGesture(_:)))
         rec2.addTarget(self, action: #selector(handleGesture(_:)))
+
+        targetView.superview?.insertChildView(overlayView, belowSubview: targetView)
     }
     deinit {
+        showShadow(false)
+        overlayView.removeFromSuperview()
         sourceView.removeGestureRecognizer(openViewRec)
         targetView.removeGestureRecognizer(closeViewRec)
         xConstraint.isActive = false
@@ -254,6 +265,10 @@ private class SideBarGestureRecognizerHelper {
         case .began:
             let point = rec.location(ofTouch: 0, in: sourceView).x
             startingPoint = point
+            targetView.superview?.insertChildView(overlayView, belowSubview: targetView)
+            overlayView.alpha = isOpenGestRec ? minOverlayAlpha : maxOverlayAlpha
+            overlayView.isHidden = false
+            showShadow(true)
         case .changed:
             let point = rec.location(ofTouch: 0, in: sourceView).x
             if isOpenGestRec {
@@ -262,6 +277,8 @@ private class SideBarGestureRecognizerHelper {
             } else {
                 xConstraint.constant = ((point < startingPoint) ? point - startingPoint : 0) + leftOffset
             }
+            let percent = (-xConstraint.constant + leftOffset) / viewWidth
+            overlayView.alpha = maxOverlayAlpha - maxOverlayAlpha * percent
         case .ended:
             let openRemainder = abs(xConstraint.constant - leftOffset)
             let shouldOpen = openRemainder < viewWidth / 2
@@ -283,26 +300,42 @@ private class SideBarGestureRecognizerHelper {
     func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
         xConstraint.constant = -viewWidth + leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
-        UIView.animate(withDuration: duration) {
+        UIView.animate(withDuration: duration, animations: {
             self.sourceView.layoutIfNeeded()
-        }
-
-        if wasClosing {
-            openViewRec.isEnabled = true
-            didClose?()
+            self.overlayView.alpha = minOverlayAlpha
+        }) { completed in
+            if completed, wasClosing {
+                self.showShadow(false)
+                self.openViewRec.isEnabled = true
+                self.overlayView.isHidden = true
+                self.didClose?()
+            }
         }
     }
     func open(withDuration duration: TimeInterval, animated: Bool = true, wasOpening: Bool = true) {
+        showShadow(true)
         xConstraint.constant = leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
-        UIView.animate(withDuration: duration) {
+        overlayView.isHidden = false
+        UIView.animate(withDuration: duration, animations: {
             self.sourceView.layoutIfNeeded()
+            self.overlayView.alpha = maxOverlayAlpha
+        }) { completed in
+            if completed, wasOpening {
+                self.openViewRec.isEnabled = false
+                self.didOpen?()
+            }
         }
+    }
 
-        if wasOpening {
-            openViewRec.isEnabled = false
-            didOpen?()
+    func showShadow(_ show: Bool) {
+        if show {
+            targetView.layer.shadowColor = UIColor.black.cgColor
+            targetView.layer.shadowOffset = CGSize(width: 2.0, height: 0.0)
+            targetView.layer.shadowOpacity = 0.5
+            targetView.layer.shadowRadius = 2.5
         }
+        targetView.layer.masksToBounds = !show
     }
 
 }

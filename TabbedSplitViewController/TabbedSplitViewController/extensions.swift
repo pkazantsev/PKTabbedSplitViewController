@@ -15,18 +15,7 @@ extension UIViewController {
     ///
     /// - Parameter childView: a child view that will take all parent's space
     func addChildView(_ childView: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
-        view.addSubview(childView)
-
-        childView.translatesAutoresizingMaskIntoConstraints = false
-        var constraints: [NSLayoutConstraint] = []
-
-        if top { constraints.append(childView.topAnchor.constraint(equalTo: view.topAnchor)) }
-        if bottom { constraints.append(childView.bottomAnchor.constraint(equalTo: view.bottomAnchor)) }
-        if leading { constraints.append(childView.leadingAnchor.constraint(equalTo: view.leadingAnchor)) }
-        if trailing { constraints.append(childView.trailingAnchor.constraint(equalTo: view.trailingAnchor)) }
-
-        NSLayoutConstraint.activate(constraints)
-        view.setNeedsLayout()
+        view.addChildView(childView, leading: leading, top: top, trailing: trailing, bottom: bottom)
     }
 }
 
@@ -53,6 +42,28 @@ extension UIView {
             separator.rightAnchor.constraint(equalTo: rightAnchor),
             separator.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
+    }
+
+    func addChildView(_ childView: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
+        addSubview(childView)
+        configureConstraints(to: childView, leading: leading, top: top, trailing: trailing, bottom: bottom)
+    }
+    func insertChildView(_ childView: UIView, belowSubview: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
+        insertSubview(childView, belowSubview: belowSubview)
+        configureConstraints(to: childView, leading: leading, top: top, trailing: trailing, bottom: bottom)
+    }
+
+    func configureConstraints(to childView: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
+        childView.translatesAutoresizingMaskIntoConstraints = false
+        var constraints: [NSLayoutConstraint] = []
+
+        if top { constraints.append(childView.topAnchor.constraint(equalTo: topAnchor)) }
+        if bottom { constraints.append(childView.bottomAnchor.constraint(equalTo: bottomAnchor)) }
+        if leading { constraints.append(childView.leadingAnchor.constraint(equalTo: leadingAnchor)) }
+        if trailing { constraints.append(childView.trailingAnchor.constraint(equalTo: trailingAnchor)) }
+
+        NSLayoutConstraint.activate(constraints)
+        setNeedsLayout()
     }
 }
 
