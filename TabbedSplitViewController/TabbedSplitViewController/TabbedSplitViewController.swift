@@ -55,10 +55,12 @@ public class TabbedSplitViewController: UIViewController {
         public var detailViewMinWidth: CGFloat = 320
         /// Color of a vertical TabBar. **Default – .white**.
         public var tabBarBackgroundColor: UIColor = .white
+        /// Color of a detail view area when there's no detail view open. **Default – .white**.
+        public var detailBackgroundColor: UIColor = .white
         /// Color of a vertical separator between tab bar and master view,
         ///   between master view and detail view.
         ///
-        /// **Default – .white**.
+        /// **Default – .gray**.
         public var verticalSeparatorColor: UIColor = .gray
 
         /// Called when ether size or traits collection of the view is changed
@@ -84,7 +86,7 @@ public class TabbedSplitViewController: UIViewController {
                 || detailViewMinWidth != oldValue.detailViewMinWidth
         }
 
-        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, verticalSeparatorColor: .gray, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
+        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, detailBackgroundColor: .white, verticalSeparatorColor: .gray, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
     }
 
     /// Tabbed Split View Controller Configuration
@@ -182,11 +184,7 @@ public class TabbedSplitViewController: UIViewController {
 
         update(oldConfig: .zero)
 
-        view.backgroundColor = .gray
-
-        tabBarVC.backgroundColor = .purple
-        masterVC.view.backgroundColor = .green
-        detailVC.view.backgroundColor = .blue
+        view.backgroundColor = .white
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -391,6 +389,9 @@ public class TabbedSplitViewController: UIViewController {
         if config.tabBarBackgroundColor != oldConfig.tabBarBackgroundColor {
             tabBarVC.backgroundColor = config.tabBarBackgroundColor
         }
+        if config.detailBackgroundColor != oldConfig.detailBackgroundColor {
+            detailVC.backgroundColor = config.detailBackgroundColor
+        }
         if config.verticalSeparatorColor != oldConfig.verticalSeparatorColor {
             tabBarVC.verticalSeparatorColor = config.verticalSeparatorColor
             masterVC.verticalSeparatorColor = config.verticalSeparatorColor
@@ -409,7 +410,11 @@ private class PKTabBar: UIViewController {
     fileprivate let actionsBar = PKTabBarTabsList<TabBarAction>()
 
     fileprivate var shouldAddVerticalSeparator: Bool = true
-    fileprivate var verticalSeparatorColor: UIColor = .gray
+    fileprivate var verticalSeparatorColor: UIColor = .gray {
+        didSet {
+            verticalSeparator.backgroundColor = verticalSeparatorColor
+        }
+    }
     fileprivate var backgroundColor: UIColor = .white {
         didSet {
             view.backgroundColor = backgroundColor
@@ -421,7 +426,7 @@ private class PKTabBar: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = nil
+        view.backgroundColor = backgroundColor
 
         actionsBar.isCompact = true
 
@@ -473,14 +478,14 @@ private class PKTabBarTabsList<Action>: UITableViewController {
         view.accessibilityIdentifier = "Tab Bar View"
 
         tableView.isScrollEnabled = false
-        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 40))
         tableView.estimatedRowHeight = 40
-        tableView.separatorInset = UIEdgeInsetsMake(0, 0, 0, 0)
-//        self.tableView.separatorStyle = .none
+        tableView.separatorStyle = .none
 
         if isCompact {
             heightConstraint = view.heightAnchor.constraint(equalToConstant: 44.0)
             heightConstraint?.isActive = true
+        } else {
+            tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 32))
         }
 
         registerCells()
@@ -490,7 +495,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
         super.viewDidLayoutSubviews()
 
         if isCompact, let constraint = heightConstraint {
-            let newHeight = tableView.contentSize.height + 8.0
+            let newHeight = tableView.contentSize.height + 16.0
             if constraint.constant != newHeight {
                 constraint.constant = newHeight
                 view.setNeedsLayout()
@@ -671,7 +676,7 @@ private class PKMasterViewController: UIViewController {
                 addChildViewController(next)
                 addChildView(next.view)
                 if shouldAddVerticalSeparator {
-                    view.addVerticalSeparator(verticalSeparator)
+                    view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
                 }
                 view.layoutIfNeeded()
                 next.didMove(toParentViewController: self)
@@ -680,7 +685,11 @@ private class PKMasterViewController: UIViewController {
     }
     private(set) var widthConstraint: NSLayoutConstraint!
     fileprivate var shouldAddVerticalSeparator: Bool = true
-    fileprivate var verticalSeparatorColor: UIColor = .gray
+    fileprivate var verticalSeparatorColor: UIColor = .gray {
+        didSet {
+            verticalSeparator.backgroundColor = verticalSeparatorColor
+        }
+    }
     private let verticalSeparator = UIView()
 
     fileprivate init() {
@@ -698,6 +707,7 @@ private class PKMasterViewController: UIViewController {
         }
 
         view.accessibilityIdentifier = "Master View"
+        view.backgroundColor = .white
     }
 
     fileprivate func setWidthConstraint(_ constraint: NSLayoutConstraint) {
@@ -723,6 +733,11 @@ private class PKDetailViewController: UIViewController {
             }
         }
     }
+    fileprivate var backgroundColor: UIColor = .white {
+        didSet {
+            view.backgroundColor = backgroundColor
+        }
+    }
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
@@ -735,6 +750,7 @@ private class PKDetailViewController: UIViewController {
         super.viewDidLoad()
 
         view.accessibilityIdentifier = "Detail View"
+        view.backgroundColor = backgroundColor
     }
 
 }

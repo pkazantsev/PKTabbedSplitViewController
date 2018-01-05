@@ -44,6 +44,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideTabBar: \(should)")
                 return should
             }
+            config.tabBarBackgroundColor = .purple
+            config.detailBackgroundColor = .blue
+            config.verticalSeparatorColor = .orange
 
             let vc1 = ViewController()
             vc1.screenText = "Screen 1111"
