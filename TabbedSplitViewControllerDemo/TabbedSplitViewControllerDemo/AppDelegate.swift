@@ -68,7 +68,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             viewController.config = config
             // Main tab bar – view controllers
             viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), action: vc1.embeddedInNavigationController()))
-            viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: #imageLiteral(resourceName: "Peotr"), action: vc2.embeddedInNavigationController()))
+            let icon = #imageLiteral(resourceName: "Peotr").withRenderingMode(.alwaysTemplate)
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: icon, action: vc2.embeddedInNavigationController()))
             // Actions bar – closures
             viewController.addToActionBar(PKTabBarItem(title: "About", image: #imageLiteral(resourceName: "Peotr")) { [unowned viewController] in
                 let alert = UIAlertController(title: "About", message: "TabbedSplitViewController v0.1", preferredStyle: .alert)

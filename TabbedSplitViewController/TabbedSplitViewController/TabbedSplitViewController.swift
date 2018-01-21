@@ -164,8 +164,12 @@ public class TabbedSplitViewController: UIViewController {
             else if self.mainView.hideMasterView {
                 if self.mainView.sideBarIsHidden {
                     self.mainView.showSideBar()
+                    self.tabBarVC.tabBar.isOpen = true
                 } else if isTheSameItem {
                     self.mainView.hideSideBar()
+                    self.tabBarVC.tabBar.isOpen = false
+                } else {
+                    self.tabBarVC.tabBar.isOpen = true
                 }
             }
         }
@@ -442,7 +446,11 @@ private class PKTabBar: UIViewController {
         actionsBar.didMove(toParentViewController: self)
 
         tabBar.view.backgroundColor = nil
+        tabBar.shouldDisplayArrow = true
         actionsBar.view.backgroundColor = nil
+        // Should not change color when selected
+        actionsBar.view.tintColor = .black
+        actionsBar.shouldDisplayArrow = false
 
         if shouldAddVerticalSeparator {
             view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
@@ -455,6 +463,13 @@ private class PKTabBarTabsList<Action>: UITableViewController {
             tableView.reloadData()
         }
     }
+    fileprivate var isOpen: Bool = false {
+        didSet {
+            if shouldDisplayArrow, let cell = tableView.cellForRow(at: IndexPath(row: selectedItemIndex, section: 0)) as? PKTabBarItemTableViewCell {
+                cell.isOpen = isOpen
+            }
+        }
+    }
 
     /// Initial value: -1, don't select anything. Can not set -1 anytime later.
     fileprivate var selectedItemIndex: Int = -1 {
@@ -464,11 +479,15 @@ private class PKTabBarTabsList<Action>: UITableViewController {
             } else {
                 selectedItemIndex = 0
             }
+            if selectedItemIndex != oldValue {
+                tableView.selectRow(at: IndexPath(row: selectedItemIndex, section: 0), animated: true, scrollPosition: .none)
+            }
         }
     }
     /// The view is shrinked to the size of the tabs
     fileprivate var isCompact: Bool = false
     fileprivate var didSelectCallback: ((PKTabBarItem<Action>) -> Void)?
+    fileprivate var shouldDisplayArrow = true
 
     private var heightConstraint: NSLayoutConstraint? = nil
 
@@ -489,6 +508,14 @@ private class PKTabBarTabsList<Action>: UITableViewController {
         }
 
         registerCells()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if selectedItemIndex >= 0, items.count > selectedItemIndex {
+            tableView.selectRow(at: IndexPath(row: selectedItemIndex, section: 0), animated: true, scrollPosition: .none)
+        }
     }
 
     override func viewDidLayoutSubviews() {
@@ -516,6 +543,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
 
         if items.count > indexPath.row {
             let item = items[indexPath.row]
+            cell.shouldDisplayArrow = shouldDisplayArrow
             cell.titleLabel.text = item.title
             cell.iconImageView.image = item.image
             // TODO: Add an image for selected state
@@ -525,8 +553,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
     }
 
     fileprivate override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        didSelectCallback?(items[indexPath.row])
-        tableView.deselectRow(at: indexPath, animated: false)
+        selectedItemIndex = indexPath.row
     }
 }
 
@@ -586,6 +613,7 @@ private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
     }
 
     private func configureCell<T>(_ cell: PKSideTabBarItemTableViewCell, for item: PKTabBarItem<T>) {
+        cell.shouldDisplayArrow = false
         cell.titleLabel.text = item.title
         cell.iconImageView.image = item.navigationBarImage ?? item.image
         // TODO: Add an image for selected state
@@ -599,6 +627,33 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
     fileprivate let iconImageView = UIImageView().then {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
+    fileprivate let arrowImageView = UIImageView().then {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.alpha = 0.0
+        $0.contentMode = .center
+        $0.tintColor = nil
+    }
+    fileprivate var shouldDisplayArrow = true {
+        didSet {
+            arrowImageView.isHidden = !shouldDisplayArrow
+        }
+    }
+    fileprivate var isOpen = false {
+        didSet {
+            if shouldDisplayArrow {
+                arrowImageView.image = isOpen ? closeArrowImage : openArrowImage
+            }
+        }
+    }
+
+    override func tintColorDidChange() {
+        super.tintColorDidChange()
+
+        titleLabel.textColor = isSelected ? self.tintColor : .black
+    }
+
+    private lazy var openArrowImage = UIImage(named: "Tab Bar Arrow Open", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
+    private lazy var closeArrowImage = UIImage(named: "Tab Bar Arrow Close", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
 
     fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -608,6 +663,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
         contentView.addSubview(titleLabel)
         contentView.addSubview(iconImageView)
+        contentView.addSubview(arrowImageView)
 
         addConstraints()
 
@@ -616,6 +672,30 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        arrowImageView.alpha = 0.0
+        iconImageView.tintColor = nil
+    }
+
+
+    override func setSelected(_ selected: Bool, animated: Bool) {
+        super.setSelected(selected, animated: animated)
+
+        let doSelect = {
+            self.arrowImageView.alpha = selected ? 1.0 : 0.0
+            self.titleLabel.textColor = selected ? self.tintColor : .black
+            self.iconImageView.tintColor = selected ? self.tintColor : .black
+            //iconImageView.image = selected ? selectedImage : image
+        }
+        if animated {
+            UIView.animate(withDuration: 0.32, animations: doSelect)
+        } else {
+            doSelect()
+        }
     }
 
     fileprivate func configureCell() {
@@ -635,9 +715,16 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
     fileprivate func addConstraints() {
         let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
 
-        contentView.addConstraints(.constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", options: [], metrics: nil, views: views))
-        contentView.addConstraints(.constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-        contentView.addConstraints(.constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, metrics: nil, views: views))
+        let constraints: [[NSLayoutConstraint]] = [
+            .constraints(withVisualFormat: "V:|-5-[iconImageView]-5-[titleLabel]-5-|", views: views),
+            .constraints(withVisualFormat: "H:|[iconImageView]|", options: .directionLeadingToTrailing, views: views),
+            .constraints(withVisualFormat: "H:|[titleLabel]|", options: .directionLeadingToTrailing, views: views)
+        ]
+
+        NSLayoutConstraint.activate(constraints.flatMap { $0 } + [
+            arrowImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -6.0),
+            arrowImageView.centerYAnchor.constraint(equalTo: iconImageView.centerYAnchor)
+        ])
     }
 
 }
@@ -656,9 +743,12 @@ private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
     fileprivate override func addConstraints() {
         let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
 
-        contentView.addConstraints(.constraints(withVisualFormat: "H:|-[iconImageView]-[titleLabel]-|", options: .directionLeadingToTrailing, metrics: nil, views: views))
-        contentView.addConstraints(.constraints(withVisualFormat: "V:|-[iconImageView(24)]-|", options: [], metrics: nil, views: views))
-        contentView.addConstraints(.constraints(withVisualFormat: "V:|-[titleLabel]-|", options: [], metrics: nil, views: views))
+        let constraints: [[NSLayoutConstraint]] = [
+            .constraints(withVisualFormat: "H:|-[iconImageView]-[titleLabel]-|", options: .directionLeadingToTrailing, views: views),
+            .constraints(withVisualFormat: "V:|-[iconImageView(24)]-|", views: views),
+            .constraints(withVisualFormat: "V:|-[titleLabel]-|", views: views)
+        ]
+        NSLayoutConstraint.activate(constraints.flatMap { $0 })
     }
 
 }
