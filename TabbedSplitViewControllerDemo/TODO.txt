@@ -6,6 +6,7 @@ Task status indicators: [ ] [•] [✓]
 [ ] Hide side bar when tap on the background overlay
 
 -- Bugs: --
+[ ] When going from split-screen to full-screen, hide an arrow for selected tab bar cell.
 
 -- Resolved: --
 [✓] iPhone: Opening of a modal detail view
