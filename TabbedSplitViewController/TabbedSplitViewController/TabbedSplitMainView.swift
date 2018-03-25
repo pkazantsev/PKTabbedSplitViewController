@@ -249,6 +249,9 @@ private class SideBarGestureRecognizerHelper {
         rec2.addTarget(self, action: #selector(handleGesture(_:)))
 
         targetView.superview?.insertChildView(overlayView, belowSubview: targetView)
+
+        let overlayTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(didTapOverlay))
+        overlayView.addGestureRecognizer(overlayTapGestureRecognizer)
     }
     deinit {
         showShadow(false)
@@ -295,6 +298,9 @@ private class SideBarGestureRecognizerHelper {
         default:
             break
         }
+    }
+    @objc private func didTapOverlay(_ rec: UIGestureRecognizer) {
+        close(withDuration: sideBarAnimationDuration)
     }
 
     func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
