@@ -13,10 +13,6 @@
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
-		C82BE5851FB895C60082CA63 /* XCGLogger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE5831FB895C60082CA63 /* XCGLogger.framework */; };
-		C82BE5861FB895CD0082CA63 /* ObjcExceptionBridging.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE5821FB895C60082CA63 /* ObjcExceptionBridging.framework */; };
-		C82BE5871FB895CD0082CA63 /* ObjcExceptionBridging.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE5821FB895C60082CA63 /* ObjcExceptionBridging.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		C82BE5891FB895CD0082CA63 /* XCGLogger.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C82BE5831FB895C60082CA63 /* XCGLogger.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C82BE58C1FB897380082CA63 /* LoggerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */; };
 		C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; };
 		C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -41,9 +37,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C82BE5871FB895CD0082CA63 /* ObjcExceptionBridging.framework in Embed Frameworks */,
 				C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */,
-				C82BE5891FB895CD0082CA63 /* XCGLogger.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -61,8 +55,6 @@
 		9D50952B1B417592009D40C1 /* TabbedSplitViewControllerDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabbedSplitViewControllerDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
-		C82BE5821FB895C60082CA63 /* ObjcExceptionBridging.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ObjcExceptionBridging.framework; path = ../Carthage/Build/iOS/ObjcExceptionBridging.framework; sourceTree = "<group>"; };
-		C82BE5831FB895C60082CA63 /* XCGLogger.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCGLogger.framework; path = ../Carthage/Build/iOS/XCGLogger.framework; sourceTree = "<group>"; };
 		C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerWrapper.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -76,8 +68,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */,
-				C82BE5861FB895CD0082CA63 /* ObjcExceptionBridging.framework in Frameworks */,
-				C82BE5851FB895C60082CA63 /* XCGLogger.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,8 +145,6 @@
 		C85A274B1D9864E800C57331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C82BE5821FB895C60082CA63 /* ObjcExceptionBridging.framework */,
-				C82BE5831FB895C60082CA63 /* XCGLogger.framework */,
 				C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */,
 			);
 			name = Frameworks;
@@ -173,7 +161,6 @@
 				9D5095131B417592009D40C1 /* Frameworks */,
 				9D5095141B417592009D40C1 /* Resources */,
 				C89ABD981FB84CA20059CA7A /* Embed Frameworks */,
-				C82BE58A1FB896530082CA63 /* Carthage */,
 				C8AE60161FBCD7D600CDE7D9 /* Integrate Reveal Server */,
 			);
 			buildRules = (
@@ -268,24 +255,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		C82BE58A1FB896530082CA63 /* Carthage */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/../Carthage/Build/iOS/ObjcExceptionBridging.framework",
-				"$(SRCROOT)/../Carthage/Build/iOS/XCGLogger.framework",
-			);
-			name = Carthage;
-			outputPaths = (
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/ObjcExceptionBridging.framework",
-				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/XCGLogger.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/carthage copy-frameworks";
-		};
 		C8AE60161FBCD7D600CDE7D9 /* Integrate Reveal Server */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
