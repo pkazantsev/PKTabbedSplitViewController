@@ -652,8 +652,8 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
         titleLabel.textColor = isSelected ? self.tintColor : .black
     }
 
-    private lazy var openArrowImage = UIImage(named: "Tab Bar Arrow Open", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
-    private lazy var closeArrowImage = UIImage(named: "Tab Bar Arrow Close", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)?.withRenderingMode(.alwaysTemplate)
+    private lazy var openArrowImage = UIImage(named: "Tab Bar Arrow Open", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
+    private lazy var closeArrowImage = UIImage(named: "Tab Bar Arrow Close", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
 
     fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
