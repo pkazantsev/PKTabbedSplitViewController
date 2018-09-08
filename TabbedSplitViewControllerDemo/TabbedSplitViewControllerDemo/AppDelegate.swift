@@ -67,7 +67,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             viewController.config = config
             // Main tab bar – view controllers
-            viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), action: vc1.embeddedInNavigationController()))
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), selectedImage: #imageLiteral(resourceName: "Peotr2"), action: vc1.embeddedInNavigationController()))
             // Second screen's icon is rendered as template so it changes tint color when selected,
             //   unlike the first screen's icon.
             viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: #imageLiteral(resourceName: "Address"), action: vc2.embeddedInNavigationController()))

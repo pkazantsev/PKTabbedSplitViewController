@@ -2,7 +2,6 @@ Task status indicators: [ ] [•] [✓]
 
 -- Tasks: --
 [ ] iPad: Animate opening / closing of detail view.
-[ ] Add ability to assign alternative icon to a selected tab bar item
 
 -- Bugs: --
 
@@ -25,3 +24,4 @@ Task status indicators: [ ] [•] [✓]
           looking inwards when the master view is shown and outwards when it's hidden.
 [✓] Hide side bar when tap on the background overlay
 [✓] Hide/show an arrow for selected tab bar cell when changing screen size (portrait/landscape/split-screen).
+[✓] Add ability to assign alternative icon to a selected tab bar item

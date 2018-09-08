@@ -8,7 +8,7 @@
 import UIKit
 
 public typealias TabBarAction = () -> Void
-public typealias ConfigureNavigationBar = ([PKTabBarItem<UIViewController>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<UIViewController>) -> Void, ((PKTabBarItem<TabBarAction>) -> Void)?) -> UIViewController
+public typealias ConfigureNavigationBar = ([PKTabBarItem<UIViewController>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<UIViewController>, Int) -> Void, ((PKTabBarItem<TabBarAction>, Int) -> Void)?, Int) -> UIViewController
 
 public struct PKTabBarItem<T> {
 
@@ -39,6 +39,17 @@ public struct PKTabBarItem<T> {
         self.navigationBarSelectedImage = navigationBarSelectedImage
     }
 }
+
+private protocol TabBarViewModel {
+
+    var title: String { get }
+    var image: UIImage { get }
+    var selectedImage: UIImage? { get }
+    var navigationBarImage: UIImage? { get }
+    var navigationBarSelectedImage: UIImage? { get }
+
+}
+extension PKTabBarItem: TabBarViewModel {}
 
 public class TabbedSplitViewController: UIViewController {
 
@@ -100,12 +111,13 @@ public class TabbedSplitViewController: UIViewController {
     /// a tab bar is hidden and a slidable navigation bar is used instead.
     /// Accepts an array of items to configure the navigation view controller,
     /// and a callback that should be called when an item is selected
-    public var configureNavigationBar: ConfigureNavigationBar = { items, actionItems, callback, actionCallback in
+    public var configureNavigationBar: ConfigureNavigationBar = { items, actionItems, callback, actionCallback, selectedItemIndex in
         let vc = PKTabBarAsSideBar()
         vc.items = items
         vc.actionItems = actionItems
         vc.didSelectCallback = callback
         vc.actionSelectedCallback = actionCallback
+        vc.selectedItemIndex = selectedItemIndex
         return vc
     }
 
@@ -124,7 +136,7 @@ public class TabbedSplitViewController: UIViewController {
 
     private var futureTraits: UITraitCollection?
     private var futureSize: CGSize?
-
+    private var selectedTabBarItemIndex: Int = -1
     private var sideNavigationBarViewController: UIViewController?
 
     public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = []) {
@@ -149,9 +161,10 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        tabBarVC.tabBar.didSelectCallback = { [unowned self] item in
+        tabBarVC.tabBar.didSelectCallback = { [unowned self] item, selectedIndex in
             let isTheSameItem = (item.action == self.masterVC.viewController)
             if !isTheSameItem {
+                self.selectedTabBarItemIndex = selectedIndex
                 self.masterVC.viewController = item.action
 
                 self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
@@ -173,7 +186,7 @@ public class TabbedSplitViewController: UIViewController {
                 }
             }
         }
-        tabBarVC.actionsBar.didSelectCallback = { [unowned self] item in
+        tabBarVC.actionsBar.didSelectCallback = { [unowned self] item, selectedIndex in
             if self.mainView.hideTabBarView {
                 self.mainView.hideSideBar()
             }
@@ -196,6 +209,7 @@ public class TabbedSplitViewController: UIViewController {
         // Disable animations so that first layout is not animated.
         UIView.setAnimationsEnabled(false)
 
+        selectedTabBarItemIndex = 0
         tabBarVC.tabBar.selectedItemIndex = 0
 
         let screenSize = futureSize ?? view.frame.size
@@ -331,7 +345,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func addNavigationSideBar() {
-        let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.actionsBar.items, tabBarVC.tabBar.didSelectCallback!, tabBarVC.actionsBar.didSelectCallback!)
+        let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.actionsBar.items, tabBarVC.tabBar.didSelectCallback!, tabBarVC.actionsBar.didSelectCallback!, selectedTabBarItemIndex)
         sideNavigationBarViewController = navVC
         addChildViewController(navVC)
         mainView.addNavigationBar(navVC.view)
@@ -478,7 +492,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
     fileprivate var selectedItemIndex: Int = -1 {
         didSet {
             if selectedItemIndex >= 0 || selectedItemIndex < items.count {
-                didSelectCallback?(items[selectedItemIndex])
+                didSelectCallback?(items[selectedItemIndex], selectedItemIndex)
             } else {
                 selectedItemIndex = 0
             }
@@ -489,7 +503,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
     }
     /// The view is shrinked to the size of the tabs
     fileprivate var isCompact: Bool = false
-    fileprivate var didSelectCallback: ((PKTabBarItem<Action>) -> Void)?
+    fileprivate var didSelectCallback: ((PKTabBarItem<Action>, Int) -> Void)?
     fileprivate var shouldDisplayArrow = true {
         didSet {
             (0..<items.count)
@@ -553,11 +567,8 @@ private class PKTabBarTabsList<Action>: UITableViewController {
 
         if items.count > indexPath.row {
             let item = items[indexPath.row]
+            cell.item = item
             cell.shouldDisplayArrow = shouldDisplayArrow
-            cell.titleLabel.text = item.title
-            cell.iconImageView.image = item.image
-            // TODO: Add an image for selected state
-
             cell.setSelected(selectedItemIndex == indexPath.row, animated: false)
         }
 
@@ -572,7 +583,7 @@ private class PKTabBarTabsList<Action>: UITableViewController {
 private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
 
     fileprivate var actionItems: [PKTabBarItem<TabBarAction>] = []
-    fileprivate var actionSelectedCallback: ((PKTabBarItem<TabBarAction>) -> Void)?
+    fileprivate var actionSelectedCallback: ((PKTabBarItem<TabBarAction>, Int) -> Void)?
 
     fileprivate override func viewDidLoad() {
         super.viewDidLoad()
@@ -595,7 +606,7 @@ private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
     }
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 1 {
-            return "___"
+            return " "
         }
         return nil
     }
@@ -606,6 +617,7 @@ private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
         if indexPath.section == 0, items.count > indexPath.row {
             let item = items[indexPath.row]
             configureCell(cell, for: item)
+            cell.setSelected(selectedItemIndex == indexPath.row, animated: false)
         }
         if indexPath.section == 1, actionItems.count > indexPath.row {
             let item = actionItems[indexPath.row]
@@ -615,24 +627,26 @@ private class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 0 {
-            super.tableView(tableView, didSelectRowAt: indexPath)
-        } else if actionItems.count > indexPath.row {
-            let item = actionItems[indexPath.row]
-            actionSelectedCallback?(item)
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        guard indexPath.section == 1 else {
+            return indexPath
         }
+        if actionItems.count > indexPath.row {
+            let item = actionItems[indexPath.row]
+            actionSelectedCallback?(item, selectedItemIndex)
+        }
+
+        return nil
     }
 
     private func configureCell<T>(_ cell: PKSideTabBarItemTableViewCell, for item: PKTabBarItem<T>) {
         cell.shouldDisplayArrow = false
-        cell.titleLabel.text = item.title
-        cell.iconImageView.image = item.navigationBarImage ?? item.image
-        // TODO: Add an image for selected state
+        cell.item = item
     }
 }
 
 private class PKTabBarItemTableViewCell: UITableViewCell {
+
     fileprivate let titleLabel = UILabel().then {
         $0.translatesAutoresizingMaskIntoConstraints = false
     }
@@ -645,6 +659,14 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
         $0.contentMode = .center
         $0.tintColor = nil
     }
+
+    fileprivate var item: TabBarViewModel! {
+        didSet {
+            guard let anItem = item else { return }
+            configureCell(with: anItem)
+        }
+    }
+
     fileprivate var shouldDisplayArrow = true {
         didSet {
             configureArrow()
@@ -699,7 +721,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
             self.arrowImageView.alpha = selected ? 1.0 : 0.0
             self.titleLabel.textColor = selected ? self.tintColor : .black
             self.iconImageView.tintColor = selected ? self.tintColor : .black
-            //iconImageView.image = selected ? selectedImage : image
+            self.iconImageView.image = selected ? self.item.selectedImage ?? self.item.image : self.item.image
         }
         if animated {
             UIView.animate(withDuration: 0.32, animations: doSelect)
@@ -710,6 +732,10 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
     fileprivate func configureCell() {
         selectionStyle = .none
+    }
+    fileprivate func configureCell(with item: TabBarViewModel) {
+        titleLabel.text = item.title
+        iconImageView.image = isSelected && item.selectedImage != nil ? item.selectedImage : item.image
     }
 
     fileprivate func configureLabel() {
@@ -749,6 +775,15 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 }
 
 private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
+
+    fileprivate override func configureCell(with item: TabBarViewModel) {
+        titleLabel.text = item.title
+        if isSelected, let image = item.navigationBarSelectedImage {
+            iconImageView.image = image
+        } else {
+            iconImageView.image = item.navigationBarImage ?? item.image
+        }
+    }
 
     fileprivate override func configureLabel() {
         titleLabel.font = .systemFont(ofSize: 15)
