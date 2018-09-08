@@ -196,6 +196,8 @@ public class TabbedSplitViewController: UIViewController {
         // Disable animations so that first layout is not animated.
         UIView.setAnimationsEnabled(false)
 
+        tabBarVC.tabBar.selectedItemIndex = 0
+
         let screenSize = futureSize ?? view.frame.size
         let traits = futureTraits ?? traitCollection
 
@@ -221,6 +223,7 @@ public class TabbedSplitViewController: UIViewController {
                     mainView.addMasterSideBar()
                 }
             }
+            tabBarVC.tabBar.shouldDisplayArrow = hideMaster
         }
         masterVC.didMove(toParentViewController: self)
 
@@ -234,8 +237,6 @@ public class TabbedSplitViewController: UIViewController {
             }
         }
         detailVC.didMove(toParentViewController: self)
-
-        tabBarVC.tabBar.selectedItemIndex = 0
 
         UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
@@ -281,6 +282,8 @@ public class TabbedSplitViewController: UIViewController {
                 self.detailVC.viewController = detail
             }
         }
+
+        tabBarVC.tabBar.shouldDisplayArrow = hideMaster
 
         coordinator.animate(alongsideTransition: { _ in
             // First, adding to the Stack view
@@ -487,7 +490,14 @@ private class PKTabBarTabsList<Action>: UITableViewController {
     /// The view is shrinked to the size of the tabs
     fileprivate var isCompact: Bool = false
     fileprivate var didSelectCallback: ((PKTabBarItem<Action>) -> Void)?
-    fileprivate var shouldDisplayArrow = true
+    fileprivate var shouldDisplayArrow = true {
+        didSet {
+            (0..<items.count)
+                .map { tableView.cellForRow(at: IndexPath(row: $0, section: 0)) }
+                .compactMap { $0 as? PKTabBarItemTableViewCell }
+                .forEach { $0.shouldDisplayArrow = self.shouldDisplayArrow }
+        }
+    }
 
     private var heightConstraint: NSLayoutConstraint? = nil
 
@@ -547,6 +557,8 @@ private class PKTabBarTabsList<Action>: UITableViewController {
             cell.titleLabel.text = item.title
             cell.iconImageView.image = item.image
             // TODO: Add an image for selected state
+
+            cell.setSelected(selectedItemIndex == indexPath.row, animated: false)
         }
 
         return cell
@@ -635,14 +647,12 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
     }
     fileprivate var shouldDisplayArrow = true {
         didSet {
-            arrowImageView.isHidden = !shouldDisplayArrow
+            configureArrow()
         }
     }
     fileprivate var isOpen = false {
         didSet {
-            if shouldDisplayArrow {
-                arrowImageView.image = isOpen ? closeArrowImage : openArrowImage
-            }
+            configureArrow()
         }
     }
 
@@ -710,6 +720,15 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
     fileprivate func configureImageView() {
         iconImageView.contentMode = .center
+    }
+    fileprivate func configureArrow() {
+        arrowImageView.isHidden = !shouldDisplayArrow
+        // When we activate 'shouldDisplayArrow' for all cells,
+        //   the deselected ones should have their arrow hidden
+        arrowImageView.alpha = isSelected && shouldDisplayArrow ? 1.0 : 0.0
+        if shouldDisplayArrow && isSelected {
+            arrowImageView.image = isOpen ? closeArrowImage : openArrowImage
+        }
     }
 
     fileprivate func addConstraints() {

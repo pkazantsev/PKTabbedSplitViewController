@@ -5,7 +5,6 @@ Task status indicators: [ ] [•] [✓]
 [ ] Add ability to assign alternative icon to a selected tab bar item
 
 -- Bugs: --
-[ ] When going from split-screen to full-screen, hide an arrow for selected tab bar cell.
 
 -- Resolved: --
 [✓] iPhone: Opening of a modal detail view
@@ -25,3 +24,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: Add arrows to an active tab bar item when master view is in a side bar,
           looking inwards when the master view is shown and outwards when it's hidden.
 [✓] Hide side bar when tap on the background overlay
+[✓] Hide/show an arrow for selected tab bar cell when changing screen size (portrait/landscape/split-screen).
