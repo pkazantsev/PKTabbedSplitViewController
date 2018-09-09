@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DA50E1E3BC8FA005883C7 /* extensions.swift */; };
+		C84F1607214523E80063B755 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F1606214523E80063B755 /* TabBar.swift */; };
 		C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */; };
 		C8E2DCDA2001656E00C05079 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8E2DCD92001656E00C05079 /* Images.xcassets */; };
 		C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */; };
@@ -15,6 +16,7 @@
 
 /* Begin PBXFileReference section */
 		C82DA50E1E3BC8FA005883C7 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
+		C84F1606214523E80063B755 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		C85A273C1D98637B00C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C85A27401D98637B00C57331 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewController.swift; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 			children = (
 				C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */,
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
+				C84F1606214523E80063B755 /* TabBar.swift */,
 				C82DA50E1E3BC8FA005883C7 /* extensions.swift */,
 				C85A27401D98637B00C57331 /* Info.plist */,
 				C8E2DCD92001656E00C05079 /* Images.xcassets */,
@@ -144,6 +147,7 @@
 				C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */,
 				C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */,
 				C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */,
+				C84F1607214523E80063B755 /* TabBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
