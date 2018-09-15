@@ -48,24 +48,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.detailBackgroundColor = .blue
             config.verticalSeparatorColor = .orange
 
+            viewController.config = config
+
+            // Master view controllers
             let vc1 = ViewController()
             vc1.screenText = "Screen 1111"
             vc1.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
-                controller.onCloseButtonPressed = viewController.dismissDetailViewController
+                controller.onCloseButtonPressed = {
+                    let time = Date()
+                    viewController.dismissDetailViewController(animated: $0) {
+                        print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
+                    }
+                }
                 let navController = UINavigationController(rootViewController: controller)
-                viewController.showDetailViewController(navController, sender: nil)
+                let time = Date()
+                viewController.showDetailViewController(navController) {
+                    print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
+                }
             }
             let vc2 = ViewController()
+            vc2.screenText = "Screen 22222"
             vc2.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
-                controller.onCloseButtonPressed = viewController.dismissDetailViewController
+                controller.onCloseButtonPressed = {
+                    let time = Date()
+                    viewController.dismissDetailViewController(animated: $0) {
+                        print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
+                    }
+                }
                 let navController = UINavigationController(rootViewController: controller)
-                viewController.showDetailViewController(navController, sender: nil)
+                let time = Date()
+                viewController.showDetailViewController(navController) {
+                    print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
+                }
             }
-            vc2.screenText = "Screen 22222"
 
-            viewController.config = config
+            // Default detail view controller, optional
+            let defaultDetailVC = storyboard().instantiateViewController(withIdentifier: "DefaultDetailScreen")
+            viewController.defaultDetailViewController = defaultDetailVC
+
             // Main tab bar – view controllers
             viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), selectedImage: #imageLiteral(resourceName: "Peotr2"), action: vc1.embeddedInNavigationController()))
             // Second screen's icon is rendered as template so it changes tint color when selected,
@@ -81,6 +103,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         return true
+    }
+
+    private func storyboard() -> UIStoryboard {
+        return UIStoryboard(name: "Main", bundle: nil)
     }
 
 }

@@ -118,7 +118,17 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
-    private weak var detailViewController: UIViewController?
+    var detailViewController: UIViewController? {
+        return detailVC.viewController
+    }
+
+    /// A view controller that, if set, will be displayed as a detail screen
+    ///   before a detail screen opened and after a detail screen closed.
+    public var defaultDetailViewController: UIViewController? {
+        didSet {
+            detailVC.defaultViewController = self.defaultDetailViewController
+        }
+    }
 
     private let masterVC = PKMasterViewController()
     private let detailVC = PKDetailViewController()
@@ -351,29 +361,34 @@ public class TabbedSplitViewController: UIViewController {
         sideNavigationBarViewController = nil
     }
 
-    public override func showDetailViewController(_ vc: UIViewController, sender: Any?) {
+    /// Use TabbedSplitViewController.showDetailViewController(_:completion:) instead.
+    public override func showDetailViewController(_ vc: UIViewController, sender: Any? = nil) {
+        showDetailViewController(vc, completion: nil)
+    }
+    public func showDetailViewController(_ vc: UIViewController, completion: (() -> Void)? = nil) {
         // Show Detail screen if needed
         if mainView.hideDetailView {
             // Hide master view while opening a detail
             mainView.hideSideBar()
 
-            show(vc, sender: sender)
+            present(vc, animated: true, completion: completion)
         } else {
             if mainView.hideMasterView {
                 // Hide master view while opening a detail
                 mainView.hideSideBar()
             }
+            detailVC.viewControllerSwitchCompleted = completion
             detailVC.viewController = vc
         }
-        detailViewController = vc
     }
 
-    public func dismissDetailViewController(animated flag: Bool = true) {
+    public func dismissDetailViewController(animated flag: Bool = true, completion: (() -> Void)? = nil) {
         if mainView.hideDetailView {
-            dismiss(animated: flag)
+            dismiss(animated: flag, completion: completion)
         }
         else if detailVC.viewController != nil {
             logger?.log("Removing presented detail VC from parent VC")
+            detailVC.viewControllerSwitchCompleted = completion
             detailVC.viewController = nil
         }
     }
@@ -475,15 +490,18 @@ private class PKDetailViewController: UIViewController {
 
     fileprivate var viewController: UIViewController? {
         didSet {
-            if let prev = oldValue {
-                prev.willMove(toParentViewController: nil)
-                prev.view.removeFromSuperview()
-                prev.removeFromParentViewController()
+            if viewController == nil {
+                viewController = defaultViewController
             }
-            if let next = viewController {
-                addChildViewController(next)
-                addChildView(next.view)
-                next.didMove(toParentViewController: self)
+            replaceViewController(oldValue, with: viewController)
+        }
+    }
+
+    fileprivate var defaultViewController: UIViewController? {
+        didSet {
+            // Don't replace current VC if it's presented
+            if viewController == nil {
+                viewController = defaultViewController
             }
         }
     }
@@ -492,6 +510,7 @@ private class PKDetailViewController: UIViewController {
             view.backgroundColor = backgroundColor
         }
     }
+    fileprivate var viewControllerSwitchCompleted: (() -> Void)?
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
@@ -505,6 +524,53 @@ private class PKDetailViewController: UIViewController {
 
         view.accessibilityIdentifier = "Detail View"
         view.backgroundColor = backgroundColor
+    }
+
+    private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?) {
+
+        if let next = newVC {
+            addChildViewController(next)
+            addChildViewCentered(next.view)
+        }
+        oldVC?.willMove(toParentViewController: nil)
+
+        let completion = { [unowned self] in
+            oldVC?.removeFromParentViewController()
+            oldVC?.view.removeFromSuperview()
+            newVC?.didMove(toParentViewController: self)
+            self.viewControllerSwitchCompleted?()
+            self.viewControllerSwitchCompleted = nil
+        }
+        view.layoutIfNeeded()
+
+        if let prev = oldVC, let next = newVC {
+            // Switching between two view controllers
+            if let nextXPosition = next.view.constraint(for: .centerX) {
+                nextXPosition.constant = -view.bounds.width
+                view.layoutIfNeeded()
+
+                nextXPosition.constant = 0
+                prev.view.constraint(for: .centerX)?.constant = view.bounds.width
+            }
+
+            transition(from: prev, to: next, duration: 0.33, options: [.curveEaseInOut], animations: {
+                self.view.layoutIfNeeded()
+            }) { finished in
+                if finished {
+                    completion()
+                }
+            }
+        } else if let view = oldVC?.view ?? newVC?.view {
+            let isClosing = (newVC == nil)
+            view.alpha = isClosing ? 1.0 : 0.0
+            UIView.transition(with: view, duration: 0.33, options: [.curveEaseInOut], animations: {
+                view.alpha = isClosing ? 0.0 : 1.0
+            }) { finished in
+                if finished {
+                    completion()
+                }
+            }
+        }
     }
 
 }

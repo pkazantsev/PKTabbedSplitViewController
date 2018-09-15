@@ -17,6 +17,20 @@ extension UIViewController {
     func addChildView(_ childView: UIView, leading: Bool = true, top: Bool = true, trailing: Bool = true, bottom: Bool = true) {
         view.addChildView(childView, leading: leading, top: top, trailing: trailing, bottom: bottom)
     }
+    func addChildViewCentered(_ childView: UIView) {
+        childView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(childView)
+
+        let constraints = [
+            childView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            childView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            childView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            childView.heightAnchor.constraint(equalTo: view.heightAnchor)
+        ]
+
+        NSLayoutConstraint.activate(constraints)
+        view.setNeedsLayout()
+    }
 }
 
 extension UIView {
@@ -64,6 +78,18 @@ extension UIView {
 
         NSLayoutConstraint.activate(constraints)
         setNeedsLayout()
+    }
+
+    func constraint(for kind: NSLayoutAttribute) -> NSLayoutConstraint? {
+        return superview?.constraints.first {
+            if let first = $0.firstItem as? UIView, first == self {
+                return $0.firstAttribute == kind
+            }
+            if let second = $0.secondItem as? UIView, second == self {
+                return $0.secondAttribute == kind
+            }
+            return false
+        }
     }
 }
 
