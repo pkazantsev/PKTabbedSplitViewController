@@ -27,3 +27,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] Add ability to assign alternative icon to a selected tab bar item
 [✓] iPad: Animate opening / closing of detail view.
 [✓] Add callbacks for after detail finished presenting and dismissing
+[✓] Add ability to change currently open tab programmatically

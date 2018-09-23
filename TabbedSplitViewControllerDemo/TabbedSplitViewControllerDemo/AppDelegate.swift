@@ -67,6 +67,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
                 }
             }
+            vc1.onSwitchTabButtonPressed = { [unowned viewController] text in
+                viewController.selectedTabBarItemIndex = 1
+            }
             let vc2 = ViewController()
             vc2.screenText = "Screen 22222"
             vc2.onButtonPressed = { [unowned viewController] text in

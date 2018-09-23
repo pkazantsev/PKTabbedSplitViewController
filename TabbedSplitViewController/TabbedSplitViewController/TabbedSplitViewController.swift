@@ -118,8 +118,20 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
 
-    var detailViewController: UIViewController? {
+    /// Currently open detail view controller
+    public var detailViewController: UIViewController? {
         return detailVC.viewController
+    }
+
+    public var selectedTabBarItemIndex: Int = -1 {
+        didSet {
+            // Double check – the same check is done on tab bar level.
+            guard selectedTabBarItemIndex >= 0 || selectedTabBarItemIndex < tabBarVC.tabBar.items.count else {
+                selectedTabBarItemIndex = oldValue
+                return
+            }
+            tabBarVC.tabBar.selectedItemIndex = selectedTabBarItemIndex
+        }
     }
 
     /// A view controller that, if set, will be displayed as a detail screen
@@ -137,7 +149,6 @@ public class TabbedSplitViewController: UIViewController {
 
     private var futureTraits: UITraitCollection?
     private var futureSize: CGSize?
-    private var selectedTabBarItemIndex: Int = -1
     private var sideNavigationBarViewController: UIViewController?
 
     public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = []) {
@@ -211,7 +222,6 @@ public class TabbedSplitViewController: UIViewController {
         UIView.setAnimationsEnabled(false)
 
         selectedTabBarItemIndex = 0
-        tabBarVC.tabBar.selectedItemIndex = 0
 
         let screenSize = futureSize ?? view.frame.size
         let traits = futureTraits ?? traitCollection

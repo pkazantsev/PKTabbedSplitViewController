@@ -12,6 +12,7 @@ import TabbedSplitViewController
 class ViewController: UIViewController {
 
     var onButtonPressed: ((_ text: String) -> Void)?
+    var onSwitchTabButtonPressed: ((_ text: String) -> Void)?
 
     private lazy var label = UILabel()
 
@@ -51,10 +52,24 @@ class ViewController: UIViewController {
 
         button2.topAnchor.constraint(equalTo: view.topAnchor, constant: 70).isActive = true
         button2.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+
+        let button3 = UIButton(type: .system)
+        button3.addTarget(self, action: #selector(button2Pressed(_:)), for: .touchUpInside)
+        button3.tag = 34
+        button3.setTitle("Switch to tab 2", for: .normal)
+        button3.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(button3)
+
+        button3.topAnchor.constraint(equalTo: view.topAnchor, constant: 100).isActive = true
+        button3.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
 
     @objc private func buttonPressed(_ button: UIButton) {
         onButtonPressed?(button.title(for: .normal)!)
+    }
+
+    @objc private func button2Pressed(_ button: UIButton) {
+        onSwitchTabButtonPressed?(button.title(for: .normal)!)
     }
 
 }
