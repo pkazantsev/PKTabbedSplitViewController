@@ -151,6 +151,8 @@ public class TabbedSplitViewController: UIViewController {
     private var futureSize: CGSize?
     private var sideNavigationBarViewController: UIViewController?
 
+    // MARK: - Init
+
     public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = []) {
         mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
@@ -165,6 +167,8 @@ public class TabbedSplitViewController: UIViewController {
 
         super.init(coder: aDecoder)
     }
+
+    // MARK: - View lifecycle
 
     public override func loadView() {
         view = mainView
@@ -347,6 +351,8 @@ public class TabbedSplitViewController: UIViewController {
         futureTraits = nil
     }
 
+    // MARK: - Private functions
+
     private func presentDetailAsModal() {
         guard let detail = detailViewController else { return }
 
@@ -370,6 +376,8 @@ public class TabbedSplitViewController: UIViewController {
         navVC.removeFromParentViewController()
         sideNavigationBarViewController = nil
     }
+
+    // MARK: - Public functions
 
     /// Use TabbedSplitViewController.showDetailViewController(_:completion:) instead.
     public override func showDetailViewController(_ vc: UIViewController, sender: Any? = nil) {
@@ -407,13 +415,37 @@ public class TabbedSplitViewController: UIViewController {
     /// - parameters:
     ///   - item: A tab bar item with a view controller as an action
     public func addToTabBar(_ item: PKTabBarItem<UIViewController>) {
-        tabBarVC.tabBar.items.append(item)
+        tabBarVC.tabBar.appendItem(item)
+    }
+    /// Insert an item with a view controller at a specific position on the tab bar
+    /// - parameters:
+    ///   - item: A tab bar item with a view controller as an action
+    ///   - index: Position on the tab bar
+    public func insertToTabBar(_ item: PKTabBarItem<UIViewController>, at index: Int) {
+        guard index >= 0 && index < tabBarVC.tabBar.items.count else { return }
+        tabBarVC.tabBar.insertItem(item, at: index)
+    }
+    public func removeFromTabBar(at index: Int) {
+        guard index >= 0 && index < tabBarVC.tabBar.items.count else { return }
+        tabBarVC.tabBar.removeItem(at: index)
     }
     /// Add an item with a closure to the bottom action bar
     /// - parameters:
     ///   - item: A tab bar item with a closure as an action
     public func addToActionBar(_ item: PKTabBarItem<TabBarAction>) {
-        tabBarVC.actionsBar.items.append(item)
+        tabBarVC.actionsBar.appendItem(item)
+    }
+    /// Insert an item with a closure to the bottom action bar at a specific position on the tab bar
+    /// - parameters:
+    ///   - item: A tab bar item with a closure as an action
+    ///   - index: Position on the action bar
+    public func insertToActionBar(_ item: PKTabBarItem<TabBarAction>, at index: Int) {
+        guard index >= 0 && index < tabBarVC.actionsBar.items.count else { return }
+        tabBarVC.actionsBar.insertItem(item, at: index)
+    }
+    public func removeFromActionBar(at index: Int) {
+        guard index >= 0 && index < tabBarVC.actionsBar.items.count else { return }
+        tabBarVC.actionsBar.removeItem(at: index)
     }
 
     private func update(oldConfig: Configuration) {

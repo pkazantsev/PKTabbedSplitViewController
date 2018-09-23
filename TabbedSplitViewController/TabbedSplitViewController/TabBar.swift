@@ -77,6 +77,7 @@ class PKTabBar: UIViewController {
 // MARK: - Tab bar items list
 
 class PKTabBarTabsList<Action>: UITableViewController {
+
     var items = [PKTabBarItem<Action>]() {
         didSet {
             tableView.reloadData()
@@ -86,6 +87,34 @@ class PKTabBarTabsList<Action>: UITableViewController {
         didSet {
             if shouldDisplayArrow, let cell = tableView.cellForRow(at: IndexPath(row: selectedItemIndex, section: 0)) as? PKTabBarItemTableViewCell {
                 cell.isOpen = isOpen
+            }
+        }
+    }
+
+    /// Use this method over the appending directly to `items`
+    func appendItem(_ item: PKTabBarItem<Action>) {
+        items.append(item)
+    }
+    /// Use this method over the inserting directly to `items`
+    func insertItem(_ item: PKTabBarItem<Action>, at index: Int) {
+        items.insert(item, at: index)
+        if index <= selectedItemIndex {
+            DispatchQueue.main.async {
+                self.selectedItemIndex += 1
+            }
+        }
+    }
+    /// Use this method over the removing directly from `items`
+    func removeItem(at index: Int) {
+        items.remove(at: index)
+        if index == selectedItemIndex {
+            DispatchQueue.main.async {
+                self.selectedItemIndex = 0
+            }
+        }
+        else if index < selectedItemIndex {
+            DispatchQueue.main.async {
+                self.selectedItemIndex -= 1
             }
         }
     }

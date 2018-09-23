@@ -86,6 +86,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
                 }
             }
+            vc2.onSwitchTabButtonPressed = { [unowned viewController] text in
+                viewController.selectedTabBarItemIndex = 0
+            }
+            vc2.onInsertTabButtonPressed = { [unowned viewController] text in
+                self.insertNewTab(to: viewController, at: 1)
+            }
 
             // Default detail view controller, optional
             let defaultDetailVC = storyboard().instantiateViewController(withIdentifier: "DefaultDetailScreen")
@@ -106,6 +112,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         return true
+    }
+
+    private func insertNewTab(to vc: TabbedSplitViewController, at index: Int) {
+        let vc3 = ViewController()
+        vc3.screenText = "Screen 33333"
+        vc3.onRemoveTabButtonPressed = { [unowned vc] text in
+            vc.removeFromTabBar(at: index)
+        }
+        vc.insertToTabBar(PKTabBarItem(title: "Multiline Tab Title", image: #imageLiteral(resourceName: "Address"), action: vc3.embeddedInNavigationController()), at: index)
     }
 
     private func storyboard() -> UIStoryboard {

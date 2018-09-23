@@ -1,7 +1,6 @@
 Task status indicators: [ ] [•] [✓]
 
 -- Tasks: --
-[ ] Add ability to insert and delete tab bar items at specific positions
 
 -- Bugs: --
 
@@ -28,3 +27,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] iPad: Animate opening / closing of detail view.
 [✓] Add callbacks for after detail finished presenting and dismissing
 [✓] Add ability to change currently open tab programmatically
+[✓] Add ability to insert and delete tab bar items at specific positions
