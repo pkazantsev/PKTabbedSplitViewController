@@ -283,6 +283,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
     fileprivate let titleLabel = UILabel().then {
         $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.numberOfLines = 0
     }
     fileprivate let iconImageView = UIImageView().then {
         $0.translatesAutoresizingMaskIntoConstraints = false

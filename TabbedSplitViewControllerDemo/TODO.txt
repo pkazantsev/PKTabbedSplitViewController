@@ -28,3 +28,4 @@ Task status indicators: [ ] [•] [✓]
 [✓] Add callbacks for after detail finished presenting and dismissing
 [✓] Add ability to change currently open tab programmatically
 [✓] Add ability to insert and delete tab bar items at specific positions
+[✓] Fix multiline tab bar item label
