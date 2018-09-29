@@ -64,8 +64,6 @@ class PKTabBar: UIViewController {
         tabBar.view.backgroundColor = nil
         tabBar.shouldDisplayArrow = true
         actionsBar.view.backgroundColor = nil
-        // Should not change color when selected
-        actionsBar.view.tintColor = .black
         actionsBar.shouldDisplayArrow = false
 
         if shouldAddVerticalSeparator {
@@ -123,13 +121,12 @@ class PKTabBarTabsList<Action>: UITableViewController {
     var selectedItemIndex: Int = -1 {
         didSet {
             guard selectedItemIndex != oldValue else { return }
-            if selectedItemIndex >= 0 || selectedItemIndex < items.count {
+            if selectedItemIndex >= 0 && selectedItemIndex < items.count {
                 didSelectCallback?(items[selectedItemIndex], selectedItemIndex)
-            } else {
-                selectedItemIndex = oldValue
-            }
-            if selectedItemIndex != oldValue {
                 tableView.selectRow(at: IndexPath(row: selectedItemIndex, section: 0), animated: true, scrollPosition: .none)
+            } else if let selected = tableView.indexPathForSelectedRow {
+                selectedItemIndex = -1
+                tableView.deselectRow(at: selected, animated: true)
             }
         }
     }

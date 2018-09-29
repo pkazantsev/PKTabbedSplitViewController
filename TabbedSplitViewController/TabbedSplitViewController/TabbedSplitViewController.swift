@@ -207,6 +207,7 @@ public class TabbedSplitViewController: UIViewController {
                 self.mainView.hideSideBar()
             }
             item.action()
+            self.tabBarVC.actionsBar.selectedItemIndex = -1
         }
 
         addChildViewController(tabBarVC)
