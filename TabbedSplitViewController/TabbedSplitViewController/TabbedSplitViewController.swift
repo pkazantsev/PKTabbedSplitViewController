@@ -92,7 +92,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     /// Tabbed Split View Controller Configuration
-    public var config = Configuration() {
+    public var config: Configuration {
         didSet {
             update(oldConfig: oldValue)
         }
@@ -153,19 +153,23 @@ public class TabbedSplitViewController: UIViewController {
 
     // MARK: - Init
 
-    public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = []) {
+    public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = [], config: Configuration? = nil) {
+        self.config = config ?? Configuration()
         mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(nibName: nil, bundle: nil)
 
+        update(oldConfig: .zero)
         tabBarVC.tabBar.items = items
         tabBarVC.actionsBar.items = actionItems
     }
 
     public required init?(coder aDecoder: NSCoder) {
+        self.config = Configuration()
         mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, masterView: masterVC.view, detailView: detailVC.view)
 
         super.init(coder: aDecoder)
+        update(oldConfig: .zero)
     }
 
     // MARK: - View lifecycle

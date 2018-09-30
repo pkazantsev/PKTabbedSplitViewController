@@ -55,7 +55,7 @@ class PKTabBar: UIViewController {
         addChildViewController(actionsBar)
         addChildView(actionsBar.view, top: false)
 
-        tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: 8.0).isActive = true
+        tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: -8).isActive = true
 
         view.layoutIfNeeded()
         tabBar.didMove(toParentViewController: self)
@@ -63,8 +63,10 @@ class PKTabBar: UIViewController {
 
         tabBar.view.backgroundColor = nil
         tabBar.shouldDisplayArrow = true
+        tabBar.view.accessibilityIdentifier = "Tabs Bar"
         actionsBar.view.backgroundColor = nil
         actionsBar.shouldDisplayArrow = false
+        actionsBar.view.accessibilityIdentifier = "Actions Bar"
 
         if shouldAddVerticalSeparator {
             view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
@@ -324,6 +326,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
 
         configureLabel()
         configureImageView()
+        arrowImageView.image = openArrowImage
 
         contentView.addSubview(titleLabel)
         contentView.addSubview(iconImageView)

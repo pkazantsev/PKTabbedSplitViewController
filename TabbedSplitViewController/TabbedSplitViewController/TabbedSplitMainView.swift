@@ -30,12 +30,12 @@ private let sideBarAnimationDuration: TimeInterval = 0.35
 @IBDesignable
 class PKTabbedSplitView: UIView {
 
-    var tabBarWidth: CGFloat = 0 {
+    var tabBarWidth: CGFloat = 70 {
         didSet {
             tabBarWidthConstraint.constant = tabBarWidth
         }
     }
-    var masterViewWidth: CGFloat = 0 {
+    var masterViewWidth: CGFloat = 320 {
         didSet {
             masterViewWidthConstraint.constant = masterViewWidth
         }
@@ -75,15 +75,16 @@ class PKTabbedSplitView: UIView {
     private let stackViewItems: [UIView]
 
     init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
-        tabBarWidthConstraint = .init(item: tabBarView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: tabBarWidth)
-        masterViewWidthConstraint = .init(item: masterView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: masterViewWidth)
+        [tabBarView, masterView, detailView].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+
+        tabBarWidthConstraint = tabBarView.widthAnchor.constraint(equalToConstant: tabBarWidth)
+        tabBarWidthConstraint.isActive = true
+        masterViewWidthConstraint = masterView.widthAnchor.constraint(equalToConstant: masterViewWidth)
+        masterViewWidthConstraint.isActive = true
 
         stackViewItems = [tabBarView, masterView, detailView]
 
         super.init(frame: .zero)
-
-        tabBarView.addConstraint(tabBarWidthConstraint)
-        masterView.addConstraint(masterViewWidthConstraint)
 
         // Different order from stackViewItems order due to layers order
         // (details view should be at the bottom, then master view, tab bar should be at the top)
