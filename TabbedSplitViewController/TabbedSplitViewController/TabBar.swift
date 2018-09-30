@@ -122,7 +122,6 @@ class PKTabBarTabsList<Action>: UITableViewController {
     /// Initial value: -1, don't select anything. Can not set -1 anytime later.
     var selectedItemIndex: Int = -1 {
         didSet {
-            guard selectedItemIndex != oldValue else { return }
             if selectedItemIndex >= 0 && selectedItemIndex < items.count {
                 didSelectCallback?(items[selectedItemIndex], selectedItemIndex)
                 tableView.selectRow(at: IndexPath(row: selectedItemIndex, section: 0), animated: true, scrollPosition: .none)

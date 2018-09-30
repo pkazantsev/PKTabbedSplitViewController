@@ -130,7 +130,9 @@ public class TabbedSplitViewController: UIViewController {
                 selectedTabBarItemIndex = oldValue
                 return
             }
-            tabBarVC.tabBar.selectedItemIndex = selectedTabBarItemIndex
+            if tabBarVC.tabBar.selectedItemIndex != selectedTabBarItemIndex {
+                tabBarVC.tabBar.selectedItemIndex = selectedTabBarItemIndex
+            }
         }
     }
 
