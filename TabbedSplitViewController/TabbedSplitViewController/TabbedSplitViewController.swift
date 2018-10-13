@@ -119,9 +119,7 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     /// Currently open detail view controller
-    public var detailViewController: UIViewController? {
-        return detailVC.viewController
-    }
+    public private(set) var detailViewController: UIViewController?
 
     public var selectedTabBarItemIndex: Int = -1 {
         didSet {
@@ -315,7 +313,7 @@ public class TabbedSplitViewController: UIViewController {
         }
         if updateDetail, !hideDetail, let detail = detailViewController {
             dismiss(animated: false) {
-                self.detailVC.viewController = detail
+                self.detailVC.setViewController(detail, animate: false)
             }
         }
 
@@ -361,9 +359,10 @@ public class TabbedSplitViewController: UIViewController {
     // MARK: - Private functions
 
     private func presentDetailAsModal() {
-        guard let detail = detailViewController else { return }
+        guard let detail = detailViewController, detail != defaultDetailViewController else { return }
 
-        detailVC.viewController = nil
+        // Remove the view controller from the DetailVC, but keep it saved in TSVC
+        detailVC.setViewController(nil, animate: false)
         detail.view.translatesAutoresizingMaskIntoConstraints = true
         self.present(detail, animated: false)
     }
@@ -402,20 +401,20 @@ public class TabbedSplitViewController: UIViewController {
                 // Hide master view while opening a detail
                 mainView.hideSideBar()
             }
-            detailVC.viewControllerSwitchCompleted = completion
-            detailVC.viewController = vc
+            detailVC.setViewController(vc, animate: true, completion: completion)
         }
+        self.detailViewController = vc
     }
 
     public func dismissDetailViewController(animated flag: Bool = true, completion: (() -> Void)? = nil) {
         if mainView.hideDetailView {
             dismiss(animated: flag, completion: completion)
         }
-        else if detailVC.viewController != nil {
+        else if detailViewController != nil {
             logger?.log("Removing presented detail VC from parent VC")
-            detailVC.viewControllerSwitchCompleted = completion
-            detailVC.viewController = nil
+            detailVC.setViewController(nil, animate: true, completion: completion)
         }
+        self.detailViewController = nil
     }
 
     /// Add an item with a view controller to open to the main tab bar
@@ -537,20 +536,13 @@ private class PKMasterViewController: UIViewController {
 
 private class PKDetailViewController: UIViewController {
 
-    fileprivate var viewController: UIViewController? {
-        didSet {
-            if viewController == nil {
-                viewController = defaultViewController
-            }
-            replaceViewController(oldValue, with: viewController)
-        }
-    }
+    private var viewController: UIViewController?
 
     fileprivate var defaultViewController: UIViewController? {
         didSet {
             // Don't replace current VC if it's presented
-            if viewController == nil {
-                viewController = defaultViewController
+            if viewController == nil, defaultViewController != nil {
+                setViewController(defaultViewController, animate: false)
             }
         }
     }
@@ -559,7 +551,6 @@ private class PKDetailViewController: UIViewController {
             view.backgroundColor = backgroundColor
         }
     }
-    fileprivate var viewControllerSwitchCompleted: (() -> Void)?
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
@@ -575,7 +566,13 @@ private class PKDetailViewController: UIViewController {
         view.backgroundColor = backgroundColor
     }
 
-    private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?) {
+    fileprivate func setViewController(_ newVC: UIViewController?, animate: Bool, completion: (() -> Void)? = nil) {
+        let oldVC = viewController
+        viewController = newVC ?? defaultViewController
+        replaceViewController(oldVC, with: viewController, animate: animate)
+    }
+
+    private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?, animate: Bool, completion: (() -> Void)? = nil) {
 
         if let next = newVC {
             addChildViewController(next)
@@ -587,10 +584,14 @@ private class PKDetailViewController: UIViewController {
             oldVC?.removeFromParentViewController()
             oldVC?.view.removeFromSuperview()
             newVC?.didMove(toParentViewController: self)
-            self.viewControllerSwitchCompleted?()
-            self.viewControllerSwitchCompleted = nil
+            completion?()
         }
         view.layoutIfNeeded()
+
+        guard animate else {
+            completion()
+            return
+        }
 
         if let prev = oldVC, let next = newVC {
             // Switching between two view controllers
