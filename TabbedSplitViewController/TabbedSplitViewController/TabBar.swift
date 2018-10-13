@@ -432,7 +432,7 @@ private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
         let views: [String: UIView] = ["titleLabel": titleLabel, "iconImageView": iconImageView]
 
         let constraints: [[NSLayoutConstraint]] = [
-            .constraints(withVisualFormat: "H:|-[iconImageView]-[titleLabel]-|", options: .directionLeadingToTrailing, views: views),
+            .constraints(withVisualFormat: "H:|-[iconImageView(24)]-[titleLabel]-|", options: .directionLeadingToTrailing, views: views),
             .constraints(withVisualFormat: "V:|-[iconImageView(24)]-|", views: views),
             .constraints(withVisualFormat: "V:|-[titleLabel]-|", views: views)
         ]
