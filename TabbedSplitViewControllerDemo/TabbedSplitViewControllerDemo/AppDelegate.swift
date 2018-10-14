@@ -16,6 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
+        let minDetailWidth: CGFloat = 320
+        let masterWidth: CGFloat = 320
+        let tabBarWidth:CGFloat = 70
+        let minFullSizeWidth: CGFloat = (tabBarWidth + masterWidth + minDetailWidth)
+
         if let viewController = self.window?.rootViewController as? TabbedSplitViewController {
             let logger = Logger()
             viewController.logger = logger
@@ -24,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideMaster: traits.userInterfaceIdiom = \(traits.userInterfaceIdiom)")
                 logger.log("hideMaster: size.width = \(size.width)")
                 /// Master should be hidden on iPad in Portrait or in multi-tasking mode unless it's iPhone-width.
-                let should = traits.userInterfaceIdiom == .pad && size.width <= 768 && size.width > 512
+                let should = traits.userInterfaceIdiom == .pad && size.width > minFullSizeWidth && size.width <= 768
                 logger.log("hideMaster: \(should)")
                 return should
             }
@@ -32,7 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideDetail: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
                 logger.log("hideDetail: size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                let should = traits.horizontalSizeClass == .compact && size.width <= (70 + 320 + 320)
+                let should = traits.horizontalSizeClass == .compact && size.width <= minFullSizeWidth
                 logger.log("hideDetail: \(should)")
                 return should
             }
@@ -40,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideTabBar: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
                 logger.log("hideTabBar: size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
-                let should = traits.horizontalSizeClass == .compact && size.width <= 320
+                let should = traits.horizontalSizeClass == .compact && size.width <= 370
                 logger.log("hideTabBar: \(should)")
                 return should
             }
