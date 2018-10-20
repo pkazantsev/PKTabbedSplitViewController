@@ -12,7 +12,7 @@
 		9D5095211B417592009D40C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D50951F1B417592009D40C1 /* Main.storyboard */; };
 		9D5095231B417592009D40C1 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095221B417592009D40C1 /* Images.xcassets */; };
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
-		9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */; };
+		9D5095321B417592009D40C1 /* DemoConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* DemoConfigTests.swift */; };
 		C82BE58C1FB897380082CA63 /* LoggerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */; };
 		C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; };
 		C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -54,7 +54,7 @@
 		9D5095251B417592009D40C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		9D50952B1B417592009D40C1 /* TabbedSplitViewControllerDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TabbedSplitViewControllerDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D5095301B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbedSplitViewControllerDemoTests.swift; sourceTree = "<group>"; };
+		9D5095311B417592009D40C1 /* DemoConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoConfigTests.swift; sourceTree = "<group>"; };
 		C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerWrapper.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,7 +128,7 @@
 		9D50952E1B417592009D40C1 /* TabbedSplitViewControllerDemoTests */ = {
 			isa = PBXGroup;
 			children = (
-				9D5095311B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift */,
+				9D5095311B417592009D40C1 /* DemoConfigTests.swift */,
 				9D50952F1B417592009D40C1 /* Supporting Files */,
 			);
 			path = TabbedSplitViewControllerDemoTests;
@@ -287,7 +287,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D5095321B417592009D40C1 /* TabbedSplitViewControllerDemoTests.swift in Sources */,
+				9D5095321B417592009D40C1 /* DemoConfigTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
