@@ -44,7 +44,7 @@ extension UIView {
     ///   - separator: view that will be set as a separator
     ///   - color: separator color
     ///   - width: separator width
-    func addVerticalSeparator(_ separator: UIView, color: UIColor = .gray, width: CGFloat? = nil) {
+    func addVerticalSeparator(_ separator: VerticalSeparatorView, color: UIColor = .gray, width: CGFloat? = nil) {
         addSubview(separator)
         let lineWidth = width ?? 1.0 / UIScreen.main.nativeScale
         separator.translatesAutoresizingMaskIntoConstraints = false
@@ -52,7 +52,7 @@ extension UIView {
         separator.accessibilityIdentifier = "Vertical Separator"
         NSLayoutConstraint.activate([
             separator.widthAnchor.constraint(equalToConstant: lineWidth),
-            separator.topAnchor.constraint(equalTo: topAnchor),
+            separator.topAnchor.constraint(equalTo: layoutMarginsGuide.topAnchor),
             separator.rightAnchor.constraint(equalTo: rightAnchor),
             separator.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])

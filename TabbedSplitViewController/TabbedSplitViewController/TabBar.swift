@@ -41,7 +41,7 @@ class PKTabBar: UIViewController {
         }
     }
 
-    private let verticalSeparator = UIView()
+    private let verticalSeparator = VerticalSeparatorView()
 
     override func viewDidLoad() {
         super.viewDidLoad()

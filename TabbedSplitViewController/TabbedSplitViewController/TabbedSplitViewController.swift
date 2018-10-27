@@ -504,7 +504,7 @@ private class PKMasterViewController: UIViewController {
             verticalSeparator.backgroundColor = verticalSeparatorColor
         }
     }
-    private let verticalSeparator = UIView()
+    private let verticalSeparator = VerticalSeparatorView()
 
     fileprivate init() {
         super.init(nibName: nil, bundle: nil)
