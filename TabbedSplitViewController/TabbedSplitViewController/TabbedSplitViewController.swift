@@ -569,10 +569,10 @@ private class PKDetailViewController: UIViewController {
     fileprivate func setViewController(_ newVC: UIViewController?, animate: Bool, completion: (() -> Void)? = nil) {
         let oldVC = viewController
         viewController = newVC ?? defaultViewController
-        replaceViewController(oldVC, with: viewController, animate: animate)
+        replaceViewController(oldVC, with: viewController, animate: animate, completion: completion)
     }
 
-    private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?, animate: Bool, completion: (() -> Void)? = nil) {
+    private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?, animate: Bool, completion: (() -> Void)?) {
 
         if let next = newVC {
             addChildViewController(next)
