@@ -56,6 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.tabBarBackgroundColor = .purple
             config.detailBackgroundColor = .blue
             config.verticalSeparatorColor = .orange
+            config.detailAsModalShouldStayInPlace = true
 
             viewController.config = config
 
