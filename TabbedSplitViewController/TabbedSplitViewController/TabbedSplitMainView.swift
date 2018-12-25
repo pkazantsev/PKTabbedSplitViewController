@@ -103,6 +103,7 @@ class PKTabbedSplitView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Add **detail** view back to the stack view
     func addDetailView() {
         let item = StackViewItem.detail
         let view = stackViewItems[item.index]
@@ -113,8 +114,24 @@ class PKTabbedSplitView: UIView {
             stackView.insertArrangedSubview(view, at: item.index)
         }
     }
+    /// Remove **detail** view from the stack view
     func removeDetailView() {
         let view = stackViewItems[StackViewItem.detail.index]
+        stackView.removeArrangedSubview(view)
+        view.removeFromSuperview()
+    }
+
+    /// Add **master** view back to the stack view
+    func addMasterView() {
+        let item = StackViewItem.master
+        let view = stackViewItems[item.index]
+        stackView.insertSubview(view, at: item.hierarchyIndex)
+        stackView.insertArrangedSubview(view, at: item.index)
+    }
+    /// Remove **master** view from the stack view
+    func removeMasterView() {
+        let item = StackViewItem.master
+        let view = stackViewItems[item.index]
         stackView.removeArrangedSubview(view)
         view.removeFromSuperview()
     }

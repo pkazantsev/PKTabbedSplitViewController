@@ -10,6 +10,8 @@ import UIKit
 public typealias TabBarAction = () -> Void
 public typealias ConfigureNavigationBar = ([PKTabBarItem<UIViewController>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<UIViewController>, Int) -> Void, ((PKTabBarItem<TabBarAction>, Int) -> Void)?, Int) -> UIViewController
 
+private typealias State = (tabBarHidden: Bool, masterHidden: Bool, detailHidden: Bool)
+
 public struct PKTabBarItem<T> {
 
     /// Item title
@@ -160,6 +162,8 @@ public class TabbedSplitViewController: UIViewController {
     private var futureSize: CGSize?
     private var sideNavigationBarViewController: UIViewController?
 
+    private var state: State = (true, true, true)
+
     // MARK: - Init
 
     public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = [], config: Configuration? = nil) {
@@ -244,6 +248,8 @@ public class TabbedSplitViewController: UIViewController {
         let screenSize = futureSize ?? view.frame.size
         let traits = futureTraits ?? traitCollection
 
+        var state: State = (true, true, true)
+
         // This method will be called also when user changes the split-screen mode
         //   from narrow to wide, if there was detail view open as a modal.
 
@@ -255,6 +261,7 @@ public class TabbedSplitViewController: UIViewController {
                     addNavigationSideBar()
                 }
             }
+            state.tabBarHidden = hideTabBar
         }
         tabBarVC.didMove(toParentViewController: self)
 
@@ -267,6 +274,7 @@ public class TabbedSplitViewController: UIViewController {
                 }
             }
             tabBarVC.tabBar.shouldDisplayArrow = hideMaster
+            state.masterHidden = hideMaster
         }
         masterVC.didMove(toParentViewController: self)
 
@@ -278,8 +286,10 @@ public class TabbedSplitViewController: UIViewController {
                     mainView.removeDetailView()
                 }
             }
+            state.detailHidden = hideDetail
         }
         detailVC.didMove(toParentViewController: self)
+        self.state = state
 
         UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
@@ -314,6 +324,8 @@ public class TabbedSplitViewController: UIViewController {
         let updateDetail = mainView.hideDetailView != hideDetail
         let updateMaster = mainView.hideMasterView != hideMaster
         let updateTabBar = mainView.hideTabBarView != hideTabBar
+
+        state = (hideTabBar, hideMaster, hideDetail)
 
         guard updateDetail || updateMaster || updateTabBar else { return }
 
@@ -365,16 +377,20 @@ public class TabbedSplitViewController: UIViewController {
     // MARK: - Private functions
 
     private func presentDetailAsModal() {
-        guard let detail = detailViewController, detail != defaultDetailViewController else { return }
+        guard let detail = detailViewController else { return }
 
         if config.detailAsModalShouldStayInPlace {
-            presentDetailInPlace()
+            if detail != defaultDetailViewController {
+                presentDetailInPlace()
+            }
         } else {
             self.mainView.removeDetailView()
-            // Remove the view controller from the DetailVC, but keep it saved in TSVC
-            detailVC.setViewController(nil, animate: false)
-            detail.view.translatesAutoresizingMaskIntoConstraints = true
-            self.present(detail, animated: false)
+            if detail != defaultDetailViewController {
+                // Remove the view controller from the DetailVC, but keep it saved in TSVC
+                detailVC.setViewController(nil, animate: false)
+                detail.view.translatesAutoresizingMaskIntoConstraints = true
+                self.present(detail, animated: false)
+            }
         }
     }
     private func hideDetailAsModal() {
@@ -390,16 +406,30 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-        // TODO: Implement
+        if !state.masterHidden {
+            // Hide master view
+            self.mainView.removeMasterView()
+        }
+        if !state.tabBarHidden {
+            // Hide tab bar
+            self.mainView.hideTabBarView = true
+        }
         // Show detail view
-        // Hide master view
-        // Hide tab bar
+        self.mainView.addDetailView()
+        // TODO: Disable side bar gesture recognizer, if needed
     }
     private func hideDetailInPlace() {
-        // TODO: Implement
+        if !state.tabBarHidden {
+            // Show tab bar, if needed
+            self.mainView.hideTabBarView = false
+        }
+        if !state.masterHidden {
+            // Show master view
+            self.mainView.addMasterView()
+        }
         // Hide detail view
-        // Show master view
-        // Show tab bar, if needed
+        self.mainView.removeDetailView()
+        // TODO: Enable side bar gesture recognizer, if needed
     }
 
     private func addNavigationSideBar() {
@@ -432,6 +462,7 @@ public class TabbedSplitViewController: UIViewController {
 
             if config.detailAsModalShouldStayInPlace {
                 presentDetailInPlace()
+                detailVC.setViewController(vc, animate: false, completion: completion)
             } else {
                 present(vc, animated: true, completion: completion)
             }
@@ -448,6 +479,7 @@ public class TabbedSplitViewController: UIViewController {
     public func dismissDetailViewController(animated flag: Bool = true, completion: (() -> Void)? = nil) {
         if mainView.hideDetailView {
             if config.detailAsModalShouldStayInPlace {
+                detailVC.setViewController(nil, animate: true, completion: completion)
                 hideDetailInPlace()
             } else {
                 dismiss(animated: flag, completion: completion)
