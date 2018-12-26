@@ -406,30 +406,24 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-        if !state.masterHidden {
-            // Hide master view
+        if !self.state.masterHidden {
             self.mainView.removeMasterView()
         }
-        if !state.tabBarHidden {
-            // Hide tab bar
-            self.mainView.hideTabBarView = true
+        if !self.state.tabBarHidden {
+            self.mainView.removeTabBar()
         }
-        // Show detail view
         self.mainView.addDetailView()
-        // TODO: Disable side bar gesture recognizer, if needed
+        self.mainView.setSideBarGestureRecognizerEnabled(false)
     }
     private func hideDetailInPlace() {
-        if !state.tabBarHidden {
-            // Show tab bar, if needed
-            self.mainView.hideTabBarView = false
+        if !self.state.tabBarHidden {
+            self.mainView.addTabBar()
         }
-        if !state.masterHidden {
-            // Show master view
+        if !self.state.masterHidden {
             self.mainView.addMasterView()
         }
-        // Hide detail view
         self.mainView.removeDetailView()
-        // TODO: Enable side bar gesture recognizer, if needed
+        self.mainView.setSideBarGestureRecognizerEnabled(true)
     }
 
     private func addNavigationSideBar() {

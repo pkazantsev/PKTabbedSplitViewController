@@ -105,7 +105,30 @@ class PKTabbedSplitView: UIView {
 
     /// Add **detail** view back to the stack view
     func addDetailView() {
-        let item = StackViewItem.detail
+        addItemView(.detail)
+    }
+    /// Remove **detail** view from the stack view
+    func removeDetailView() {
+        removeItemView(.detail)
+    }
+    /// Add **master** view back to the stack view
+    func addMasterView() {
+        addItemView(.master)
+    }
+    /// Remove **master** view from the stack view
+    func removeMasterView() {
+        removeItemView(.master)
+    }
+    /// Add **tab bar** view back to the stack view
+    func addTabBar() {
+        addItemView(.tabBar)
+    }
+    /// Remove **tab bar** view from the stack view
+    func removeTabBar() {
+        removeItemView(.tabBar)
+    }
+
+    private func addItemView(_ item: StackViewItem) {
         let view = stackViewItems[item.index]
         stackView.insertSubview(view, at: item.hierarchyIndex)
         if item.index >= stackView.arrangedSubviews.count {
@@ -114,23 +137,7 @@ class PKTabbedSplitView: UIView {
             stackView.insertArrangedSubview(view, at: item.index)
         }
     }
-    /// Remove **detail** view from the stack view
-    func removeDetailView() {
-        let view = stackViewItems[StackViewItem.detail.index]
-        stackView.removeArrangedSubview(view)
-        view.removeFromSuperview()
-    }
-
-    /// Add **master** view back to the stack view
-    func addMasterView() {
-        let item = StackViewItem.master
-        let view = stackViewItems[item.index]
-        stackView.insertSubview(view, at: item.hierarchyIndex)
-        stackView.insertArrangedSubview(view, at: item.index)
-    }
-    /// Remove **master** view from the stack view
-    func removeMasterView() {
-        let item = StackViewItem.master
+    private func removeItemView(_ item: StackViewItem) {
         let view = stackViewItems[item.index]
         stackView.removeArrangedSubview(view)
         view.removeFromSuperview()
@@ -217,6 +224,10 @@ class PKTabbedSplitView: UIView {
         logger?.log("Opening side bar")
         sideBarGestRecHelper?.open(withDuration: sideBarAnimationDuration, animated: true, wasOpening: true)
     }
+
+    func setSideBarGestureRecognizerEnabled(_ enabled: Bool) {
+        sideBarGestRecHelper?.isEnabled = enabled
+    }
     
 }
 
@@ -231,10 +242,17 @@ private class SideBarGestureRecognizerHelper {
     private let viewWidth: CGFloat
     private let leftOffset: CGFloat
 
-    fileprivate let openViewRec: UIGestureRecognizer
-    fileprivate let closeViewRec: UIGestureRecognizer
+    private let openViewRec: UIGestureRecognizer
+    private let closeViewRec: UIGestureRecognizer
     fileprivate var didOpen: (() -> Void)?
     fileprivate var didClose: (() -> Void)?
+
+    fileprivate var isEnabled: Bool = true {
+        didSet {
+            openViewRec.isEnabled = isEnabled
+            closeViewRec.isEnabled = isEnabled
+        }
+    }
 
     private var startingPoint: CGFloat = 0
 
