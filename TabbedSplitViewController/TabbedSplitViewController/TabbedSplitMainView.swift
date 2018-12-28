@@ -104,31 +104,31 @@ class PKTabbedSplitView: UIView {
     }
 
     /// Add **detail** view back to the stack view
-    func addDetailView() {
-        addItemView(.detail)
+    func addDetailView(animate: Bool) {
+        addItemView(.detail, animate: animate)
     }
     /// Remove **detail** view from the stack view
-    func removeDetailView() {
-        removeItemView(.detail)
+    func removeDetailView(removeFromViewHierarchy: Bool, animate: Bool) {
+        hideItemView(.detail, remove: removeFromViewHierarchy, animate: animate)
     }
     /// Add **master** view back to the stack view
-    func addMasterView() {
-        addItemView(.master)
+    func addMasterView(animate: Bool) {
+        addItemView(.master, animate: animate)
     }
     /// Remove **master** view from the stack view
-    func removeMasterView() {
-        removeItemView(.master)
+    func removeMasterView(animate: Bool) {
+        hideItemView(.master, remove: false, animate: animate)
     }
     /// Add **tab bar** view back to the stack view
-    func addTabBar() {
-        addItemView(.tabBar)
+    func addTabBar(animate: Bool) {
+        addItemView(.tabBar, animate: animate)
     }
     /// Remove **tab bar** view from the stack view
-    func removeTabBar() {
-        removeItemView(.tabBar)
+    func removeTabBar(animate: Bool) {
+        hideItemView(.tabBar, remove: false, animate: animate)
     }
 
-    private func addItemView(_ item: StackViewItem) {
+    private func addItemView(_ item: StackViewItem, animate: Bool) {
         let view = stackViewItems[item.index]
         stackView.insertSubview(view, at: item.hierarchyIndex)
         if item.index >= stackView.arrangedSubviews.count {
@@ -136,11 +136,18 @@ class PKTabbedSplitView: UIView {
         } else {
             stackView.insertArrangedSubview(view, at: item.index)
         }
+        if animate {
+            // TODO: Implement hiding animation
+        }
     }
-    private func removeItemView(_ item: StackViewItem) {
+    private func hideItemView(_ item: StackViewItem, remove: Bool, animate: Bool) {
         let view = stackViewItems[item.index]
         stackView.removeArrangedSubview(view)
-        view.removeFromSuperview()
+        if remove {
+            view.removeFromSuperview()
+        } else if animate {
+            // TODO: Implement hiding animation
+        }
     }
 
     /// Creates a side bar then adds a master view there.

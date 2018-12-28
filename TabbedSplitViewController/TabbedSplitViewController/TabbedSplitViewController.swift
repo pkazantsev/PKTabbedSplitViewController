@@ -283,7 +283,7 @@ public class TabbedSplitViewController: UIViewController {
             if mainView.hideDetailView != hideDetail {
                 mainView.hideDetailView = hideDetail
                 if hideDetail {
-                    mainView.removeDetailView()
+                    mainView.removeDetailView(removeFromViewHierarchy: !config.detailAsModalShouldStayInPlace)
                 }
             }
             state.detailHidden = hideDetail
@@ -384,7 +384,7 @@ public class TabbedSplitViewController: UIViewController {
                 presentDetailInPlace()
             }
         } else {
-            self.mainView.removeDetailView()
+            self.mainView.removeDetailView(removeFromViewHierarchy: true)
             if detail != defaultDetailViewController {
                 // Remove the view controller from the DetailVC, but keep it saved in TSVC
                 detailVC.setViewController(nil, animate: false)
@@ -422,7 +422,7 @@ public class TabbedSplitViewController: UIViewController {
         if !self.state.masterHidden {
             self.mainView.addMasterView()
         }
-        self.mainView.removeDetailView()
+        self.mainView.removeDetailView(removeFromViewHierarchy: false)
         self.mainView.setSideBarGestureRecognizerEnabled(true)
     }
 
