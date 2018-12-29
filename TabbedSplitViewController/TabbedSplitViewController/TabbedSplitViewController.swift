@@ -158,6 +158,8 @@ public class TabbedSplitViewController: UIViewController {
     private let tabBarVC = PKTabBar()
     private let mainView: PKTabbedSplitView
 
+    private var configured: Bool = false
+
     private var futureTraits: UITraitCollection?
     private var futureSize: CGSize?
     private var sideNavigationBarViewController: UIViewController?
@@ -239,6 +241,10 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public override func viewWillAppear(_ animated: Bool) {
+        if (configured) {
+            super.viewWillAppear(animated)
+            return
+        }
         let shouldAnimate = UIView.areAnimationsEnabled
         // Disable animations so that first layout is not animated.
         UIView.setAnimationsEnabled(false)
@@ -293,6 +299,7 @@ public class TabbedSplitViewController: UIViewController {
 
         UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
+        configured = true
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -377,15 +384,15 @@ public class TabbedSplitViewController: UIViewController {
     // MARK: - Private functions
 
     private func presentDetailAsModal() {
-        guard let detail = detailViewController else { return }
-
         if config.detailAsModalShouldStayInPlace {
-            if detail != defaultDetailViewController {
+            if detailViewController != nil {
                 presentDetailInPlace()
+            } else {
+                self.mainView.removeDetailView(removeFromViewHierarchy: true)
             }
         } else {
             self.mainView.removeDetailView(removeFromViewHierarchy: true)
-            if detail != defaultDetailViewController {
+            if let detail = detailViewController {
                 // Remove the view controller from the DetailVC, but keep it saved in TSVC
                 detailVC.setViewController(nil, animate: false)
                 detail.view.translatesAutoresizingMaskIntoConstraints = true
@@ -394,11 +401,9 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
     private func hideDetailAsModal() {
-        guard let detail = detailViewController, detail != defaultDetailViewController else { return }
-
         if config.detailAsModalShouldStayInPlace {
             hideDetailInPlace()
-        } else {
+        } else if let detail = detailViewController {
             dismiss(animated: false) {
                 self.detailVC.setViewController(detail, animate: false)
             }
@@ -406,23 +411,11 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-        if !self.state.masterHidden {
-            self.mainView.removeMasterView()
-        }
-        if !self.state.tabBarHidden {
-            self.mainView.removeTabBar()
-        }
-        self.mainView.addDetailView()
+        self.mainView.addDetailView(removingTabBar: !self.state.tabBarHidden, removingMaster: !self.state.masterHidden)
         self.mainView.setSideBarGestureRecognizerEnabled(false)
     }
     private func hideDetailInPlace() {
-        if !self.state.tabBarHidden {
-            self.mainView.addTabBar()
-        }
-        if !self.state.masterHidden {
-            self.mainView.addMasterView()
-        }
-        self.mainView.removeDetailView(removeFromViewHierarchy: false)
+        self.mainView.removeDetailView(addingTabBar: !self.state.tabBarHidden, addingMaster: !self.state.masterHidden)
         self.mainView.setSideBarGestureRecognizerEnabled(true)
     }
 

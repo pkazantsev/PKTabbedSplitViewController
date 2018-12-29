@@ -104,49 +104,65 @@ class PKTabbedSplitView: UIView {
     }
 
     /// Add **detail** view back to the stack view
-    func addDetailView(animate: Bool) {
-        addItemView(.detail, animate: animate)
+    func addDetailView() {
+        addItemView(.detail)
+    }
+    func addDetailView(removingTabBar: Bool, removingMaster: Bool) {
+        if removingMaster {
+            removeMasterView()
+        }
+        if removingTabBar {
+            removeTabBar()
+        }
+        addDetailView()
     }
     /// Remove **detail** view from the stack view
-    func removeDetailView(removeFromViewHierarchy: Bool, animate: Bool) {
-        hideItemView(.detail, remove: removeFromViewHierarchy, animate: animate)
+    func removeDetailView(removeFromViewHierarchy: Bool) {
+        hideItemView(.detail, remove: removeFromViewHierarchy)
+    }
+    func removeDetailView(addingTabBar: Bool, addingMaster: Bool) {
+        if addingTabBar {
+            addTabBar()
+        }
+        if addingMaster {
+            addMasterView()
+        }
+        hideItemView(.detail, remove: false)
     }
     /// Add **master** view back to the stack view
-    func addMasterView(animate: Bool) {
-        addItemView(.master, animate: animate)
+    func addMasterView() {
+        addItemView(.master)
     }
     /// Remove **master** view from the stack view
-    func removeMasterView(animate: Bool) {
-        hideItemView(.master, remove: false, animate: animate)
+    func removeMasterView() {
+        hideItemView(.master, remove: false)
     }
     /// Add **tab bar** view back to the stack view
-    func addTabBar(animate: Bool) {
-        addItemView(.tabBar, animate: animate)
+    func addTabBar() {
+        addItemView(.tabBar)
     }
     /// Remove **tab bar** view from the stack view
-    func removeTabBar(animate: Bool) {
-        hideItemView(.tabBar, remove: false, animate: animate)
+    func removeTabBar() {
+        hideItemView(.tabBar, remove: false)
     }
 
-    private func addItemView(_ item: StackViewItem, animate: Bool) {
+    private func addItemView(_ item: StackViewItem) {
         let view = stackViewItems[item.index]
+        view.isHidden = false
         stackView.insertSubview(view, at: item.hierarchyIndex)
         if item.index >= stackView.arrangedSubviews.count {
             stackView.addArrangedSubview(view)
         } else {
             stackView.insertArrangedSubview(view, at: item.index)
         }
-        if animate {
-            // TODO: Implement hiding animation
-        }
     }
-    private func hideItemView(_ item: StackViewItem, remove: Bool, animate: Bool) {
+    private func hideItemView(_ item: StackViewItem, remove: Bool) {
         let view = stackViewItems[item.index]
         stackView.removeArrangedSubview(view)
         if remove {
             view.removeFromSuperview()
-        } else if animate {
-            // TODO: Implement hiding animation
+        } else {
+            view.isHidden = true
         }
     }
 
@@ -162,6 +178,7 @@ class PKTabbedSplitView: UIView {
 
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
         view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        view.isHidden = false
 
         let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
         leadingConstraint.isActive = true
@@ -185,6 +202,7 @@ class PKTabbedSplitView: UIView {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.topAnchor.constraint(equalTo: topAnchor).isActive = true
         view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        view.isHidden = false
         let width = view.widthAnchor.constraint(equalToConstant: navigationBarWidth)
         width.isActive = true
         navigationBarWidthConstraint = width
