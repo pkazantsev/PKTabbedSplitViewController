@@ -402,7 +402,7 @@ public class TabbedSplitViewController: UIViewController {
     }
     private func hideDetailAsModal() {
         if config.detailAsModalShouldStayInPlace {
-            hideDetailInPlace()
+            hideDetailInPlace(keepShown: !self.state.detailHidden)
         } else if let detail = detailViewController {
             dismiss(animated: false) {
                 self.detailVC.setViewController(detail, animate: false)
@@ -411,11 +411,13 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-        self.mainView.addDetailView(removingTabBar: !self.state.tabBarHidden, removingMaster: !self.state.masterHidden)
+        self.mainView.presentDetailViewSolo(hidingTabBar: !self.state.tabBarHidden, hidingMaster: !self.state.masterHidden)
         self.mainView.setSideBarGestureRecognizerEnabled(false)
     }
-    private func hideDetailInPlace() {
-        self.mainView.removeDetailView(addingTabBar: !self.state.tabBarHidden, addingMaster: !self.state.masterHidden)
+    private func hideDetailInPlace(keepShown: Bool) {
+        self.mainView.hideDetailViewSolo(keepShown: keepShown,
+                                     addingTabBar: !self.state.tabBarHidden,
+                                     addingMaster: !self.state.masterHidden)
         self.mainView.setSideBarGestureRecognizerEnabled(true)
     }
 
@@ -467,7 +469,7 @@ public class TabbedSplitViewController: UIViewController {
         if mainView.hideDetailView {
             if config.detailAsModalShouldStayInPlace {
                 detailVC.setViewController(nil, animate: true, completion: completion)
-                hideDetailInPlace()
+                hideDetailInPlace(keepShown: false)
             } else {
                 dismiss(animated: flag, completion: completion)
             }
