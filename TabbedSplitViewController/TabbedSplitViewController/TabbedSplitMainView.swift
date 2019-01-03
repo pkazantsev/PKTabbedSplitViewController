@@ -111,16 +111,17 @@ class PKTabbedSplitView: UIView {
 
     /// Present detail view in-place, hiding master and detail, if not already hidden
     func presentDetailViewSolo(hidingTabBar: Bool, hidingMaster: Bool) {
-        let masterNewFrame = hidingMaster ? newFrameWhenHiding(for: .master) : nil
-        let tabBarNewFrame = hidingTabBar ? newFrameWhenHiding(for: .tabBar) : nil
+        let masterNewFrame = hidingMaster ? prepareForHiding(.master) : nil
+        let tabBarNewFrame = hidingTabBar ? prepareForHiding(.tabBar) : nil
 
-        let view = self.view(for: .detail)
-        stackView.insertSubview(view, at: StackViewItem.detail.hierarchyIndex)
+        let detailView = self.view(for: .detail)
+        // Just add as a subview, will add to arranged after the animation
+        stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
 
         // Set frame to full screen and hide behind right edge
-        view.frame = stackView.frame
-        view.frame.origin.x = stackView.frame.maxX
-        view.isHidden = false
+        detailView.frame = stackView.frame
+        detailView.frame.origin.x = stackView.frame.maxX
+        detailView.isHidden = false
 
         UIView.animate(withDuration: 0.33, animations: {
             if let newFrame = masterNewFrame {
@@ -129,7 +130,7 @@ class PKTabbedSplitView: UIView {
             if let newFrame = tabBarNewFrame {
                 self.view(for: .tabBar).frame = newFrame
             }
-            view.frame.origin.x = 0
+            detailView.frame.origin.x = 0
         }) { _ in
             self.view(for: .master).isHidden = true
             self.view(for: .tabBar).isHidden = true
@@ -146,25 +147,29 @@ class PKTabbedSplitView: UIView {
     ///   - addingTabBar: add the tab bar back
     ///   - addingMaster: add the master view back
     func hideDetailViewSolo(keepShown: Bool, addingTabBar: Bool, addingMaster: Bool) {
-        func prepareView(for item: StackViewItem) {
+        func prepareForShowing(_ item: StackViewItem, pushRight: Bool = false) {
             let view = self.view(for: item)
+            stackView.removeArrangedSubview(view)
             stackView.insertSubview(view, at: item.hierarchyIndex)
+            view.translatesAutoresizingMaskIntoConstraints = true
             view.frame.size.height = stackView.frame.height
-            view.frame.origin.x = -view.frame.size.width
+            if !pushRight {
+                view.frame.origin.x = -view.frame.width
+            }
             view.isHidden = false
         }
         if addingTabBar {
-            prepareView(for: .tabBar)
+            prepareForShowing(.tabBar)
         }
         if addingMaster {
-            prepareView(for: .master)
+            prepareForShowing(.master)
         }
         let detailNewFrame: CGRect
         if keepShown {
             detailNewFrame = .zero
-            prepareView(for: .detail)
+            prepareForShowing(.detail, pushRight: true)
         } else {
-            detailNewFrame = newFrameWhenHiding(for: .detail, pushRight: true)
+            detailNewFrame = prepareForHiding(.detail, pushRight: true)
         }
         UIView.animate(withDuration: 0.33, animations: {
             if addingTabBar {
@@ -201,16 +206,13 @@ class PKTabbedSplitView: UIView {
         }
     }
 
-    private func newFrameWhenHiding(for item: StackViewItem, pushRight: Bool = false) -> CGRect {
+    private func prepareForHiding(_ item: StackViewItem, pushRight: Bool = false) -> CGRect {
         let view = self.view(for: item)
         var newFrame = view.frame
         view.translatesAutoresizingMaskIntoConstraints = true
         stackView.removeArrangedSubview(view)
-        if pushRight {
-            newFrame.origin.x = stackView.frame.maxX
-        } else {
-            newFrame.origin.x = -view.frame.size.width
-        }
+        newFrame.origin.x = pushRight ? stackView.frame.maxX : -view.frame.width
+
         return newFrame
     }
 
@@ -218,14 +220,7 @@ class PKTabbedSplitView: UIView {
 
     /// Add **detail** view back to the stack view
     func addDetailView() {
-        addItemView(.detail)
-    }
-    /// Remove **detail** view from the stack view
-    func removeDetailView(removeFromViewHierarchy: Bool) {
-        hideItemView(.detail, remove: removeFromViewHierarchy)
-    }
-
-    private func addItemView(_ item: StackViewItem) {
+        let item = StackViewItem.detail
         let view = self.view(for: item)
 
         view.isHidden = true
@@ -233,6 +228,16 @@ class PKTabbedSplitView: UIView {
         addArrangedView(item)
         view.isHidden = false
     }
+    /// Remove **detail** view from the stack view
+    func removeDetailView(removeFromViewHierarchy: Bool) {
+        let view = self.view(for: .detail)
+        if removeFromViewHierarchy {
+            view.removeFromSuperview()
+        } else {
+            view.isHidden = true
+        }
+    }
+
     private func addArrangedView(_ item: StackViewItem) {
         let view = self.view(for: item)
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -242,34 +247,24 @@ class PKTabbedSplitView: UIView {
             stackView.insertArrangedSubview(view, at: item.index)
         }
     }
-    private func hideItemView(_ item: StackViewItem, remove: Bool) {
-        let view = self.view(for: item)
-        if remove {
-            view.removeFromSuperview()
-        } else {
-            view.isHidden = true
-        }
-    }
 
     /// Creates a side bar then adds a master view there.
     /// Should be called after removing the view from the stack view!
     func addMasterSideBar() {
         logger?.log("Entered")
         sideBarIsHidden = true
-        let view = self.view(for: .master)
-        stackView.removeArrangedSubview(view)
-        view.removeFromSuperview()
-        stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
+        let sideBarView = self.view(for: .master)
+        stackView.removeArrangedSubview(sideBarView)
 
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        view.isHidden = false
+        sideBarView.translatesAutoresizingMaskIntoConstraints = false
+        sideBarView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        sideBarView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        sideBarView.isHidden = false
 
-        let leadingConstraint = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
-        leadingConstraint.isActive = true
+        let leading = sideBarView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
+        leading.isActive = true
 
-        let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leadingConstraint, targetWidth: masterViewWidth, leftOffset: tabBarWidth)
+        let helper = SideBarGestureRecognizerHelper(base: self, target: sideBarView, targetX: leading, targetWidth: masterViewWidth, leftOffset: tabBarWidth)
         helper.logger = logger
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false
@@ -279,24 +274,25 @@ class PKTabbedSplitView: UIView {
         }
         sideBarGestRecHelper = helper
     }
-    func addNavigationBar(_ view: UIView) {
+    func addNavigationBar(_ sideBarView: UIView) {
         logger?.log("Entered")
         sideBarIsHidden = true
         self.view(for: .tabBar).removeFromSuperview()
-        addSubview(view)
+        addSubview(sideBarView)
 
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        view.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        view.isHidden = false
-        let width = view.widthAnchor.constraint(equalToConstant: navigationBarWidth)
+        sideBarView.translatesAutoresizingMaskIntoConstraints = false
+        sideBarView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        sideBarView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        sideBarView.isHidden = false
+
+        let leading = sideBarView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -navigationBarWidth)
+        leading.isActive = true
+
+        let width = sideBarView.widthAnchor.constraint(equalToConstant: navigationBarWidth)
         width.isActive = true
         navigationBarWidthConstraint = width
 
-        let leading = view.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -navigationBarWidth)
-        leading.isActive = true
-
-        let helper = SideBarGestureRecognizerHelper(base: self, target: view, targetX: leading, targetWidth: navigationBarWidth)
+        let helper = SideBarGestureRecognizerHelper(base: self, target: sideBarView, targetX: leading, targetWidth: navigationBarWidth)
         helper.logger = logger
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false
@@ -317,13 +313,15 @@ class PKTabbedSplitView: UIView {
         stackView.insertSubview(view, at: StackViewItem.master.hierarchyIndex)
         stackView.insertArrangedSubview(view, at: StackViewItem.master.index)
     }
-    func removeNavigationBar(_ view: UIView) {
+    func removeNavigationBar(_ view: UIView, keepTabBarHidden: Bool) {
         logger?.log("\(view)")
         sideBarGestRecHelper = nil
         view.removeFromSuperview()
 
         let tabBar = self.view(for: .tabBar)
-        tabBar.isHidden = false
+        if !keepTabBarHidden {
+            tabBar.isHidden = false
+        }
         stackView.insertSubview(tabBar, at: StackViewItem.tabBar.hierarchyIndex)
         stackView.insertArrangedSubview(tabBar, at: StackViewItem.tabBar.index)
     }

@@ -343,12 +343,14 @@ public class TabbedSplitViewController: UIViewController {
             hideDetailAsModal()
         }
 
+        let keepTabBarHidden = hideDetail && !hideTabBar && detailViewController != nil
+
         tabBarVC.tabBar.shouldDisplayArrow = hideMaster
 
         coordinator.animate(alongsideTransition: { _ in
             // First, adding to the Stack view
             if updateTabBar, !hideTabBar {
-                self.removeNavigationSideBar()
+                self.removeNavigationSideBar(keepTabBarHidden: keepTabBarHidden)
             }
             if updateMaster, !hideMaster {
                 self.mainView.removeMasterSideBar()
@@ -428,11 +430,11 @@ public class TabbedSplitViewController: UIViewController {
         mainView.addNavigationBar(navVC.view)
         navVC.didMove(toParentViewController: self)
     }
-    private func removeNavigationSideBar() {
+    private func removeNavigationSideBar(keepTabBarHidden: Bool) {
         guard let navVC = sideNavigationBarViewController else { return }
 
         navVC.willMove(toParentViewController: nil)
-        self.mainView.removeNavigationBar(navVC.view)
+        self.mainView.removeNavigationBar(navVC.view, keepTabBarHidden: keepTabBarHidden)
         navVC.removeFromParentViewController()
         sideNavigationBarViewController = nil
     }
