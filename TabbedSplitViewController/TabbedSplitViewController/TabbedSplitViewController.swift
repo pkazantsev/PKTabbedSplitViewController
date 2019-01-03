@@ -303,10 +303,14 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+
         logger?.log("\(newCollection)")
         futureTraits = newCollection
     }
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
         logger?.log("\(size)")
         futureSize = size
         var hideDetail = false

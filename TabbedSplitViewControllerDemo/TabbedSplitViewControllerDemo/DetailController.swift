@@ -60,7 +60,7 @@ class DetailController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
     @objc private func openModalScreen(_ sender: UIButton) {
-        let vc = UIViewController()
+        let vc = DemoModalViewController()
         vc.view.backgroundColor = .gray
         vc.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeModal(_:)))
 
@@ -68,6 +68,23 @@ class DetailController: UIViewController {
         navVc.modalPresentationStyle = .formSheet
 
         present(navVc, animated: true, completion: nil)
+    }
+
+}
+
+private class DemoModalViewController: UIViewController {
+
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        print("DemoModalViewController.viewWillTransition(to:with:)")
+    }
+
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+
+        print("DemoModalViewController.willTransition(to:with:)")
     }
 
 }
