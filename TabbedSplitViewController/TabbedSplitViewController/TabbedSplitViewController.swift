@@ -229,9 +229,9 @@ public class TabbedSplitViewController: UIViewController {
             self.tabBarVC.actionsBar.selectedItemIndex = -1
         }
 
-        addChildViewController(tabBarVC)
-        addChildViewController(masterVC)
-        addChildViewController(detailVC)
+        addChild(tabBarVC)
+        addChild(masterVC)
+        addChild(detailVC)
 
         masterVC.setWidthConstraint(mainView.masterViewWidthConstraint)
 
@@ -269,7 +269,7 @@ public class TabbedSplitViewController: UIViewController {
             }
             state.tabBarHidden = hideTabBar
         }
-        tabBarVC.didMove(toParentViewController: self)
+        tabBarVC.didMove(toParent: self)
 
         if let hideMaster = config.showMasterAsSideBarWithSizeChange?(screenSize, traits, config) {
             // Update only if it's changed
@@ -282,7 +282,7 @@ public class TabbedSplitViewController: UIViewController {
             tabBarVC.tabBar.shouldDisplayArrow = hideMaster
             state.masterHidden = hideMaster
         }
-        masterVC.didMove(toParentViewController: self)
+        masterVC.didMove(toParent: self)
 
         // Hide detail from main view if there is not enough width
         if let hideDetail = config.showDetailAsModalWithSizeChange?(screenSize, traits, config) {
@@ -294,7 +294,7 @@ public class TabbedSplitViewController: UIViewController {
             }
             state.detailHidden = hideDetail
         }
-        detailVC.didMove(toParentViewController: self)
+        detailVC.didMove(toParent: self)
         self.state = state
 
         UIView.setAnimationsEnabled(shouldAnimate)
@@ -433,16 +433,16 @@ public class TabbedSplitViewController: UIViewController {
     private func addNavigationSideBar() {
         let navVC = configureNavigationBar(tabBarVC.tabBar.items, tabBarVC.actionsBar.items, tabBarVC.tabBar.didSelectCallback!, tabBarVC.actionsBar.didSelectCallback!, selectedTabBarItemIndex)
         sideNavigationBarViewController = navVC
-        addChildViewController(navVC)
+        addChild(navVC)
         mainView.addNavigationBar(navVC.view)
-        navVC.didMove(toParentViewController: self)
+        navVC.didMove(toParent: self)
     }
     private func removeNavigationSideBar(keepTabBarHidden: Bool) {
         guard let navVC = sideNavigationBarViewController else { return }
 
-        navVC.willMove(toParentViewController: nil)
+        navVC.willMove(toParent: nil)
         self.mainView.removeNavigationBar(navVC.view, keepTabBarHidden: keepTabBarHidden)
-        navVC.removeFromParentViewController()
+        navVC.removeFromParent()
         sideNavigationBarViewController = nil
     }
 
@@ -556,18 +556,18 @@ private class PKMasterViewController: UIViewController {
     fileprivate var viewController: UIViewController? {
         didSet {
             if let prev = oldValue {
-                prev.willMove(toParentViewController: nil)
+                prev.willMove(toParent: nil)
                 prev.view.removeFromSuperview()
-                prev.removeFromParentViewController()
+                prev.removeFromParent()
             }
             if let next = viewController {
-                addChildViewController(next)
+                addChild(next)
                 addChildView(next.view)
                 if shouldAddVerticalSeparator {
                     view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
                 }
                 view.layoutIfNeeded()
-                next.didMove(toParentViewController: self)
+                next.didMove(toParent: self)
             }
         }
     }
@@ -649,15 +649,15 @@ private class PKDetailViewController: UIViewController {
     private func replaceViewController(_ oldVC: UIViewController?, with newVC: UIViewController?, animate: Bool, completion: (() -> Void)?) {
 
         if let next = newVC {
-            addChildViewController(next)
+            addChild(next)
             addChildViewCentered(next.view)
         }
-        oldVC?.willMove(toParentViewController: nil)
+        oldVC?.willMove(toParent: nil)
 
         let completion = { [unowned self] in
-            oldVC?.removeFromParentViewController()
+            oldVC?.removeFromParent()
             oldVC?.view.removeFromSuperview()
-            newVC?.didMove(toParentViewController: self)
+            newVC?.didMove(toParent: self)
             completion?()
         }
         view.layoutIfNeeded()

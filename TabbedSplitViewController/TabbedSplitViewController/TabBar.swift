@@ -50,16 +50,16 @@ class PKTabBar: UIViewController {
 
         actionsBar.isCompact = true
 
-        addChildViewController(tabBar)
+        addChild(tabBar)
         addChildView(tabBar.view, bottom: false)
-        addChildViewController(actionsBar)
+        addChild(actionsBar)
         addChildView(actionsBar.view, top: false)
 
         tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: -8).isActive = true
 
         view.layoutIfNeeded()
-        tabBar.didMove(toParentViewController: self)
-        actionsBar.didMove(toParentViewController: self)
+        tabBar.didMove(toParent: self)
+        actionsBar.didMove(toParent: self)
 
         tabBar.view.backgroundColor = nil
         tabBar.shouldDisplayArrow = true
@@ -320,7 +320,7 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
     private lazy var openArrowImage = UIImage(named: "Tab Bar Arrow Open", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
     private lazy var closeArrowImage = UIImage(named: "Tab Bar Arrow Close", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
 
-    fileprivate override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    fileprivate override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
         configureLabel()

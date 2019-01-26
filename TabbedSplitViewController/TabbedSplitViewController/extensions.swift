@@ -80,7 +80,7 @@ extension UIView {
         setNeedsLayout()
     }
 
-    func constraint(for kind: NSLayoutAttribute) -> NSLayoutConstraint? {
+    func constraint(for kind: NSLayoutConstraint.Attribute) -> NSLayoutConstraint? {
         return superview?.constraints.first {
             if let first = $0.firstItem as? UIView, first == self {
                 return $0.firstAttribute == kind
@@ -95,7 +95,7 @@ extension UIView {
 
 extension Array where Element: NSLayoutConstraint {
 
-    static func constraints(withVisualFormat format: String, options opts: NSLayoutFormatOptions = [], metrics: [String : Any]? = nil, views: [String : Any]) -> [NSLayoutConstraint] {
+    static func constraints(withVisualFormat format: String, options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]? = nil, views: [String : Any]) -> [NSLayoutConstraint] {
         return NSLayoutConstraint.constraints(withVisualFormat: format, options: opts, metrics: metrics, views: views)
     }
 }
