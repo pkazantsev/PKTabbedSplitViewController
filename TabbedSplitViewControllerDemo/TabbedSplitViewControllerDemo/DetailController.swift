@@ -30,7 +30,7 @@ class DetailController: UIViewController {
         view.backgroundColor = .white
 
         if onCloseButtonPressed != nil {
-            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(close(_:)))
+            navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeDetail(_:)))
         }
 
         let label = UILabel()
@@ -41,10 +41,50 @@ class DetailController: UIViewController {
 
         label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+
+        let button = UIButton(type: .system)
+        button.setTitle("Open modal screen", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(button)
+
+        button.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8).isActive = true
+        button.addTarget(self, action: #selector(openModalScreen), for: .touchUpInside)
     }
 
-    @objc private func close(_ sender: UIBarButtonItem) {
+    @objc private func closeDetail(_ sender: UIBarButtonItem) {
         onCloseButtonPressed?(true)
+    }
+    @objc private func closeModal(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
+    @objc private func openModalScreen(_ sender: UIButton) {
+        let vc = DemoModalViewController()
+        vc.view.backgroundColor = .gray
+        vc.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeModal(_:)))
+
+        let navVc = UINavigationController(rootViewController: vc)
+        navVc.modalPresentationStyle = .formSheet
+
+        present(navVc, animated: true, completion: nil)
+    }
+
+}
+
+private class DemoModalViewController: UIViewController {
+
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        print("DemoModalViewController.viewWillTransition(to:with:)")
+    }
+
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+
+        print("DemoModalViewController.willTransition(to:with:)")
     }
 
 }
