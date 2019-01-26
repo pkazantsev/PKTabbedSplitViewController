@@ -110,7 +110,7 @@ class PKTabbedSplitView: UIView {
     // MARK: - Presenting detail view in-place
 
     /// Present detail view in-place, hiding master and detail, if not already hidden
-    func presentDetailViewSolo(hidingTabBar: Bool, hidingMaster: Bool) {
+    func presentDetailViewSolo(hidingTabBar: Bool, hidingMaster: Bool, animationFinished: (() -> Void)?) {
         let masterNewFrame = hidingMaster ? prepareForHiding(.master) : nil
         let tabBarNewFrame = hidingTabBar ? prepareForHiding(.tabBar) : nil
 
@@ -135,6 +135,7 @@ class PKTabbedSplitView: UIView {
             self.view(for: .master).isHidden = true
             self.view(for: .tabBar).isHidden = true
             self.addArrangedView(.detail)
+            animationFinished?()
         }
     }
 
@@ -146,7 +147,7 @@ class PKTabbedSplitView: UIView {
     ///   - keepShown: keep detail view on screen
     ///   - addingTabBar: add the tab bar back
     ///   - addingMaster: add the master view back
-    func hideDetailViewSolo(keepShown: Bool, addingTabBar: Bool, addingMaster: Bool) {
+    func hideDetailViewSolo(keepShown: Bool, addingTabBar: Bool, addingMaster: Bool, animationFinished: (() -> Void)?) {
         func prepareForShowing(_ item: StackViewItem, pushRight: Bool = false) {
             let view = self.view(for: item)
             stackView.removeArrangedSubview(view)
@@ -203,6 +204,7 @@ class PKTabbedSplitView: UIView {
             } else {
                 self.view(for: .detail).isHidden = true
             }
+            animationFinished?()
         }
     }
 

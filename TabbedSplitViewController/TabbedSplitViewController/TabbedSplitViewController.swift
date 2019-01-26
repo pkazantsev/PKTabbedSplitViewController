@@ -408,7 +408,7 @@ public class TabbedSplitViewController: UIViewController {
     }
     private func hideDetailAsModal() {
         if config.detailAsModalShouldStayInPlace {
-            hideDetailInPlace(keepShown: !self.state.detailHidden)
+            hideDetailInPlace(keepShown: !self.state.detailHidden, then: nil)
         } else if let detail = detailViewController {
             dismiss(animated: false) {
                 self.detailVC.setViewController(detail, animate: false)
@@ -417,13 +417,16 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-        self.mainView.presentDetailViewSolo(hidingTabBar: !self.state.tabBarHidden, hidingMaster: !self.state.masterHidden)
+        self.mainView.presentDetailViewSolo(hidingTabBar: !self.state.tabBarHidden,
+                                            hidingMaster: !self.state.masterHidden,
+                                            animationFinished: nil)
         self.mainView.setSideBarGestureRecognizerEnabled(false)
     }
-    private func hideDetailInPlace(keepShown: Bool) {
+    private func hideDetailInPlace(keepShown: Bool, then completion: (() -> Void)?) {
         self.mainView.hideDetailViewSolo(keepShown: keepShown,
                                      addingTabBar: !self.state.tabBarHidden,
-                                     addingMaster: !self.state.masterHidden)
+                                     addingMaster: !self.state.masterHidden,
+                                     animationFinished: completion)
         self.mainView.setSideBarGestureRecognizerEnabled(true)
     }
 
@@ -474,8 +477,9 @@ public class TabbedSplitViewController: UIViewController {
     public func dismissDetailViewController(animated flag: Bool = true, completion: (() -> Void)? = nil) {
         if mainView.hideDetailView {
             if config.detailAsModalShouldStayInPlace {
-                detailVC.setViewController(nil, animate: true, completion: completion)
-                hideDetailInPlace(keepShown: false)
+                hideDetailInPlace(keepShown: false, then: {
+                    self.detailVC.setViewController(nil, animate: false, completion: completion)
+                })
             } else {
                 dismiss(animated: flag, completion: completion)
             }
