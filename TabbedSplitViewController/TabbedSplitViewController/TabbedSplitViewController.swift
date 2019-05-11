@@ -233,8 +233,6 @@ public class TabbedSplitViewController: UIViewController {
         addChild(masterVC)
         addChild(detailVC)
 
-        masterVC.setWidthConstraint(mainView.masterViewWidthConstraint)
-
         update(oldConfig: .zero)
 
         view.backgroundColor = .white
@@ -297,6 +295,9 @@ public class TabbedSplitViewController: UIViewController {
         detailVC.didMove(toParent: self)
         self.state = state
 
+        mainView.tabBarWidthConstraint.isActive = true
+        mainView.masterViewWidthConstraint.isActive = true
+
         UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
         configured = true
@@ -343,7 +344,7 @@ public class TabbedSplitViewController: UIViewController {
         if updateMaster, !hideMaster {
             mainView.hideMasterView = false
         }
-        if updateDetail, !hideDetail {
+        if updateDetail, !hideDetail, !config.detailAsModalShouldStayInPlace {
             hideDetailAsModal()
         }
 
@@ -360,6 +361,9 @@ public class TabbedSplitViewController: UIViewController {
                 self.mainView.removeMasterSideBar()
             }
             if updateDetail, !hideDetail {
+                if self.config.detailAsModalShouldStayInPlace {
+                    self.hideDetailAsModalInPlace()
+                }
                 self.mainView.addDetailView()
             }
             // Then, removing from the stack view
@@ -407,13 +411,15 @@ public class TabbedSplitViewController: UIViewController {
         }
     }
     private func hideDetailAsModal() {
-        if config.detailAsModalShouldStayInPlace {
-            hideDetailInPlace(keepShown: !self.state.detailHidden, then: nil)
-        } else if let detail = detailViewController {
+        if let detail = detailViewController {
             dismiss(animated: false) {
                 self.detailVC.setViewController(detail, animate: false)
             }
         }
+    }
+    private func hideDetailAsModalInPlace() {
+        logger?.log("Move detail back to the stack view")
+        hideDetailInPlace(keepShown: !self.state.detailHidden, then: nil)
     }
 
     private func presentDetailInPlace() {
@@ -571,7 +577,6 @@ private class PKMasterViewController: UIViewController {
             }
         }
     }
-    private(set) var widthConstraint: NSLayoutConstraint!
     fileprivate var shouldAddVerticalSeparator: Bool = true
     fileprivate var verticalSeparatorColor: UIColor = .gray {
         didSet {
@@ -596,12 +601,6 @@ private class PKMasterViewController: UIViewController {
 
         view.accessibilityIdentifier = "Master View"
         view.backgroundColor = .white
-    }
-
-    fileprivate func setWidthConstraint(_ constraint: NSLayoutConstraint) {
-        if widthConstraint != nil {
-            widthConstraint = constraint
-        }
     }
 
 }
@@ -660,7 +659,6 @@ private class PKDetailViewController: UIViewController {
             newVC?.didMove(toParent: self)
             completion?()
         }
-        view.layoutIfNeeded()
 
         guard animate else {
             completion()

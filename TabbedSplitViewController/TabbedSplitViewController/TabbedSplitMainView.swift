@@ -79,14 +79,16 @@ class PKTabbedSplitView: UIView {
     }
 
     init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
-        [tabBarView, masterView, detailView].forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        stackViewItems = [tabBarView, masterView, detailView]
+        stackViewItems.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
 
         tabBarWidthConstraint = tabBarView.widthAnchor.constraint(equalToConstant: tabBarWidth)
-        tabBarWidthConstraint.isActive = true
+        // For transitions when we only have tab bar during the transition,
+        //   i.e. we don't yet have other views in the stack view by the moment transition starts
+        tabBarWidthConstraint.priority = UILayoutPriority(995)
         masterViewWidthConstraint = masterView.widthAnchor.constraint(equalToConstant: masterViewWidth)
-        masterViewWidthConstraint.isActive = true
-
-        stackViewItems = [tabBarView, masterView, detailView]
+        // For a case when we don't have detail view and we stretch master to all the parent width
+        masterViewWidthConstraint.priority = UILayoutPriority(900)
 
         super.init(frame: .zero)
 
@@ -256,14 +258,16 @@ class PKTabbedSplitView: UIView {
         logger?.log("Entered")
         sideBarIsHidden = true
         let sideBarView = self.view(for: .master)
-        stackView.removeArrangedSubview(sideBarView)
+        // Remove the master view from the stack view but only to get rid of all the constraints
+        sideBarView.removeFromSuperview()
+        stackView.insertSubview(sideBarView, at: StackViewItem.master.hierarchyIndex)
 
         sideBarView.translatesAutoresizingMaskIntoConstraints = false
-        sideBarView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        sideBarView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        sideBarView.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+        sideBarView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
         sideBarView.isHidden = false
 
-        let leading = sideBarView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -masterViewWidth)
+        let leading = sideBarView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: -masterViewWidth)
         leading.isActive = true
 
         let helper = SideBarGestureRecognizerHelper(base: self, target: sideBarView, targetX: leading, targetWidth: masterViewWidth, leftOffset: tabBarWidth)
