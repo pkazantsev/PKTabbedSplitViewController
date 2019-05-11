@@ -47,6 +47,7 @@ class PKTabBar: UIViewController {
         super.viewDidLoad()
 
         view.backgroundColor = backgroundColor
+        view.accessibilityIdentifier = "Tab Bar Container"
 
         actionsBar.isCompact = true
 
@@ -57,7 +58,6 @@ class PKTabBar: UIViewController {
 
         tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: -8).isActive = true
 
-        view.layoutIfNeeded()
         tabBar.didMove(toParent: self)
         actionsBar.didMove(toParent: self)
 
