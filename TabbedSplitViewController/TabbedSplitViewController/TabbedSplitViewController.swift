@@ -239,23 +239,17 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     public override func viewWillAppear(_ animated: Bool) {
-        if (configured) {
+        if configured {
             super.viewWillAppear(animated)
             return
         }
-        let shouldAnimate = UIView.areAnimationsEnabled
-        // Disable animations so that first layout is not animated.
-        UIView.setAnimationsEnabled(false)
 
         selectedTabBarItemIndex = 0
 
-        let screenSize = futureSize ?? view.frame.size
+        let screenSize = view.frame.size.adjustedForSafeAreaInitially(logger)
         let traits = futureTraits ?? traitCollection
 
         var state: State = (true, true, true)
-
-        // This method will be called also when user changes the split-screen mode
-        //   from narrow to wide, if there was detail view open as a modal.
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(screenSize, traits, config) {
             // Update only if it's changed
@@ -274,7 +268,7 @@ public class TabbedSplitViewController: UIViewController {
             if mainView.hideMasterView != hideMaster {
                 mainView.hideMasterView = hideMaster
                 if hideMaster {
-                    mainView.addMasterSideBar()
+                    mainView.addMasterSideBar(tabBarWidth: config.tabBarWidth)
                 }
             }
             tabBarVC.tabBar.shouldDisplayArrow = hideMaster
@@ -295,10 +289,10 @@ public class TabbedSplitViewController: UIViewController {
         detailVC.didMove(toParent: self)
         self.state = state
 
-        mainView.tabBarWidthConstraint.isActive = true
+        tabBarVC.tabBarWidthConstraint.isActive = true
+        tabBarVC.actionBarWidthConstraint.isActive = true
         mainView.masterViewWidthConstraint.isActive = true
 
-        UIView.setAnimationsEnabled(shouldAnimate)
         super.viewWillAppear(animated)
         configured = true
     }
@@ -312,47 +306,55 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        logger?.log("\(size)")
-        futureSize = size
         var hideDetail = false
         var hideMaster = false
         var hideTabBar = false
 
-        let traits = futureTraits ?? traitCollection
-        if let hideDetailFunc = config.showDetailAsModalWithSizeChange {
-            hideDetail = hideDetailFunc(size, traits, config)
-            logger?.log("hide detail view: \(hideDetail)")
-        }
-        if let hideMasterFunc = config.showMasterAsSideBarWithSizeChange {
-            hideMaster = hideMasterFunc(size, traits, config)
-            logger?.log("hide master view: \(hideMaster)")
-        }
-        if hideDetail && hideMaster {
-            logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
-        } else if let hideTabBarFunc = config.showTabBarAsSideBarWithSizeChange {
-            hideTabBar = hideTabBarFunc(size, traits, config)
-            logger?.log("hide Tab Bar: \(hideTabBar)")
-        }
-        let updateDetail = mainView.hideDetailView != hideDetail
-        let updateMaster = mainView.hideMasterView != hideMaster
-        let updateTabBar = mainView.hideTabBarView != hideTabBar
-
-        state = (hideTabBar, hideMaster, hideDetail)
-
-        guard updateDetail || updateMaster || updateTabBar else { return }
-
-        if updateMaster, !hideMaster {
-            mainView.hideMasterView = false
-        }
-        if updateDetail, !hideDetail, !config.detailAsModalShouldStayInPlace {
-            hideDetailAsModal()
-        }
-
-        let keepTabBarHidden = hideDetail && !hideTabBar && detailViewController != nil
-
-        tabBarVC.tabBar.shouldDisplayArrow = hideMaster
+        var updateDetail = false
+        var updateMaster = false
+        var updateTabBar = false
 
         coordinator.animate(alongsideTransition: { _ in
+            // Only here we could get our hand on the correct safe area values, not earlier
+            let realSize = size.adjustedForSafeArea(of: self.view, self.logger)
+            self.logger?.log("View is transitioning to \(realSize)")
+            self.futureSize = realSize
+
+            let traits = self.futureTraits ?? self.traitCollection
+            if let hideDetailFunc = self.config.showDetailAsModalWithSizeChange {
+                hideDetail = hideDetailFunc(realSize, traits, self.config)
+                self.logger?.log("hide detail view: \(hideDetail)")
+            }
+            if let hideMasterFunc = self.config.showMasterAsSideBarWithSizeChange {
+                hideMaster = hideMasterFunc(realSize, traits, self.config)
+                self.logger?.log("hide master view: \(hideMaster)")
+            }
+            if hideDetail && hideMaster {
+                self.logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
+            }
+            else if let hideTabBarFunc = self.config.showTabBarAsSideBarWithSizeChange {
+                hideTabBar = hideTabBarFunc(realSize, traits, self.config)
+                self.logger?.log("hide Tab Bar: \(hideTabBar)")
+            }
+            updateDetail = self.mainView.hideDetailView != hideDetail
+            updateMaster = self.mainView.hideMasterView != hideMaster
+            updateTabBar = self.mainView.hideTabBarView != hideTabBar
+
+            self.state = (hideTabBar, hideMaster, hideDetail)
+
+            guard updateDetail || updateMaster || updateTabBar else { return }
+
+            if updateMaster, !hideMaster {
+                self.mainView.hideMasterView = false
+            }
+            if updateDetail, !hideDetail, !self.config.detailAsModalShouldStayInPlace {
+                self.hideDetailAsModal()
+            }
+
+            let keepTabBarHidden = hideDetail && !hideTabBar && self.detailViewController != nil
+
+            self.tabBarVC.tabBar.shouldDisplayArrow = hideMaster
+
             // First, adding to the Stack view
             if updateTabBar, !hideTabBar {
                 self.removeNavigationSideBar(keepTabBarHidden: keepTabBarHidden)
@@ -371,7 +373,7 @@ public class TabbedSplitViewController: UIViewController {
                 self.addNavigationSideBar()
             }
             if updateMaster, hideMaster, !hideDetail {
-                self.mainView.addMasterSideBar()
+                self.mainView.addMasterSideBar(tabBarWidth: self.config.tabBarWidth)
             }
         }, completion: { _ in
             if updateMaster, hideMaster, !hideDetail {
@@ -536,7 +538,7 @@ public class TabbedSplitViewController: UIViewController {
 
     private func update(oldConfig: Configuration) {
         if config.tabBarWidth != oldConfig.tabBarWidth {
-            mainView.tabBarWidth = config.tabBarWidth
+            tabBarVC.tabBarWidth = config.tabBarWidth
         }
         if config.masterViewWidth != oldConfig.masterViewWidth {
             mainView.masterViewWidth = config.masterViewWidth

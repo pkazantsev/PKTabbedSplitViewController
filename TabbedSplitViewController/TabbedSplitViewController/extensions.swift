@@ -132,3 +132,60 @@ public enum LogLevel {
     case warning
     case error
 }
+
+extension CGSize {
+
+    func adjustedForSafeAreaInitially(_ logger: DebugLogger?) -> CGSize {
+        var screenSize = self
+        // Can't get safe area insets from here
+        if Utils.deviceHasNotch {
+            if screenSize.isPortrait {
+                logger?.log("Estemated safe area: \(UIEdgeInsets.init(top: 44, left: 0, bottom: 34, right: 0))")
+                screenSize.height -= 44 /* top */ + 34 /* bottom */
+            }
+            else {
+                logger?.log("Estemated safe area: \(UIEdgeInsets.init(top: 0, left: 44, bottom: 21, right: 44))")
+                screenSize.width -= 44 /* left */ + 44 /* right */
+                screenSize.height -= 21 /* bottom */
+            }
+        }
+        else {
+            logger?.log("Device does not have a notch")
+        }
+        return screenSize
+    }
+
+    func adjustedForSafeArea(of view: UIView, _ logger: DebugLogger?) -> CGSize {
+        var size = self
+        if #available(iOS 11.0, *) {
+            logger?.log("Current safe area: \(view.safeAreaInsets)")
+            size.width -= view.safeAreaInsets.left + view.safeAreaInsets.right
+            size.height -= view.safeAreaInsets.top + view.safeAreaInsets.bottom
+        }
+        return size
+    }
+
+    var isPortrait: Bool {
+        return width < height
+    }
+}
+
+private let notchDeviceNames = [
+    "iPhone10,3", "iPhone10,6", "iPhone11,2", "iPhone11,4", "iPhone11,6", "iPhone11,8"
+]
+
+enum Utils {
+
+    static var deviceHasNotch: Bool {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+
+        return notchDeviceNames.contains(identifier)
+    }
+
+}

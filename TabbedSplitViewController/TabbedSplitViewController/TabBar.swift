@@ -29,6 +29,15 @@ class PKTabBar: UIViewController {
     let tabBar = PKTabBarTabsList<UIViewController>()
     let actionsBar = PKTabBarTabsList<TabBarAction>()
 
+    var tabBarWidth: CGFloat = 70 {
+        didSet {
+            tabBarWidthConstraint?.constant = tabBarWidth
+            actionBarWidthConstraint?.constant = tabBarWidth
+        }
+    }
+    private(set) var tabBarWidthConstraint: NSLayoutConstraint!
+    private(set) var actionBarWidthConstraint: NSLayoutConstraint!
+
     var shouldAddVerticalSeparator: Bool = true
     var verticalSeparatorColor: UIColor = .gray {
         didSet {
@@ -52,9 +61,28 @@ class PKTabBar: UIViewController {
         actionsBar.isCompact = true
 
         addChild(tabBar)
-        addChildView(tabBar.view, bottom: false)
         addChild(actionsBar)
-        addChildView(actionsBar.view, top: false)
+
+        if #available(iOS 11.0, *) {
+            view.addSubview(tabBar.view)
+            view.addSubview(actionsBar.view)
+            tabBar.view.translatesAutoresizingMaskIntoConstraints = false
+            actionsBar.view.translatesAutoresizingMaskIntoConstraints = false
+            let safeArea = view.safeAreaLayoutGuide
+            let constraints = [
+                safeArea.topAnchor.constraint(equalTo: tabBar.view.topAnchor),
+                safeArea.leftAnchor.constraint(equalTo: tabBar.view.leftAnchor),
+                safeArea.rightAnchor.constraint(equalTo: tabBar.view.rightAnchor),
+
+                safeArea.leftAnchor.constraint(equalTo: actionsBar.view.leftAnchor),
+                safeArea.rightAnchor.constraint(equalTo: actionsBar.view.rightAnchor),
+                safeArea.bottomAnchor.constraint(equalTo: actionsBar.view.bottomAnchor),
+            ]
+            NSLayoutConstraint.activate(constraints)
+        } else {
+            addChildView(tabBar.view, bottom: false)
+            addChildView(actionsBar.view, top: false)
+        }
 
         tabBar.view.bottomAnchor.constraint(equalTo: actionsBar.view.topAnchor, constant: -8).isActive = true
 
@@ -67,6 +95,14 @@ class PKTabBar: UIViewController {
         actionsBar.view.backgroundColor = nil
         actionsBar.shouldDisplayArrow = false
         actionsBar.view.accessibilityIdentifier = "Actions Bar"
+
+
+        tabBarWidthConstraint = tabBar.view.widthAnchor.constraint(equalToConstant: tabBarWidth)
+        actionBarWidthConstraint = actionsBar.view.widthAnchor.constraint(equalToConstant: tabBarWidth)
+        // For transitions when we only have tab bar during the transition,
+        //   i.e. we don't yet have other views in the stack view by the moment transition starts
+        tabBarWidthConstraint.priority = UILayoutPriority(995)
+        actionBarWidthConstraint.priority = UILayoutPriority(995)
 
         if shouldAddVerticalSeparator {
             view.addVerticalSeparator(verticalSeparator, color: verticalSeparatorColor)
@@ -158,7 +194,7 @@ class PKTabBarTabsList<Action>: UITableViewController {
             heightConstraint = view.heightAnchor.constraint(equalToConstant: 44.0)
             heightConstraint?.isActive = true
         } else {
-            tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 32))
+            tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 10, height: 8))
         }
 
         registerCells()
