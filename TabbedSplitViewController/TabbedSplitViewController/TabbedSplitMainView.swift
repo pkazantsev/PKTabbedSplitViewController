@@ -30,11 +30,6 @@ private let sideBarAnimationDuration: TimeInterval = 0.35
 @IBDesignable
 class PKTabbedSplitView: UIView {
 
-    var tabBarWidth: CGFloat = 70 {
-        didSet {
-            tabBarWidthConstraint.constant = tabBarWidth
-        }
-    }
     var masterViewWidth: CGFloat = 320 {
         didSet {
             masterViewWidthConstraint.constant = masterViewWidth
@@ -45,7 +40,6 @@ class PKTabbedSplitView: UIView {
             navigationBarWidthConstraint?.constant = navigationBarWidth
         }
     }
-    let tabBarWidthConstraint: NSLayoutConstraint
     let masterViewWidthConstraint: NSLayoutConstraint
     private(set) var navigationBarWidthConstraint: NSLayoutConstraint?
 
@@ -81,11 +75,6 @@ class PKTabbedSplitView: UIView {
     init(tabBarView: UIView, masterView: UIView, detailView: UIView) {
         stackViewItems = [tabBarView, masterView, detailView]
         stackViewItems.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
-
-        tabBarWidthConstraint = tabBarView.widthAnchor.constraint(equalToConstant: tabBarWidth)
-        // For transitions when we only have tab bar during the transition,
-        //   i.e. we don't yet have other views in the stack view by the moment transition starts
-        tabBarWidthConstraint.priority = UILayoutPriority(995)
         masterViewWidthConstraint = masterView.widthAnchor.constraint(equalToConstant: masterViewWidth)
         // For a case when we don't have detail view and we stretch master to all the parent width
         masterViewWidthConstraint.priority = UILayoutPriority(900)
@@ -102,7 +91,21 @@ class PKTabbedSplitView: UIView {
             stackView.addArrangedSubview(view)
         }
 
-        addChildView(stackView)
+        if #available(iOS 11.0, *) {
+            addSubview(stackView)
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+
+            let constraints = [
+                stackView.leftAnchor.constraint(equalTo: leftAnchor),
+                stackView.topAnchor.constraint(equalTo: topAnchor),
+                stackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
+                stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            ]
+            NSLayoutConstraint.activate(constraints)
+        }
+        else {
+            addChildView(stackView)
+        }
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -254,7 +257,7 @@ class PKTabbedSplitView: UIView {
 
     /// Creates a side bar then adds a master view there.
     /// Should be called after removing the view from the stack view!
-    func addMasterSideBar() {
+    func addMasterSideBar(tabBarWidth: CGFloat) {
         logger?.log("Entered")
         sideBarIsHidden = true
         let sideBarView = self.view(for: .master)

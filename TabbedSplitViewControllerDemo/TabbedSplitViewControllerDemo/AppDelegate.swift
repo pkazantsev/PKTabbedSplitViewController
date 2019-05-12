@@ -154,3 +154,27 @@ extension UIViewController {
     
 }
 
+extension UIUserInterfaceIdiom: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .unspecified: return ".unspecified"
+        case .phone: return ".phone"
+        case .pad: return ".pad"
+        case .tv: return ".tv"
+        case .carPlay: return ".carPlay"
+        }
+    }
+}
+
+extension UIUserInterfaceSizeClass: CustomStringConvertible {
+
+    public var description: String {
+        switch self {
+        case .unspecified: return ".unspecified"
+        case .compact: return ".compact"
+        case .regular: return ".regular"
+        }
+    }
+}
+

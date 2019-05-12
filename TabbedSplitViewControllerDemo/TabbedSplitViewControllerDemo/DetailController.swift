@@ -53,6 +53,12 @@ class DetailController: UIViewController {
         button.addTarget(self, action: #selector(openModalScreen), for: .touchUpInside)
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        print("viewDidLayoutSubviews(): Detail view width: \(view.frame.width)")
+    }
+
     @objc private func closeDetail(_ sender: UIBarButtonItem) {
         onCloseButtonPressed?(true)
     }
