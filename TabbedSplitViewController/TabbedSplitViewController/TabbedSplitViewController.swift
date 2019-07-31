@@ -47,6 +47,7 @@ public struct PKTabBarItem<T> {
 public class TabbedSplitViewController: UIViewController {
 
     public typealias SizeChangedCallback = ((CGSize, UITraitCollection, Configuration) -> Bool)
+    public typealias SizeClassCallback = ((CGSize, UITraitCollection, Configuration) -> UIUserInterfaceSizeClass)
 
     public struct Configuration {
         /// Width of a vertical TabBar. **Default – 70**.
@@ -92,6 +93,10 @@ public class TabbedSplitViewController: UIViewController {
         ///
         /// **Should not return true when** `showMasterAsSideBarWithSizeChange` **callback returns true!**
         public var showDetailAsModalWithSizeChange: SizeChangedCallback?
+        /// Called when ether size or traits collection of the view is changed
+        ///   to determine detail view size class
+        ///   considering you may want it different from the main controller's one.
+        public var detailSizeClass: SizeClassCallback?
 
         fileprivate func widthChanged(old oldValue: Configuration) -> Bool {
             return tabBarWidth != oldValue.tabBarWidth
@@ -99,7 +104,7 @@ public class TabbedSplitViewController: UIViewController {
                 || detailViewMinWidth != oldValue.detailViewMinWidth
         }
 
-        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, detailBackgroundColor: .white, verticalSeparatorColor: .gray, detailAsModalShouldStayInPlace: false, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil)
+        fileprivate static let zero: Configuration = Configuration(tabBarWidth: 0, masterViewWidth: 0, detailViewMinWidth: 0, tabBarBackgroundColor: .white, detailBackgroundColor: .white, verticalSeparatorColor: .gray, detailAsModalShouldStayInPlace: false, showTabBarAsSideBarWithSizeChange: nil, showMasterAsSideBarWithSizeChange: nil, showDetailAsModalWithSizeChange: nil, detailSizeClass: nil)
     }
 
     /// Tabbed Split View Controller Configuration

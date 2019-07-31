@@ -56,7 +56,12 @@ class DetailController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        print("viewDidLayoutSubviews(): Detail view width: \(view.frame.width)")
+        print("DetailController.viewDidLayoutSubviews(): Detail view width: \(view.frame.width)")
+    }
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        print("DetailController.viewWillTransition(to:with:) Detail view will transition to \(size)")
     }
 
     @objc private func closeDetail(_ sender: UIBarButtonItem) {
