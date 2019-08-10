@@ -444,17 +444,30 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
-//        self.masterDetailView.presentFullWidthDetailView(hidingTabBar: !self.state.tabBarHidden,
-//                                                         hidingMaster: !self.state.masterHidden,
-//                                                         animationFinished: nil)
-//        self.mainView.setSideBarGestureRecognizerEnabled(false)
+        if !state.tabBarHidden {
+            mainView.hideTabBar(animated: true)
+        }
+        if !state.masterHidden {
+            masterDetailView.hideMasterView(animated: true)
+        }
+        masterDetailView.presentFullWidthDetailView(animated: true)
+        mainView.setSideBarGestureRecognizerEnabled(false)
     }
     private func hideDetailInPlace(keepShown: Bool, then completion: (() -> Void)?) {
-//        self.masterDetailView.closeFullWidthDetailView(keepShown: keepShown,
-//                                                       addingTabBar: !self.state.tabBarHidden,
-//                                                       addingMaster: !self.state.masterHidden,
-//                                                       animationFinished: completion)
-//        self.mainView.setSideBarGestureRecognizerEnabled(true)
+        var masterViewOffset: CGFloat = 0
+        var detailViewOffset: CGFloat = 0
+        if !state.tabBarHidden {
+            mainView.showTabBar(animated: true)
+            detailViewOffset += config.tabBarWidth
+            masterViewOffset += config.tabBarWidth
+        }
+        if !state.masterHidden {
+            masterDetailView.showMasterView(animated: true, offset: masterViewOffset)
+            detailViewOffset += config.masterViewWidth
+        }
+
+        masterDetailView.closeFullWidthDetailView(keepShown: keepShown, offset: detailViewOffset, animationFinished: completion)
+        mainView.setSideBarGestureRecognizerEnabled(true)
     }
 
     private func addNavigationSideBar() {

@@ -87,14 +87,39 @@ class PKTabbedSplitView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func prepareForHiding(_ item: StackViewItem, pushRight: Bool = false) -> CGRect {
-        let view = self.view(for: item)
-        var newFrame = view.frame
-        view.translatesAutoresizingMaskIntoConstraints = true
-        stackView.removeArrangedSubview(view)
-        newFrame.origin.x = pushRight ? stackView.frame.maxX : -view.frame.width
+    func hideTabBar(animated: Bool, animationFinished: (() -> Void)? = nil) {
+        let tabBarView = self.view(for: .tabBar)
 
-        return newFrame
+        var newFrame = tabBarView.frame
+        tabBarView.translatesAutoresizingMaskIntoConstraints = true
+        stackView.removeArrangedSubview(tabBarView)
+        newFrame.origin.x = -tabBarView.frame.width
+
+        UIView.animate(withDuration: 0.33, animations: {
+            tabBarView.frame = newFrame
+
+        }) { _ in
+            tabBarView.isHidden = true
+            animationFinished?()
+        }
+    }
+
+    func showTabBar(animated: Bool, animationFinished: (() -> Void)? = nil) {
+        let tabBarView = self.view(for: .tabBar)
+
+        stackView.removeArrangedSubview(tabBarView)
+        stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
+        tabBarView.translatesAutoresizingMaskIntoConstraints = true
+        tabBarView.frame.size.height = stackView.frame.height
+        tabBarView.frame.origin.x = -tabBarView.frame.width
+        tabBarView.isHidden = false
+
+        UIView.animate(withDuration: 0.33, animations: {
+            tabBarView.frame.origin.x = 0
+
+        }) { _ in
+            self.addArrangedView(.tabBar)
+        }
     }
 
     // MARK: - Switching mods for split-view
@@ -108,6 +133,8 @@ class PKTabbedSplitView: UIView {
             stackView.insertArrangedSubview(view, at: item.index)
         }
     }
+
+    // MARK: - Side bar
 
     func addNavigationBar(_ sideBarView: UIView) {
         logger?.log("Entered")
@@ -150,6 +177,9 @@ class PKTabbedSplitView: UIView {
         logger?.log("\(view)")
         sideBarGestRecHelper = nil
         view.removeFromSuperview()
+
+        navigationBarWidthConstraint?.isActive = false
+        navigationBarWidthConstraint = nil
     }
     /// After removing a navigation side bar
     ///   we need to put the tab bar back to the stack view
