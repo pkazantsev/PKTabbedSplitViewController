@@ -87,7 +87,9 @@ class PKTabbedSplitView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func hideTabBar(animated: Bool, animationFinished: (() -> Void)? = nil) {
+    // MARK: - Switching mods for split-view
+
+    func hideTabBar(animator: UIViewPropertyAnimator) {
         let tabBarView = self.view(for: .tabBar)
 
         var newFrame = tabBarView.frame
@@ -95,16 +97,16 @@ class PKTabbedSplitView: UIView {
         stackView.removeArrangedSubview(tabBarView)
         newFrame.origin.x = -tabBarView.frame.width
 
-        UIView.animate(withDuration: 0.33, animations: {
-            tabBarView.frame = newFrame
-
-        }) { _ in
+        animator.addAnimations {
             tabBarView.isHidden = true
-            animationFinished?()
+            tabBarView.frame = newFrame
+        }
+        animator.addCompletion { _ in
+            tabBarView.isHidden = true
         }
     }
 
-    func showTabBar(animated: Bool, animationFinished: (() -> Void)? = nil) {
+    func showTabBar(animator: UIViewPropertyAnimator) {
         let tabBarView = self.view(for: .tabBar)
 
         stackView.removeArrangedSubview(tabBarView)
@@ -114,15 +116,13 @@ class PKTabbedSplitView: UIView {
         tabBarView.frame.origin.x = -tabBarView.frame.width
         tabBarView.isHidden = false
 
-        UIView.animate(withDuration: 0.33, animations: {
+        animator.addAnimations {
             tabBarView.frame.origin.x = 0
-
-        }) { _ in
+        }
+        animator.addCompletion { _ in
             self.addArrangedView(.tabBar)
         }
     }
-
-    // MARK: - Switching mods for split-view
 
     private func addArrangedView(_ item: StackViewItem) {
         let view = self.view(for: item)

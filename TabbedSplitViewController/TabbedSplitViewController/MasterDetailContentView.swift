@@ -98,33 +98,32 @@ class MasterDetailContentView: UIView {
 
     // MARK: - Presenting detail view in-place
 
-    func hideMasterView(animated: Bool, animationFinished: (() -> Void)? = nil) {
+    func hideMasterView(animator: UIViewPropertyAnimator) {
         let masterView = self.view(for: .master)
         let newFrame = prepareForHiding(masterView)
 
-        UIView.animate(withDuration: 0.33, animations: {
+        animator.addAnimations {
             masterView.frame = newFrame
-
-        }) { _ in
+        }
+        animator.addCompletion { _ in
             masterView.isHidden = true
-            animationFinished?()
         }
     }
 
-    func showMasterView(animated: Bool, offset: CGFloat, animationFinished: (() -> Void)? = nil) {
+    func showMasterView(animator: UIViewPropertyAnimator, offset: CGFloat) {
         let masterView = self.view(for: .master)
         prepareForShowing(masterView, at: StackViewItem.master.hierarchyIndex)
 
-        UIView.animate(withDuration: 0.33, animations: {
+        animator.addAnimations {
             masterView.frame.origin.x = offset
-
-        }) { _ in
+        }
+        animator.addCompletion { _ in
             self.addArrangedView(.master)
         }
     }
 
     /// Present detail view in-place, hiding master and detail, if not already hidden
-    func presentFullWidthDetailView(animated: Bool, animationFinished: (() -> Void)? = nil) {
+    func presentFullWidthDetailView(animator: UIViewPropertyAnimator) {
         let detailView = self.view(for: .detail)
         // Just add as a subview, will add to arranged after the animation
         stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
@@ -134,12 +133,11 @@ class MasterDetailContentView: UIView {
         detailView.frame.origin.x = stackView.frame.maxX
         detailView.isHidden = false
 
-        UIView.animate(withDuration: 0.33, animations: {
+        animator.addAnimations {
             detailView.frame.origin.x = 0
-
-        }) { _ in
+        }
+        animator.addCompletion { _ in
             self.addArrangedView(.detail)
-            animationFinished?()
         }
     }
 
@@ -151,7 +149,7 @@ class MasterDetailContentView: UIView {
     ///   - keepShown: keep detail view on screen
     ///   - addingTabBar: add the tab bar back
     ///   - addingMaster: add the master view back
-    func closeFullWidthDetailView(keepShown: Bool, offset: CGFloat, animationFinished: (() -> Void)?) {
+    func closeFullWidthDetailView(animator: UIViewPropertyAnimator, keepShown: Bool, offset: CGFloat) {
         let detailView = self.view(for: .detail)
 
         let detailNewFrame: CGRect
@@ -161,19 +159,19 @@ class MasterDetailContentView: UIView {
         } else {
             detailNewFrame = prepareForHiding(detailView, pushRight: true)
         }
-        UIView.animate(withDuration: 0.33, animations: {
+        animator.addAnimations {
             if keepShown {
                 detailView.frame.origin.x = offset
             } else {
                 detailView.frame = detailNewFrame
             }
-        }) { _ in
+        }
+        animator.addCompletion { _ in
             if keepShown {
                 self.addArrangedView(.detail)
             } else {
                 detailView.isHidden = true
             }
-            animationFinished?()
         }
     }
 

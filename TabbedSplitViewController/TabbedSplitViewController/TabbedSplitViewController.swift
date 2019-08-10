@@ -444,30 +444,43 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     private func presentDetailInPlace() {
+        let animator = UIViewPropertyAnimator(duration: 0.33, curve: .easeInOut, animations: nil)
+
         if !state.tabBarHidden {
-            mainView.hideTabBar(animated: true)
+            mainView.hideTabBar(animator: animator)
         }
         if !state.masterHidden {
-            masterDetailView.hideMasterView(animated: true)
+            masterDetailView.hideMasterView(animator: animator)
         }
-        masterDetailView.presentFullWidthDetailView(animated: true)
+        masterDetailView.presentFullWidthDetailView(animator: animator)
         mainView.setSideBarGestureRecognizerEnabled(false)
+
+        animator.startAnimation()
     }
     private func hideDetailInPlace(keepShown: Bool, then completion: (() -> Void)?) {
+        let animator = UIViewPropertyAnimator(duration: 0.33, curve: .easeInOut, animations: nil)
+
+        if let animationCompleted = completion {
+            animator.addCompletion { _ in
+                animationCompleted()
+            }
+        }
         var masterViewOffset: CGFloat = 0
         var detailViewOffset: CGFloat = 0
         if !state.tabBarHidden {
-            mainView.showTabBar(animated: true)
+            mainView.showTabBar(animator: animator)
             detailViewOffset += config.tabBarWidth
             masterViewOffset += config.tabBarWidth
         }
         if !state.masterHidden {
-            masterDetailView.showMasterView(animated: true, offset: masterViewOffset)
+            masterDetailView.showMasterView(animator: animator, offset: masterViewOffset)
             detailViewOffset += config.masterViewWidth
         }
 
-        masterDetailView.closeFullWidthDetailView(keepShown: keepShown, offset: detailViewOffset, animationFinished: completion)
+        masterDetailView.closeFullWidthDetailView(animator: animator, keepShown: keepShown, offset: detailViewOffset)
         mainView.setSideBarGestureRecognizerEnabled(true)
+
+        animator.startAnimation()
     }
 
     private func addNavigationSideBar() {
