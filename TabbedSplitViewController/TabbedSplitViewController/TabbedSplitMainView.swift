@@ -89,8 +89,20 @@ class PKTabbedSplitView: UIView {
 
     // MARK: - Switching mods for split-view
 
+    /// This placeholder view will animate the stack view
+    /// while we move the real tab bar to the left
+    fileprivate func makeTabBarPlaceholder(for tabBarView: UIView) -> UIView {
+        let view = UIView()
+        view.widthAnchor.constraint(equalToConstant: tabBarView.frame.width).isActive = true
+        stackView.insertArrangedSubview(view, at: 0)
+        stackView.insertSubview(view, belowSubview: tabBarView)
+
+        return view
+    }
+
     func hideTabBar(animator: UIViewPropertyAnimator) {
         let tabBarView = self.view(for: .tabBar)
+        let placeholderView = makeTabBarPlaceholder(for: tabBarView)
 
         var newFrame = tabBarView.frame
         tabBarView.translatesAutoresizingMaskIntoConstraints = true
@@ -98,11 +110,12 @@ class PKTabbedSplitView: UIView {
         newFrame.origin.x = -tabBarView.frame.width
 
         animator.addAnimations {
-            tabBarView.isHidden = true
+            placeholderView.isHidden = true
             tabBarView.frame = newFrame
         }
         animator.addCompletion { _ in
             tabBarView.isHidden = true
+            placeholderView.removeFromSuperview()
         }
     }
 
@@ -111,16 +124,22 @@ class PKTabbedSplitView: UIView {
 
         stackView.removeArrangedSubview(tabBarView)
         stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
+
+        let placeholderView = makeTabBarPlaceholder(for: tabBarView)
+        placeholderView.isHidden = true
+
         tabBarView.translatesAutoresizingMaskIntoConstraints = true
         tabBarView.frame.size.height = stackView.frame.height
         tabBarView.frame.origin.x = -tabBarView.frame.width
         tabBarView.isHidden = false
 
         animator.addAnimations {
+            placeholderView.isHidden = false
             tabBarView.frame.origin.x = 0
         }
         animator.addCompletion { _ in
             self.addArrangedView(.tabBar)
+            placeholderView.removeFromSuperview()
         }
     }
 

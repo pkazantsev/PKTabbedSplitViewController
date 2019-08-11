@@ -465,15 +465,12 @@ public class TabbedSplitViewController: UIViewController {
                 animationCompleted()
             }
         }
-        var masterViewOffset: CGFloat = 0
         var detailViewOffset: CGFloat = 0
         if !state.tabBarHidden {
             mainView.showTabBar(animator: animator)
-            detailViewOffset += config.tabBarWidth
-            masterViewOffset += config.tabBarWidth
         }
         if !state.masterHidden {
-            masterDetailView.showMasterView(animator: animator, offset: masterViewOffset)
+            masterDetailView.showMasterView(animator: animator)
             detailViewOffset += config.masterViewWidth
         }
 
