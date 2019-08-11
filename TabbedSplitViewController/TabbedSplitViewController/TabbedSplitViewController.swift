@@ -449,10 +449,7 @@ public class TabbedSplitViewController: UIViewController {
         if !state.tabBarHidden {
             mainView.hideTabBar(animator: animator)
         }
-        if !state.masterHidden {
-            masterDetailView.hideMasterView(animator: animator)
-        }
-        masterDetailView.presentFullWidthDetailView(animator: animator)
+        masterDetailView.presentFullWidthDetailView(animator: animator, hideMaster: !state.masterHidden)
         mainView.setSideBarGestureRecognizerEnabled(false)
 
         animator.startAnimation()
@@ -465,16 +462,13 @@ public class TabbedSplitViewController: UIViewController {
                 animationCompleted()
             }
         }
-        var detailViewOffset: CGFloat = 0
         if !state.tabBarHidden {
             mainView.showTabBar(animator: animator)
         }
-        if !state.masterHidden {
-            masterDetailView.showMasterView(animator: animator)
-            detailViewOffset += config.masterViewWidth
-        }
 
-        masterDetailView.closeFullWidthDetailView(animator: animator, keepShown: keepShown, offset: detailViewOffset)
+        masterDetailView.closeFullWidthDetailView(animator: animator,
+                                                  keepShown: keepShown,
+                                                  showMaster: !state.masterHidden)
         mainView.setSideBarGestureRecognizerEnabled(true)
 
         animator.startAnimation()

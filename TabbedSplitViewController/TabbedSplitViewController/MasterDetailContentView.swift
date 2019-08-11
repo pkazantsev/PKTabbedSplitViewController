@@ -54,7 +54,10 @@ class MasterDetailContentView: UIView {
 
     init(masterView: UIView, detailView: UIView) {
         stackViewItems = [masterView, detailView]
-        stackViewItems.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        stackViewItems.forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            $0.autoresizingMask = []
+        }
 
         masterViewWidthConstraint = masterView.widthAnchor.constraint(equalToConstant: masterViewWidth)
         // For a case when we don't have detail view and we stretch master to all the parent width
@@ -98,75 +101,75 @@ class MasterDetailContentView: UIView {
 
     // MARK: - Presenting detail view in-place
 
-    func hideMasterView(animator: UIViewPropertyAnimator) {
-        let masterView = self.view(for: .master)
-        let newFrame = prepareForHiding(masterView)
-
-        animator.addAnimations {
-            masterView.frame = newFrame
-        }
-        animator.addCompletion { _ in
-            masterView.isHidden = true
-        }
-    }
-
-    func showMasterView(animator: UIViewPropertyAnimator, offset: CGFloat) {
-        let masterView = self.view(for: .master)
-        prepareForShowing(masterView, at: StackViewItem.master.hierarchyIndex)
-
-        animator.addAnimations {
-            masterView.frame.origin.x = offset
-        }
-        animator.addCompletion { _ in
-            self.addArrangedView(.master)
-        }
-    }
-
     /// Present detail view in-place, hiding master and detail, if not already hidden
-    func presentFullWidthDetailView(animator: UIViewPropertyAnimator) {
+    ///
+    /// - Parameters:
+    ///   - animator: the main animator that will animate the whole view
+    ///   - hideMaster: hide the master view it it isn't already hidden
+    func presentFullWidthDetailView(animator: UIViewPropertyAnimator, hideMaster: Bool) {
         let detailView = self.view(for: .detail)
         // Just add as a subview, will add to arranged after the animation
         stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
 
-        // Set frame to full screen and hide behind right edge
-        detailView.frame = stackView.frame
+        let masterView = self.view(for: .master)
+        let newMasterViewFrame = hideMaster ? prepareForHiding(masterView) : nil
+
         detailView.frame.origin.x = stackView.frame.maxX
         detailView.isHidden = false
 
         animator.addAnimations {
+            if let newFrame = newMasterViewFrame {
+                masterView.frame = newFrame
+            }
             detailView.frame.origin.x = 0
         }
         animator.addCompletion { _ in
+            if hideMaster {
+                masterView.isHidden = true
+            }
             self.addArrangedView(.detail)
         }
     }
 
-    /// Hide detail view in-place, showing tab bar and master
+    /// Hide detail-view-in-place, showing tab bar and master
     ///  if they were hidden by `presentDetailViewSolo(hidingTabBar:hidingMaster:)`
     ///  but otherwise should be shown
     ///
     /// - Parameters:
+    ///   - animator: the main animator that will animate the whole view
     ///   - keepShown: keep detail view on screen
-    ///   - addingTabBar: add the tab bar back
-    ///   - addingMaster: add the master view back
-    func closeFullWidthDetailView(animator: UIViewPropertyAnimator, keepShown: Bool, offset: CGFloat) {
+    ///   - showMaster: add the master view back if it was hidden
+    func closeFullWidthDetailView(animator: UIViewPropertyAnimator, keepShown: Bool, showMaster: Bool) {
         let detailView = self.view(for: .detail)
+        let masterView = self.view(for: .master)
+
+        var detailViewOffset: CGFloat = 0
+        if showMaster {
+            prepareForShowing(masterView, at: StackViewItem.master.hierarchyIndex)
+            detailViewOffset += masterView.frame.width
+        }
 
         let detailNewFrame: CGRect
         if keepShown {
             detailNewFrame = .zero
             prepareForShowing(detailView, at: StackViewItem.detail.hierarchyIndex, pushRight: true)
         } else {
-            detailNewFrame = prepareForHiding(detailView, pushRight: true)
+            detailNewFrame = prepareForHiding(detailView, to: masterView.frame.width)
         }
         animator.addAnimations {
+            if showMaster {
+                masterView.frame.origin.x = 0
+            }
             if keepShown {
-                detailView.frame.origin.x = offset
+                detailView.frame.origin.x = detailViewOffset
             } else {
                 detailView.frame = detailNewFrame
             }
         }
         animator.addCompletion { _ in
+            if showMaster {
+                self.addArrangedView(.master)
+            }
             if keepShown {
                 self.addArrangedView(.detail)
             } else {
@@ -175,11 +178,16 @@ class MasterDetailContentView: UIView {
         }
     }
 
-    private func prepareForHiding(_ view: UIView, pushRight: Bool = false) -> CGRect {
+    private func prepareForHiding(_ view: UIView, to position: CGFloat? = nil) -> CGRect {
         var newFrame = view.frame
         view.translatesAutoresizingMaskIntoConstraints = true
         stackView.removeArrangedSubview(view)
-        newFrame.origin.x = pushRight ? stackView.frame.maxX : -view.frame.width
+        if let targetPosition = position {
+            newFrame.origin.x = targetPosition
+        }
+        else {
+            newFrame.origin.x = -view.frame.width
+        }
 
         return newFrame
     }
