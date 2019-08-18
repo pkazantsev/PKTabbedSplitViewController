@@ -48,15 +48,14 @@ class PKTabbedSplitView: UIView {
         $0.spacing = 0
     }
     /// Views saved here for us to be able to remove them from stack view and add back
-    private let stackViewItems: [UIView]
-
-    private func view(for item: StackViewItem) -> UIView {
-        return stackViewItems[item.index]
-    }
+    private let tabBarView: UIView
+    private var contentView: UIView
 
     init(tabBarView: UIView, contentView: UIView) {
-        stackViewItems = [tabBarView, contentView]
-        stackViewItems.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
+        self.tabBarView = tabBarView
+        self.tabBarView.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView = contentView
+        self.contentView.translatesAutoresizingMaskIntoConstraints = false
 
         super.init(frame: .zero)
 
@@ -101,7 +100,6 @@ class PKTabbedSplitView: UIView {
     }
 
     func hideTabBar(animator: UIViewPropertyAnimator) {
-        let tabBarView = self.view(for: .tabBar)
         let placeholderView = makeTabBarPlaceholder(for: tabBarView)
 
         var newFrame = tabBarView.frame
@@ -111,16 +109,15 @@ class PKTabbedSplitView: UIView {
 
         animator.addAnimations {
             placeholderView.isHidden = true
-            tabBarView.frame = newFrame
+            self.tabBarView.frame = newFrame
         }
         animator.addCompletion { _ in
-            tabBarView.isHidden = true
+            self.tabBarView.isHidden = true
             placeholderView.removeFromSuperview()
         }
     }
 
     func showTabBar(animator: UIViewPropertyAnimator) {
-        let tabBarView = self.view(for: .tabBar)
 
         stackView.removeArrangedSubview(tabBarView)
         stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
@@ -135,21 +132,30 @@ class PKTabbedSplitView: UIView {
 
         animator.addAnimations {
             placeholderView.isHidden = false
-            tabBarView.frame.origin.x = 0
+            self.tabBarView.frame.origin.x = 0
         }
         animator.addCompletion { _ in
-            self.addArrangedView(.tabBar)
+            self.tabBarView.translatesAutoresizingMaskIntoConstraints = false
+            self.stackView.insertArrangedSubview(self.tabBarView, at: StackViewItem.tabBar.index)
             placeholderView.removeFromSuperview()
         }
     }
 
-    private func addArrangedView(_ item: StackViewItem) {
-        let view = self.view(for: item)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        if item.index >= stackView.arrangedSubviews.count {
-            stackView.addArrangedSubview(view)
-        } else {
-            stackView.insertArrangedSubview(view, at: item.index)
+
+    func replaceContentView(with contentView: UIView, then completion: @escaping () -> Void) {
+        let prevContentView = self.contentView
+        self.contentView = contentView
+
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.isHidden = true
+        stackView.insertSubview(contentView, at: StackViewItem.content.hierarchyIndex)
+        stackView.insertArrangedSubview(contentView, at: StackViewItem.content.index)
+
+        UIView.animate(withDuration: 0.33, animations: {
+            prevContentView.isHidden = true
+            contentView.isHidden = false
+        }) { _ in
+            completion()
         }
     }
 
@@ -157,7 +163,7 @@ class PKTabbedSplitView: UIView {
 
     func addNavigationBar(_ sideBarView: UIView) {
         logger?.log("Entered")
-        self.view(for: .tabBar).removeFromSuperview()
+        tabBarView.removeFromSuperview()
 
         addSideBar(sideBarView)
     }
@@ -204,12 +210,11 @@ class PKTabbedSplitView: UIView {
     ///   we need to put the tab bar back to the stack view
     func putTabBarBack(keepHidden: Bool) {
 
-        let tabBar = self.view(for: .tabBar)
         if !keepHidden {
-            tabBar.isHidden = false
+            tabBarView.isHidden = false
         }
-        stackView.insertSubview(tabBar, at: StackViewItem.tabBar.hierarchyIndex)
-        stackView.insertArrangedSubview(tabBar, at: StackViewItem.tabBar.index)
+        stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
+        stackView.insertArrangedSubview(tabBarView, at: StackViewItem.tabBar.index)
     }
 
     func hideSideBar() {

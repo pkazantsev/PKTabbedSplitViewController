@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C81723D422F6C4F500951558 /* MasterDetailContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D322F6C4F500951558 /* MasterDetailContentView.swift */; };
+		C81723D422F6C4F500951558 /* MasterDetailContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */; };
 		C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */; };
 		C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DA50E1E3BC8FA005883C7 /* extensions.swift */; };
 		C84F1607214523E80063B755 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F1606214523E80063B755 /* TabBar.swift */; };
@@ -18,7 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C81723D322F6C4F500951558 /* MasterDetailContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDetailContentView.swift; sourceTree = "<group>"; };
+		C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDetailContentViewController.swift; sourceTree = "<group>"; };
 		C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBarGestureRecognizerHelper.swift; sourceTree = "<group>"; };
 		C82DA50E1E3BC8FA005883C7 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		C84F1606214523E80063B755 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 				C82DA50E1E3BC8FA005883C7 /* extensions.swift */,
 				C8E2DCD92001656E00C05079 /* Images.xcassets */,
 				C85A27401D98637B00C57331 /* Info.plist */,
-				C81723D322F6C4F500951558 /* MasterDetailContentView.swift */,
+				C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */,
 				C84F1606214523E80063B755 /* TabBar.swift */,
 				C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */,
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
@@ -155,7 +155,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */,
-				C81723D422F6C4F500951558 /* MasterDetailContentView.swift in Sources */,
+				C81723D422F6C4F500951558 /* MasterDetailContentViewController.swift in Sources */,
 				C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */,
 				C8E5E9752184A15F00765F14 /* VerticalSeparatorView.swift in Sources */,
 				C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */,

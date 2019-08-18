@@ -119,6 +119,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 viewController.present(alert, animated: true)
             })
 
+            viewController.addToTabBar(PKTabBarItem(title: "Full Width", image: UIImage(named: "Analytics")!, isFullWidth: true, action: FullWidthViewController()))
+
         }
 
         return true
