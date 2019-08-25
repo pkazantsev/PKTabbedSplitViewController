@@ -16,7 +16,7 @@ final class FullWidthViewController: UIViewController {
         view.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 20).isActive = true
+        label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
         label.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
 
         label.numberOfLines = 0

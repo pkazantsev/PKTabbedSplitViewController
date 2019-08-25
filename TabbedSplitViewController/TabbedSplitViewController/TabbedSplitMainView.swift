@@ -90,17 +90,17 @@ class PKTabbedSplitView: UIView {
 
     /// This placeholder view will animate the stack view
     /// while we move the real tab bar to the left
-    fileprivate func makeTabBarPlaceholder(for tabBarView: UIView) -> UIView {
+    fileprivate func makeStackViewPlaceholderView(for sourceView: UIView, index: Int) -> UIView {
         let view = UIView()
-        view.widthAnchor.constraint(equalToConstant: tabBarView.frame.width).isActive = true
-        stackView.insertArrangedSubview(view, at: 0)
-        stackView.insertSubview(view, belowSubview: tabBarView)
+        view.widthAnchor.constraint(equalToConstant: sourceView.frame.width).isActive = true
+        stackView.insertArrangedSubview(view, at: index)
+        stackView.insertSubview(view, belowSubview: sourceView)
 
         return view
     }
 
     func hideTabBar(animator: UIViewPropertyAnimator) {
-        let placeholderView = makeTabBarPlaceholder(for: tabBarView)
+        let placeholderView = makeStackViewPlaceholderView(for: tabBarView, index: StackViewItem.tabBar.index)
 
         var newFrame = tabBarView.frame
         tabBarView.translatesAutoresizingMaskIntoConstraints = true
@@ -118,11 +118,12 @@ class PKTabbedSplitView: UIView {
     }
 
     func showTabBar(animator: UIViewPropertyAnimator) {
+        let item = StackViewItem.tabBar
 
         stackView.removeArrangedSubview(tabBarView)
-        stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
+        stackView.insertSubview(tabBarView, at: item.hierarchyIndex)
 
-        let placeholderView = makeTabBarPlaceholder(for: tabBarView)
+        let placeholderView = makeStackViewPlaceholderView(for: tabBarView, index: item.index)
         placeholderView.isHidden = true
 
         tabBarView.translatesAutoresizingMaskIntoConstraints = true
@@ -136,25 +137,41 @@ class PKTabbedSplitView: UIView {
         }
         animator.addCompletion { _ in
             self.tabBarView.translatesAutoresizingMaskIntoConstraints = false
-            self.stackView.insertArrangedSubview(self.tabBarView, at: StackViewItem.tabBar.index)
+            self.stackView.insertArrangedSubview(self.tabBarView, at: item.index)
             placeholderView.removeFromSuperview()
         }
     }
 
-
     func replaceContentView(with contentView: UIView, then completion: @escaping () -> Void) {
+        let item = StackViewItem.content
+
         let prevContentView = self.contentView
         self.contentView = contentView
 
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.isHidden = true
-        stackView.insertSubview(contentView, at: StackViewItem.content.hierarchyIndex)
-        stackView.insertArrangedSubview(contentView, at: StackViewItem.content.index)
+        // The placeholder view will prevent the stack view from animating
+        // while we replace the content view
+        let placeholderView = makeStackViewPlaceholderView(for: prevContentView, index: item.index)
+        prevContentView.translatesAutoresizingMaskIntoConstraints = true
+
+        stackView.removeArrangedSubview(prevContentView)
+
+        let animate = UIView.areAnimationsEnabled
+        // Somehow the size does not apply immediately but animates instead
+        // but we need to have the final size before the animation.
+        UIView.setAnimationsEnabled(false)
+        contentView.translatesAutoresizingMaskIntoConstraints = true
+        contentView.frame.size = prevContentView.frame.size
+        contentView.frame.origin.x = prevContentView.frame.minX - prevContentView.frame.width
+        stackView.insertSubview(contentView, aboveSubview: prevContentView)
+        contentView.layoutIfNeeded()
+        UIView.setAnimationsEnabled(animate)
 
         UIView.animate(withDuration: 0.33, animations: {
-            prevContentView.isHidden = true
-            contentView.isHidden = false
+            prevContentView.frame.origin.x += prevContentView.frame.width
+            contentView.frame.origin.x += contentView.frame.width
         }) { _ in
+            placeholderView.removeFromSuperview()
+            self.stackView.insertArrangedSubview(contentView, at: item.index)
             completion()
         }
     }
