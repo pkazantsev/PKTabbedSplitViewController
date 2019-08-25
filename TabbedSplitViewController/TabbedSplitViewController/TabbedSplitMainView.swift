@@ -143,14 +143,14 @@ class PKTabbedSplitView: UIView {
     }
 
     func replaceContentView(with contentView: UIView, then completion: @escaping () -> Void) {
-        let item = StackViewItem.content
+        let stackViewIndex = self.contentViewIndex()
 
         let prevContentView = self.contentView
         self.contentView = contentView
 
         // The placeholder view will prevent the stack view from animating
         // while we replace the content view
-        let placeholderView = makeStackViewPlaceholderView(for: prevContentView, index: item.index)
+        let placeholderView = makeStackViewPlaceholderView(for: prevContentView, index: stackViewIndex)
         prevContentView.translatesAutoresizingMaskIntoConstraints = true
 
         stackView.removeArrangedSubview(prevContentView)
@@ -171,9 +171,17 @@ class PKTabbedSplitView: UIView {
             contentView.frame.origin.x += contentView.frame.width
         }) { _ in
             placeholderView.removeFromSuperview()
-            self.stackView.insertArrangedSubview(contentView, at: item.index)
+            self.stackView.insertArrangedSubview(contentView, at: stackViewIndex)
             completion()
         }
+    }
+
+    private func contentViewIndex() -> Int {
+        var index = StackViewItem.content.index
+        if self.hideTabBarView {
+            index -= 1
+        }
+        return index
     }
 
     // MARK: - Side bar

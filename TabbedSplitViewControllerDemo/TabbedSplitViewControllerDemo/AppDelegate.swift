@@ -108,10 +108,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             viewController.defaultDetailViewController = defaultDetailVC
 
             // Main tab bar – view controllers
-            viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), selectedImage: #imageLiteral(resourceName: "Peotr2"), action: vc1.embeddedInNavigationController()))
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 1", image: #imageLiteral(resourceName: "Peotr"), selectedImage: #imageLiteral(resourceName: "Peotr2"), action: (vc1.embeddedInNavigationController(), false)))
             // Second screen's icon is rendered as template so it changes tint color when selected,
             //   unlike the first screen's icon.
-            viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: #imageLiteral(resourceName: "Address"), action: vc2.embeddedInNavigationController()))
+            viewController.addToTabBar(PKTabBarItem(title: "Screen 2", image: #imageLiteral(resourceName: "Address"), action: (vc2.embeddedInNavigationController(), false)))
             // Actions bar – closures
             viewController.addToActionBar(PKTabBarItem(title: "About", image: #imageLiteral(resourceName: "About")) { [unowned viewController] in
                 let alert = UIAlertController(title: "About", message: "TabbedSplitViewController v0.1", preferredStyle: .alert)
@@ -119,7 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 viewController.present(alert, animated: true)
             })
 
-            viewController.addToTabBar(PKTabBarItem(title: "Full Width", image: UIImage(named: "Analytics")!, isFullWidth: true, action: FullWidthViewController()))
+            viewController.addToTabBar(PKTabBarItem(title: "Full Width", image: UIImage(named: "Analytics")!, action: (FullWidthViewController(), true)))
 
         }
 
@@ -132,7 +132,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc3.onRemoveTabButtonPressed = { [unowned vc] text in
             vc.removeFromTabBar(at: index)
         }
-        vc.insertToTabBar(PKTabBarItem(title: "Multiline Tab Title", image: #imageLiteral(resourceName: "Address"), action: vc3.embeddedInNavigationController()), at: index)
+        vc.insertToTabBar(PKTabBarItem(title: "Multiline Tab Title", image: #imageLiteral(resourceName: "Address"), action: (vc3.embeddedInNavigationController(), false)), at: index)
     }
 
     private func storyboard() -> UIStoryboard {

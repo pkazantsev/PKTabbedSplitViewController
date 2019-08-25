@@ -8,7 +8,14 @@
 import UIKit
 
 public typealias TabBarAction = () -> Void
-public typealias ConfigureNavigationBar = ([PKTabBarItem<UIViewController>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<UIViewController>, Int) -> Void, ((PKTabBarItem<TabBarAction>, Int) -> Void)?, Int) -> UIViewController
+/**
+ * vc: UIViewController instance to be displayed
+ *
+ * isFullWidth: declares that the tab opens a screen that takes all the space
+ *   beside the tab bar that otherwise would show master and detail screens.
+ */
+public typealias TabBarScreenConfiguration = (vc: UIViewController, isFullWidth: Bool)
+public typealias ConfigureNavigationBar = ([PKTabBarItem<TabBarScreenConfiguration>], [PKTabBarItem<TabBarAction>], @escaping (PKTabBarItem<TabBarScreenConfiguration>, Int) -> Void, ((PKTabBarItem<TabBarAction>, Int) -> Void)?, Int) -> UIViewController
 
 private typealias State = (tabBarHidden: Bool, masterHidden: Bool, detailHidden: Bool)
 
@@ -24,17 +31,14 @@ public struct PKTabBarItem<T> {
     public var navigationBarImage: UIImage?
     /// Navigation Bar item image – selected state
     public var navigationBarSelectedImage: UIImage?
-    /// Declares that the tab opens a screen that takes all the space
-    ///   beside the tab bar that otherwise would show master and detail screens.
-    public let isFullWidth: Bool
     /// An action value that will be passed to the `OnSelection` callback
     ///
-    /// Default types are `UIViewController` for the main tab bar and
-    ///   `TabBarAction` closure for the action bar.
+    /// Default types are `TabBarScreenConfiguration` for the main tab bar
+    ///   and `TabBarAction` closure for the action bar.
     public let action: T
 
     ///
-    public init(title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil, isFullWidth: Bool = false, action: T) {
+    public init(title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil, action: T) {
         self.title = title
         self.image = image
         self.selectedImage = selectedImage
@@ -42,7 +46,6 @@ public struct PKTabBarItem<T> {
 
         self.navigationBarImage = navigationBarImage
         self.navigationBarSelectedImage = navigationBarSelectedImage
-        self.isFullWidth = isFullWidth
     }
 }
 
@@ -174,7 +177,7 @@ public class TabbedSplitViewController: UIViewController {
 
     // MARK: - Init
 
-    public init(items: [PKTabBarItem<UIViewController>], actionItems: [PKTabBarItem<TabBarAction>] = [], config: Configuration? = nil) {
+    public init(items: [PKTabBarItem<TabBarScreenConfiguration>], actionItems: [PKTabBarItem<TabBarAction>] = [], config: Configuration? = nil) {
         self.config = config ?? Configuration()
         masterDetailVC = MasterDetailContentViewController()
         mainView = PKTabbedSplitView(tabBarView: tabBarVC.view, contentView: masterDetailVC.view)
@@ -211,31 +214,32 @@ public class TabbedSplitViewController: UIViewController {
         super.viewDidLoad()
 
         tabBarVC.tabBar.didSelectCallback = { [unowned self] item, selectedIndex in
-            let isTheSameMasterVC = item.action == self.masterDetailVC.masterViewController
-            let itemChanged = (item.isFullWidth == (self.currentContentVC == self.masterDetailVC))
+            let isTheSameMasterVC = item.action.vc == self.masterDetailVC.masterViewController
+            let itemChanged = (item.action.isFullWidth == (self.currentContentVC == self.masterDetailVC))
                                 || !isTheSameMasterVC
 
             if itemChanged {
                 self.selectedTabBarItemIndex = selectedIndex
-                if item.isFullWidth {
-                    self.replaceContent(with: item.action)
+
+                if self.state.tabBarHidden {
+                    self.mainView.hideSideBar()
+                }
+
+                if item.action.isFullWidth {
+                    self.replaceContent(with: item.action.vc)
                     return
                 }
 
                 // Master-detail part until the end of the closure
 
                 self.resetContentToMasterDetail()
-                self.masterDetailVC.masterViewController = item.action
+                self.masterDetailVC.masterViewController = item.action.vc
 
                 self.logger?.log("Hide tab bar: \(self.mainView.hideTabBarView)")
                 self.logger?.log("Hide master view: \(self.masterDetailVC.hideMasterView)")
             }
 
-            if self.mainView.hideTabBarView {
-                // Hide navigation view while opening a detail
-                self.mainView.hideSideBar()
-            }
-            else if self.masterDetailVC.hideMasterView {
+            if !self.state.tabBarHidden && self.state.masterHidden {
                 if self.mainView.sideBarIsHidden {
                     self.mainView.showSideBar()
                     self.tabBarVC.tabBar.isOpen = true
@@ -573,14 +577,14 @@ public class TabbedSplitViewController: UIViewController {
     /// Add an item with a view controller to open to the main tab bar
     /// - parameters:
     ///   - item: A tab bar item with a view controller as an action
-    public func addToTabBar(_ item: PKTabBarItem<UIViewController>) {
+    public func addToTabBar(_ item: PKTabBarItem<TabBarScreenConfiguration>) {
         tabBarVC.tabBar.appendItem(item)
     }
     /// Insert an item with a view controller at a specific position on the tab bar
     /// - parameters:
     ///   - item: A tab bar item with a view controller as an action
     ///   - index: Position on the tab bar
-    public func insertToTabBar(_ item: PKTabBarItem<UIViewController>, at index: Int) {
+    public func insertToTabBar(_ item: PKTabBarItem<TabBarScreenConfiguration>, at index: Int) {
         guard index >= 0 && index < tabBarVC.tabBar.items.count else { return }
         tabBarVC.tabBar.insertItem(item, at: index)
     }

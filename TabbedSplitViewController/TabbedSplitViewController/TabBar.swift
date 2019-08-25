@@ -26,7 +26,7 @@ extension PKTabBarItem: TabBarViewModel {}
 
 class PKTabBar: UIViewController {
 
-    let tabBar = PKTabBarTabsList<UIViewController>()
+    let tabBar = PKTabBarTabsList<TabBarScreenConfiguration>()
     let actionsBar = PKTabBarTabsList<TabBarAction>()
 
     var tabBarWidth: CGFloat = 70 {
@@ -248,7 +248,7 @@ class PKTabBarTabsList<Action>: UITableViewController {
 
 // MARK: - Tab bar for a navigation side bar
 
-class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
+class PKTabBarAsSideBar: PKTabBarTabsList<TabBarScreenConfiguration> {
 
     var actionItems: [PKTabBarItem<TabBarAction>] = []
     var actionSelectedCallback: ((PKTabBarItem<TabBarAction>, Int) -> Void)?
