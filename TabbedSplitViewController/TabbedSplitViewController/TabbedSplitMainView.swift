@@ -193,25 +193,31 @@ class PKTabbedSplitView: UIView {
         addSideBar(sideBarView)
     }
 
-    func addSideBar(_ sideBarView: UIView, width: CGFloat? = nil) {
+    func addSideBar(_ sideBarView: UIView, width: CGFloat? = nil, leftOffset: CGFloat = 0) {
+        logger?.log("Entered")
         sideBarIsHidden = true
-        addSubview(sideBarView)
+        if tabBarView.superview == nil {
+            stackView.addSubview(sideBarView)
+        }
+        else {
+            stackView.insertSubview(sideBarView, belowSubview: tabBarView)
+        }
 
         let sideBarWidth = width ?? navigationBarWidth
 
         sideBarView.translatesAutoresizingMaskIntoConstraints = false
-        sideBarView.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        sideBarView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        sideBarView.topAnchor.constraint(equalTo: stackView.topAnchor).isActive = true
+        sideBarView.bottomAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
         sideBarView.isHidden = false
 
-        let leading = sideBarView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: -sideBarWidth)
+        let leading = sideBarView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: -sideBarWidth)
         leading.isActive = true
 
         let widthConstraint = sideBarView.widthAnchor.constraint(equalToConstant: sideBarWidth)
         widthConstraint.isActive = true
         navigationBarWidthConstraint = widthConstraint
 
-        let helper = SideBarGestureRecognizerHelper(base: self, target: sideBarView, targetX: leading, targetWidth: sideBarWidth)
+        let helper = SideBarGestureRecognizerHelper(base: stackView, target: sideBarView, targetX: leading, targetWidth: sideBarWidth, leftOffset: leftOffset)
         helper.logger = logger
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false

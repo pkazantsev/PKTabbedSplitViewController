@@ -185,11 +185,9 @@ public class TabbedSplitViewController: UIViewController {
 
         super.init(nibName: nil, bundle: nil)
 
-
         update(oldConfig: .zero)
         tabBarVC.tabBar.items = items
         tabBarVC.actionsBar.items = actionItems
-
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -199,7 +197,6 @@ public class TabbedSplitViewController: UIViewController {
         currentContentVC = masterDetailVC
 
         super.init(coder: aDecoder)
-
 
         update(oldConfig: .zero)
     }
@@ -221,12 +218,12 @@ public class TabbedSplitViewController: UIViewController {
             if itemChanged {
                 self.selectedTabBarItemIndex = selectedIndex
 
-                if self.state.tabBarHidden {
-                    self.mainView.hideSideBar()
-                }
-
                 if item.action.isFullWidth {
                     self.replaceContent(with: item.action.vc)
+
+                    if self.mainView.hideTabBarView || self.masterDetailVC.hideMasterView {
+                        self.mainView.hideSideBar()
+                    }
                     return
                 }
 
@@ -239,7 +236,11 @@ public class TabbedSplitViewController: UIViewController {
                 self.logger?.log("Hide master view: \(self.masterDetailVC.hideMasterView)")
             }
 
-            if !self.state.tabBarHidden && self.state.masterHidden {
+            if self.mainView.hideTabBarView {
+                // Hide navigation view while opening a detail
+                self.mainView.hideSideBar()
+            }
+            else if self.masterDetailVC.hideMasterView {
                 if self.mainView.sideBarIsHidden {
                     self.mainView.showSideBar()
                     self.tabBarVC.tabBar.isOpen = true
@@ -297,7 +298,7 @@ public class TabbedSplitViewController: UIViewController {
             if self.masterDetailVC.hideMasterView != hideMaster {
                 self.masterDetailVC.hideMasterView = hideMaster
                 if hideMaster, let sideBar = self.masterDetailVC.prepareMasterForSideBar() {
-                    mainView.addSideBar(sideBar.view)
+                    mainView.addSideBar(sideBar.view, leftOffset: config.tabBarWidth)
                     self.sideBarViewController = sideBar
                 }
             }
@@ -406,7 +407,7 @@ public class TabbedSplitViewController: UIViewController {
             }
             if updateMaster, hideMaster, !hideDetail {
                 if let sideBar = self.masterDetailVC.prepareMasterForSideBar() {
-                    self.mainView.addSideBar(sideBar.view)
+                    self.mainView.addSideBar(sideBar.view, leftOffset: self.config.tabBarWidth)
                     self.sideBarViewController = sideBar
                 }
             }
