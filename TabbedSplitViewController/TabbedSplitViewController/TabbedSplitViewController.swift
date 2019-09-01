@@ -298,7 +298,7 @@ public class TabbedSplitViewController: UIViewController {
             if self.masterDetailVC.hideMasterView != hideMaster {
                 self.masterDetailVC.hideMasterView = hideMaster
                 if hideMaster, let sideBar = self.masterDetailVC.prepareMasterForSideBar() {
-                    mainView.addSideBar(sideBar.view, leftOffset: config.tabBarWidth)
+                    self.addMasterSideBar(sideBar)
                     self.sideBarViewController = sideBar
                 }
             }
@@ -407,7 +407,7 @@ public class TabbedSplitViewController: UIViewController {
             }
             if updateMaster, hideMaster, !hideDetail {
                 if let sideBar = self.masterDetailVC.prepareMasterForSideBar() {
-                    self.mainView.addSideBar(sideBar.view, leftOffset: self.config.tabBarWidth)
+                    self.addMasterSideBar(sideBar)
                     self.sideBarViewController = sideBar
                 }
             }
@@ -430,6 +430,14 @@ public class TabbedSplitViewController: UIViewController {
     }
 
     // MARK: - Private functions
+
+    private func addMasterSideBar(_ sideBar: UIViewController) {
+        mainView.addSideBar(sideBar.view, leftOffset: config.tabBarWidth, willOpen: { [weak self] in
+            self?.tabBarVC.tabBar.isOpen = true
+        }, willClose: { [weak self] in
+            self?.tabBarVC.tabBar.isOpen = false
+        })
+    }
 
     private func presentDetailAsModal() {
         if config.detailAsModalShouldStayInPlace {

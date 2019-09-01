@@ -193,7 +193,7 @@ class PKTabbedSplitView: UIView {
         addSideBar(sideBarView)
     }
 
-    func addSideBar(_ sideBarView: UIView, width: CGFloat? = nil, leftOffset: CGFloat = 0) {
+    func addSideBar(_ sideBarView: UIView, width: CGFloat? = nil, leftOffset: CGFloat = 0, willOpen: (() -> Void)? = nil, willClose: (() -> Void)? = nil) {
         logger?.log("Entered")
         sideBarIsHidden = true
         if tabBarView.superview == nil {
@@ -219,9 +219,11 @@ class PKTabbedSplitView: UIView {
 
         let helper = SideBarGestureRecognizerHelper(base: stackView, target: sideBarView, targetX: leading, targetWidth: sideBarWidth, leftOffset: leftOffset)
         helper.logger = logger
+        helper.willOpen = willOpen
         helper.didOpen = { [unowned self] in
             self.sideBarIsHidden = false
         }
+        helper.willClose = willClose
         helper.didClose = { [unowned self] in
             self.sideBarIsHidden = true
         }

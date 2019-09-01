@@ -18,7 +18,10 @@ class SideBarGestureRecognizerHelper {
 
     private let openViewRec: UIGestureRecognizer
     private let closeViewRec: UIGestureRecognizer
+
+    var willOpen: (() -> Void)?
     var didOpen: (() -> Void)?
+    var willClose: (() -> Void)?
     var didClose: (() -> Void)?
 
     var isEnabled: Bool = true {
@@ -82,6 +85,12 @@ class SideBarGestureRecognizerHelper {
             overlayView.alpha = isOpenGestRec ? minOverlayAlpha : maxOverlayAlpha
             overlayView.isHidden = false
             showShadow(true)
+            if isOpenGestRec {
+                willOpen?()
+            }
+            else {
+                willClose?()
+            }
         case .changed:
             let point = rec.location(ofTouch: 0, in: sourceView).x
             if isOpenGestRec {
@@ -116,11 +125,12 @@ class SideBarGestureRecognizerHelper {
     func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
         xConstraint.constant = -viewWidth + leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
+        willClose?()
         UIView.animate(withDuration: duration, animations: {
             self.sourceView.layoutIfNeeded()
             self.overlayView.alpha = minOverlayAlpha
         }) { completed in
-            if completed, wasClosing {
+            if completed {
                 self.showShadow(false)
                 self.openViewRec.isEnabled = true
                 self.overlayView.isHidden = true
@@ -133,11 +143,12 @@ class SideBarGestureRecognizerHelper {
         xConstraint.constant = leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
         overlayView.isHidden = false
+        willOpen?();
         UIView.animate(withDuration: duration, animations: {
             self.sourceView.layoutIfNeeded()
             self.overlayView.alpha = maxOverlayAlpha
         }) { completed in
-            if completed, wasOpening {
+            if completed {
                 self.openViewRec.isEnabled = false
                 self.didOpen?()
             }
