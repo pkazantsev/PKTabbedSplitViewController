@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C80B9FAA231C3BB700996F97 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80B9FA9231C3BB700996F97 /* Utils.swift */; };
 		C81723D422F6C4F500951558 /* MasterDetailContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */; };
 		C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */; };
 		C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DA50E1E3BC8FA005883C7 /* extensions.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C80B9FA9231C3BB700996F97 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDetailContentViewController.swift; sourceTree = "<group>"; };
 		C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBarGestureRecognizerHelper.swift; sourceTree = "<group>"; };
 		C82DA50E1E3BC8FA005883C7 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
 				C8E5E9742184A15F00765F14 /* VerticalSeparatorView.swift */,
 				C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */,
+				C80B9FA9231C3BB700996F97 /* Utils.swift */,
 			);
 			path = TabbedSplitViewController;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 				C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */,
 				C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */,
 				C84F1607214523E80063B755 /* TabBar.swift in Sources */,
+				C80B9FAA231C3BB700996F97 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

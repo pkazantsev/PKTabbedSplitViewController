@@ -99,6 +99,18 @@ extension UIView {
     }
 }
 
+extension UILayoutGuide {
+
+    func alignBounds(with view: UIView) {
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: self.topAnchor),
+            view.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            view.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+        ])
+    }
+}
+
 extension Array where Element: NSLayoutConstraint {
 
     static func constraints(withVisualFormat format: String, options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]? = nil, views: [String : Any]) -> [NSLayoutConstraint] {

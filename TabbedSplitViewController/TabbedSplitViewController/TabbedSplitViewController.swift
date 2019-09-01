@@ -127,7 +127,7 @@ public class TabbedSplitViewController: UIViewController {
         vc.didSelectCallback = callback
         vc.actionSelectedCallback = actionCallback
         vc.selectedItemIndex = selectedItemIndex
-        return vc
+        return SideBarWrapper(childVC: vc)
     }
 
     public var logger: DebugLogger? {
