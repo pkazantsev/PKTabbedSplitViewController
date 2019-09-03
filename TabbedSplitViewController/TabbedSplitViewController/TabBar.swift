@@ -125,7 +125,6 @@ class PKTabBarTabsList<Action>: UITableViewController {
     var isOpen: Bool = false {
         didSet {
             if shouldDisplayArrow, let cell = tableView.cellForRow(at: IndexPath(row: selectedItemIndex, section: 0)) as? PKTabBarItemTableViewCell {
-                print("isOpen: \(isOpen)")
                 cell.isOpen = isOpen
             }
         }
