@@ -49,6 +49,20 @@ public struct PKTabBarItem<T> {
     }
 }
 
+extension PKTabBarItem where T == TabBarScreenConfiguration {
+
+    /// Convinience initializer for non-full-width view controllers
+    public init(title: String, image: UIImage, selectedImage: UIImage? = nil, navigationBarImage: UIImage? = nil, navigationBarSelectedImage: UIImage? = nil, action vc: UIViewController) {
+        self.title = title
+        self.image = image
+        self.selectedImage = selectedImage
+        self.action = (vc: vc, isFullWidth: false)
+
+        self.navigationBarImage = navigationBarImage
+        self.navigationBarSelectedImage = navigationBarSelectedImage
+    }
+}
+
 // MARK: - Main view controller
 
 public class TabbedSplitViewController: UIViewController {
@@ -279,7 +293,7 @@ public class TabbedSplitViewController: UIViewController {
         let screenSize = view.frame.size.adjustedForSafeAreaInitially(logger)
         let traits = futureTraits ?? traitCollection
 
-        var state: State = (true, true, true)
+        var state: State = (tabBarHidden: true, masterHidden: true, detailHidden: true)
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(screenSize, traits, config) {
             // Update only if it's changed
