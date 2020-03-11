@@ -119,6 +119,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 viewController.present(alert, animated: true)
             })
 
+            viewController.addToTabBar(PKTabBarItem(title: "Full Width", image: UIImage(named: "Analytics")!, action: (vc: FullWidthViewController(), isFullWidth: true)))
+
         }
 
         return true
@@ -130,7 +132,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc3.onRemoveTabButtonPressed = { [unowned vc] text in
             vc.removeFromTabBar(at: index)
         }
-        vc.insertToTabBar(PKTabBarItem(title: "Multiline Tab Title", image: #imageLiteral(resourceName: "Address"), action: vc3.embeddedInNavigationController()), at: index)
+        vc.insertToTabBar(PKTabBarItem(title: "Multiline Tab Title", image: #imageLiteral(resourceName: "Address"), action: (vc3.embeddedInNavigationController(), false)), at: index)
     }
 
     private func storyboard() -> UIStoryboard {

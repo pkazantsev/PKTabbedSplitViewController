@@ -26,7 +26,7 @@ extension PKTabBarItem: TabBarViewModel {}
 
 class PKTabBar: UIViewController {
 
-    let tabBar = PKTabBarTabsList<UIViewController>()
+    let tabBar = PKTabBarTabsList<TabBarScreenConfiguration>()
     let actionsBar = PKTabBarTabsList<TabBarAction>()
 
     var tabBarWidth: CGFloat = 70 {
@@ -91,6 +91,9 @@ class PKTabBar: UIViewController {
 
         tabBar.view.backgroundColor = nil
         tabBar.shouldDisplayArrow = true
+        tabBar.shouldDisplayArrowForItem = { (tabBar, item) in
+            return tabBar.shouldDisplayArrow && !item.action.isFullWidth
+        }
         tabBar.view.accessibilityIdentifier = "Tabs Bar"
         actionsBar.view.backgroundColor = nil
         actionsBar.shouldDisplayArrow = false
@@ -173,11 +176,23 @@ class PKTabBarTabsList<Action>: UITableViewController {
     var shouldDisplayArrow = true {
         didSet {
             (0..<items.count)
-                .map { tableView.cellForRow(at: IndexPath(row: $0, section: 0)) }
-                .compactMap { $0 as? PKTabBarItemTableViewCell }
-                .forEach { $0.shouldDisplayArrow = self.shouldDisplayArrow }
+                .map {
+                    return (items[$0], tableView.cellForRow(at: IndexPath(row: $0, section: 0)))
+                }
+                .compactMap {
+                    if let cell = $0.1 as? PKTabBarItemTableViewCell {
+                        return ($0.0, cell)
+                    }
+                    return nil
+                }
+                .forEach { (a: (PKTabBarItem<Action>, PKTabBarItemTableViewCell)) in
+                    a.1.shouldDisplayArrow = self.shouldDisplayArrow(for: a.0)
+                }
         }
     }
+
+    /// Allows to dynamically check if the cell for a specific item should have an arrow
+    fileprivate var shouldDisplayArrowForItem: ((PKTabBarTabsList<Action>, PKTabBarItem<Action>) -> Bool)?
 
     private var heightConstraint: NSLayoutConstraint? = nil
 
@@ -234,7 +249,7 @@ class PKTabBarTabsList<Action>: UITableViewController {
         if items.count > indexPath.row {
             let item = items[indexPath.row]
             cell.item = item
-            cell.shouldDisplayArrow = shouldDisplayArrow
+            cell.shouldDisplayArrow = shouldDisplayArrow(for: item)
             cell.setSelected(selectedItemIndex == indexPath.row, animated: false)
         }
 
@@ -244,11 +259,15 @@ class PKTabBarTabsList<Action>: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         selectedItemIndex = indexPath.row
     }
+
+    private func shouldDisplayArrow(for item: PKTabBarItem<Action>) -> Bool {
+        return self.shouldDisplayArrowForItem?(self, item) ?? self.shouldDisplayArrow
+    }
 }
 
 // MARK: - Tab bar for a navigation side bar
 
-class PKTabBarAsSideBar: PKTabBarTabsList<UIViewController> {
+class PKTabBarAsSideBar: PKTabBarTabsList<TabBarScreenConfiguration> {
 
     var actionItems: [PKTabBarItem<TabBarAction>] = []
     var actionSelectedCallback: ((PKTabBarItem<TabBarAction>, Int) -> Void)?

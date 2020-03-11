@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C80B9FAA231C3BB700996F97 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80B9FA9231C3BB700996F97 /* Utils.swift */; };
+		C81723D422F6C4F500951558 /* MasterDetailContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */; };
+		C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */; };
 		C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82DA50E1E3BC8FA005883C7 /* extensions.swift */; };
 		C84F1607214523E80063B755 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F1606214523E80063B755 /* TabBar.swift */; };
 		C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */; };
@@ -16,6 +19,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C80B9FA9231C3BB700996F97 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDetailContentViewController.swift; sourceTree = "<group>"; };
+		C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideBarGestureRecognizerHelper.swift; sourceTree = "<group>"; };
 		C82DA50E1E3BC8FA005883C7 /* extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		C84F1606214523E80063B755 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		C85A273C1D98637B00C57331 /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,13 +62,16 @@
 		C85A273E1D98637B00C57331 /* TabbedSplitViewController */ = {
 			isa = PBXGroup;
 			children = (
+				C82DA50E1E3BC8FA005883C7 /* extensions.swift */,
+				C8E2DCD92001656E00C05079 /* Images.xcassets */,
+				C85A27401D98637B00C57331 /* Info.plist */,
+				C81723D322F6C4F500951558 /* MasterDetailContentViewController.swift */,
+				C84F1606214523E80063B755 /* TabBar.swift */,
 				C8FF32851E3819F300D8EACC /* TabbedSplitMainView.swift */,
 				C85A27491D9863C600C57331 /* TabbedSplitViewController.swift */,
-				C84F1606214523E80063B755 /* TabBar.swift */,
 				C8E5E9742184A15F00765F14 /* VerticalSeparatorView.swift */,
-				C82DA50E1E3BC8FA005883C7 /* extensions.swift */,
-				C85A27401D98637B00C57331 /* Info.plist */,
-				C8E2DCD92001656E00C05079 /* Images.xcassets */,
+				C81723D522F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift */,
+				C80B9FA9231C3BB700996F97 /* Utils.swift */,
 			);
 			path = TabbedSplitViewController;
 			sourceTree = "<group>";
@@ -119,6 +128,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = C85A27321D98637B00C57331;
@@ -148,10 +158,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8FF32861E3819F300D8EACC /* TabbedSplitMainView.swift in Sources */,
+				C81723D422F6C4F500951558 /* MasterDetailContentViewController.swift in Sources */,
 				C85A274A1D9863C600C57331 /* TabbedSplitViewController.swift in Sources */,
 				C8E5E9752184A15F00765F14 /* VerticalSeparatorView.swift in Sources */,
+				C81723D622F6CC2E00951558 /* SideBarGestureRecognizerHelper.swift in Sources */,
 				C82DA50F1E3BC8FA005883C7 /* extensions.swift in Sources */,
 				C84F1607214523E80063B755 /* TabBar.swift in Sources */,
+				C80B9FAA231C3BB700996F97 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,7 +220,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -262,7 +275,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";

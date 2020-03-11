@@ -17,6 +17,7 @@
 		C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; };
 		C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CF86D71E104535000D2B4B /* DetailController.swift */; };
+		C8DBED162308212E0096D870 /* FullWidthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBED152308212E0096D870 /* FullWidthViewController.swift */; };
 		C8E573861E11CE6700534598 /* TODO.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E573851E11CE6700534598 /* TODO.txt */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8CF86D71E104535000D2B4B /* DetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
+		C8DBED152308212E0096D870 /* FullWidthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthViewController.swift; sourceTree = "<group>"; };
 		C8E573851E11CE6700534598 /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,6 +114,7 @@
 				9D5095221B417592009D40C1 /* Images.xcassets */,
 				9D5095241B417592009D40C1 /* LaunchScreen.xib */,
 				9D5095191B417592009D40C1 /* Supporting Files */,
+				C8DBED152308212E0096D870 /* FullWidthViewController.swift */,
 			);
 			path = TabbedSplitViewControllerDemo;
 			sourceTree = "<group>";
@@ -219,6 +222,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -277,6 +281,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D50951E1B417592009D40C1 /* ViewController.swift in Sources */,
+				C8DBED162308212E0096D870 /* FullWidthViewController.swift in Sources */,
 				C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */,
 				9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */,
 				C82BE58C1FB897380082CA63 /* LoggerWrapper.swift in Sources */,
@@ -367,7 +372,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -416,7 +421,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
