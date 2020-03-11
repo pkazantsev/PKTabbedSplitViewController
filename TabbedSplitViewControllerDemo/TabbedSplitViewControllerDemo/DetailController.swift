@@ -76,6 +76,23 @@ class DetailController: UIViewController {
         present(navVc, animated: true, completion: nil)
     }
 
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+
+        print("DetailController.viewWillTransition(to:with:)")
+
+        coordinator.animate(alongsideTransition: nil) { _ in
+            print("self.bounds after transition: \(self.view.bounds)")
+        }
+    }
+
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+
+        print("DetailController.willTransition(to:with:)")
+    }
+
 }
 
 private class DemoModalViewController: UIViewController {
