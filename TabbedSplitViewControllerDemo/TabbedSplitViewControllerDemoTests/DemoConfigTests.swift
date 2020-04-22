@@ -31,31 +31,32 @@ class DemoConfigTests: XCTestCase {
             ("iPhone Xs Max Landscape", 808, .regular, false, false, false, .phone), // XR/Xs Max, (896 - 44 * 2) – notch margins
 
             // iPads, 1/3 (lanscape, portrait):
-            ("iPad 9.7\"/ 1/3 screen",  320, .compact,  true, false,  true, .pad), // Both 9.7" and 10.5"
-            ("iPad 12.9\" 1/3 screen",  375, .compact, false, false,  true, .pad),
+            ("iPad 9.7\"/ 1/3 screen",  320, .compact,  true, false,  true, .pad), // The same for 10.5" and 11" portrait
+            ("iPad 12.9\" 1/3 screen",  375, .compact, false, false,  true, .pad), // The same for 11" in landscape
             // iPads, full-screen, portrait:
             ("iPad 9.7\" Portrait",     768, .regular, false,  true, false, .pad),
-            ("iPad 10.5\" Portrait",    834, .regular, false,  true, false, .pad),
+            ("iPad 10.5\" Portrait",    834, .regular, false,  true, false, .pad), // The same for 11"
             ("iPad 12.9\" Portrait",   1024, .regular, false, false, false, .pad),
             // iPads, full-screen, landscape:
             ("iPad 9.7\" Landscape",   1024, .regular, false, false, false, .pad),
             ("iPad 10.5\" Landscape",  1112, .regular, false, false, false, .pad),
+            ("iPad 11\" Landscape",    1194, .regular, false, false, false, .pad),
             ("iPad 12.9\" Landscape",  1366, .regular, false, false, false, .pad),
             // iPads, half-screen, portrait:
-            ("iPad 9.7\" 1/2, Port.",   379, .compact, false, false,  true, .pad),
-            ("iPad 10.5\" 1/2, Port.",  412, .compact, false, false,  true, .pad),
             ("iPad 12.9\" 1/2, Port.",  507, .compact, false, false,  true, .pad),
             // iPads, half-screen, landscape:
             ("iPad 9.7\" 1/2, Lands.",  507, .compact, false, false,  true, .pad),
             ("iPad 10.5\" 1/2, Lands.", 551, .compact, false, false,  true, .pad),
+            ("iPad 11\" 1/2, Lands.",   592, .compact, false, false,  true, .pad),
             ("iPad 12.9\" 1/2, Lands.", 678, .regular, false,  true, false, .pad),
             // iPads, portrait, wide:
             ("iPad 9.7\" 2/3, Port.",   438, .compact, false, false,  true, .pad),
-            ("iPad 10.5\" 2/3, Port.",  504, .compact, false, false,  true, .pad),
+            ("iPad 10.5\" 2/3, Port.",  504, .compact, false, false,  true, .pad), // The same for 11"
             ("iPad 12.9\" 2/3, Port.",  639, .compact, false, false,  true, .pad),
             // iPads, landscape, 2/3:
             ("iPad 9.7\" 2/3, Lands.",  694, .regular, false,  true, false, .pad),
             ("iPad 10.5\" 2/3, Lands.", 782, .regular, false,  true, false, .pad),
+            ("iPad 11\" 2/3, Lands.",   809, .regular, false,  true, false, .pad),
             ("iPad 12.9\" 2/3, Lands.", 981, .regular, false, false, false, .pad),
         ]
 
