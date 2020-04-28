@@ -61,7 +61,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             viewController.config = config
 
             // Master view controllers
-            let vc1 = ViewController()
+            let vc1 = self.instantiateMaster()
             vc1.screenText = "Screen 1111"
             vc1.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
@@ -80,7 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             vc1.onSwitchTabButtonPressed = { [unowned viewController] text in
                 viewController.selectedTabBarItemIndex = 1
             }
-            let vc2 = ViewController()
+            let vc2 = self.instantiateMaster()
             vc2.screenText = "Screen 22222"
             vc2.onButtonPressed = { [unowned viewController] text in
                 let controller = DetailController(text: "Button: \(text)")
@@ -104,7 +104,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
 
             // Default detail view controller, optional
-            let defaultDetailVC = storyboard().instantiateViewController(withIdentifier: "DefaultDetailScreen")
+            let defaultDetailVC = self.instantiateDetail()
             viewController.defaultDetailViewController = defaultDetailVC
 
             // Main tab bar – view controllers
@@ -127,7 +127,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     private func insertNewTab(to vc: TabbedSplitViewController, at index: Int) {
-        let vc3 = ViewController()
+        let vc3 = self.instantiateMaster()
         vc3.screenText = "Screen 33333"
         vc3.onRemoveTabButtonPressed = { [unowned vc] text in
             vc.removeFromTabBar(at: index)
@@ -138,7 +138,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func storyboard() -> UIStoryboard {
         return UIStoryboard(name: "Main", bundle: nil)
     }
-
+    private func instantiateMaster() -> ViewController {
+        storyboard().instantiateViewController(withIdentifier: "MasterViewController") as! ViewController
+    }
+    private func instantiateDetail() -> UIViewController {
+        storyboard().instantiateViewController(withIdentifier: "DefaultDetailScreen")
+    }
 }
 
 extension UIViewController {
