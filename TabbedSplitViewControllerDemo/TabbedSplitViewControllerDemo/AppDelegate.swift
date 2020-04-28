@@ -61,47 +61,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             viewController.config = config
 
             // Master view controllers
-            let vc1 = self.instantiateMaster()
-            vc1.screenText = "Screen 1111"
-            vc1.onButtonPressed = { [unowned viewController] text in
-                let controller = DetailController(text: "Button: \(text)")
-                controller.onCloseButtonPressed = {
-                    let time = Date()
-                    viewController.dismissDetailViewController(animated: $0) {
-                        print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
-                    }
-                }
-                let navController = UINavigationController(rootViewController: controller)
-                let time = Date()
-                viewController.showDetailViewController(navController) {
-                    print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
-                }
-            }
-            vc1.onSwitchTabButtonPressed = { [unowned viewController] text in
-                viewController.selectedTabBarItemIndex = 1
-            }
-            let vc2 = self.instantiateMaster()
-            vc2.screenText = "Screen 22222"
-            vc2.onButtonPressed = { [unowned viewController] text in
-                let controller = DetailController(text: "Button: \(text)")
-                controller.onCloseButtonPressed = {
-                    let time = Date()
-                    viewController.dismissDetailViewController(animated: $0) {
-                        print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
-                    }
-                }
-                let navController = UINavigationController(rootViewController: controller)
-                let time = Date()
-                viewController.showDetailViewController(navController) {
-                    print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
-                }
-            }
-            vc2.onSwitchTabButtonPressed = { [unowned viewController] text in
-                viewController.selectedTabBarItemIndex = 0
-            }
-            vc2.onInsertTabButtonPressed = { [unowned viewController] text in
-                self.insertNewTab(to: viewController, at: 1)
-            }
+            let vc1 = configureMasterViewController1(with: viewController)
+            let vc2 = configureMasterViewController2(with: viewController)
 
             // Default detail view controller, optional
             let defaultDetailVC = self.instantiateDetail()
@@ -120,10 +81,62 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             })
 
             viewController.addToTabBar(PKTabBarItem(title: "Full Width", image: UIImage(named: "Analytics")!, action: (vc: FullWidthViewController(), isFullWidth: true)))
-
         }
 
         return true
+    }
+
+    private func configureMasterViewController1(with split: TabbedSplitViewController) -> UIViewController {
+        let vc = self.instantiateMaster()
+        vc.screenText = "Screen 1111"
+        vc.onButtonPressed = { [unowned split] text in
+            let controller = DetailController(text: "Button: \(text)")
+            controller.onCloseButtonPressed = {
+                let time = Date()
+                split.dismissDetailViewController(animated: $0) {
+                    print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
+                }
+            }
+            let time = Date()
+            split.showDetailViewController(controller.embeddedInNavigationController()) {
+                print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
+            }
+        }
+        vc.onTableButtonPressed = { [unowned split] text in
+            let controller = UITableViewController(style: .plain)
+            controller.title = "Generic Table View Controller"
+            split.showDetailViewController(controller.embeddedInNavigationController())
+        }
+        vc.onSwitchTabButtonPressed = { [unowned split] text in
+            split.selectedTabBarItemIndex = 1
+        }
+
+        return vc
+    }
+    private func configureMasterViewController2(with split: TabbedSplitViewController) -> UIViewController {
+        let vc = self.instantiateMaster()
+        vc.screenText = "Screen 22222"
+        vc.onButtonPressed = { [unowned split] text in
+            let controller = DetailController(text: "Button: \(text)")
+            controller.onCloseButtonPressed = {
+                let time = Date()
+                split.dismissDetailViewController(animated: $0) {
+                    print("\(Date().timeIntervalSince(time)) Finished dismissing \("Button: \(text)")")
+                }
+            }
+            let time = Date()
+            split.showDetailViewController(controller.embeddedInNavigationController()) {
+                print("\(Date().timeIntervalSince(time)) Finished presenting \("Button: \(text)")")
+            }
+        }
+        vc.onSwitchTabButtonPressed = { [unowned split] text in
+            split.selectedTabBarItemIndex = 0
+        }
+        vc.onInsertTabButtonPressed = { [unowned split] text in
+            self.insertNewTab(to: split, at: 1)
+        }
+
+        return vc
     }
 
     private func insertNewTab(to vc: TabbedSplitViewController, at index: Int) {

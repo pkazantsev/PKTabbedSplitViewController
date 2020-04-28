@@ -106,7 +106,7 @@ Cg
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Hpx-fo-K75">
-                                <rect key="frame" x="20" y="54" width="335" height="214"/>
+                                <rect key="frame" x="20" y="54" width="335" height="252"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OIj-bA-KBt">
                                         <rect key="frame" x="0.0" y="0.0" width="335" height="24"/>
@@ -128,22 +128,29 @@ Cg
                                             <action selector="detailButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="xjY-Co-wvf"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" tag="34" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hoh-e5-2LX">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7gE-jg-EuQ">
                                         <rect key="frame" x="0.0" y="108" width="335" height="30"/>
+                                        <state key="normal" title="Open Table View Controller Detail"/>
+                                        <connections>
+                                            <action selector="detailTVCButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="SNi-mn-CnL"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="34" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hoh-e5-2LX">
+                                        <rect key="frame" x="0.0" y="146" width="335" height="30"/>
                                         <state key="normal" title="Switch to the other tab"/>
                                         <connections>
                                             <action selector="switchButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="Wo5-9I-vBm"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" tag="35" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RL4-3K-EGx">
-                                        <rect key="frame" x="0.0" y="146" width="335" height="30"/>
+                                        <rect key="frame" x="0.0" y="184" width="335" height="30"/>
                                         <state key="normal" title="Insert a tab on index 1"/>
                                         <connections>
                                             <action selector="addTabBarItemButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="A7O-Ij-0vB"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" tag="35" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVo-43-L1I">
-                                        <rect key="frame" x="0.0" y="184" width="335" height="30"/>
+                                        <rect key="frame" x="0.0" y="222" width="335" height="30"/>
                                         <state key="normal" title="Remove a tab on index 1"/>
                                         <connections>
                                             <action selector="removeTabBarItemButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="Doq-9L-sdU"/>
@@ -165,6 +172,7 @@ Cg
                         <outlet property="addTabBarItemButton" destination="RL4-3K-EGx" id="cwg-44-9EL"/>
                         <outlet property="detailButton1" destination="K6n-e5-wmo" id="FTi-kj-6Bu"/>
                         <outlet property="detailButton2" destination="hVF-8t-ggw" id="WbD-Pf-ckS"/>
+                        <outlet property="detailTVCButton" destination="7gE-jg-EuQ" id="zug-FL-S1i"/>
                         <outlet property="label" destination="OIj-bA-KBt" id="6Ps-10-Lqb"/>
                         <outlet property="removeTabBarItemButton" destination="jVo-43-L1I" id="kEI-Vm-KS1"/>
                         <outlet property="switchButton" destination="hoh-e5-2LX" id="GOI-Me-o9z"/>
