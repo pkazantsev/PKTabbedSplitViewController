@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideTabBar: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
                 logger.log("hideTabBar: size.width = \(size.width)")
                 /// Use on iPad in compact mode and on iPhone 4s/5/5s/SE
-                let should = traits.horizontalSizeClass == .compact && size.width < 375 /* Regular iPhone width */
+                let should = traits.horizontalSizeClass == .compact && size.width <= 375 /* Regular iPhone width */
                 logger.log("hideTabBar: \(should)")
                 return should
             }
