@@ -192,7 +192,7 @@ class PKTabbedSplitView: UIView {
     func addNavigationBar(_ sideBarView: UIView) {
         logger?.log("Entered")
 
-        let animator = UIViewPropertyAnimator()
+        let animator = UIViewPropertyAnimator(duration: 0.01, curve: .linear)
         hideTabBar(animator: animator)
         addSideBar(sideBarView)
 
