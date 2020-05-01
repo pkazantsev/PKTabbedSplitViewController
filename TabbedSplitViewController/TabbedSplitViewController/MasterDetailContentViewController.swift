@@ -171,14 +171,19 @@ class MasterDetailContentViewController: UIViewController {
     ///   - animator: the main animator that will animate the whole view
     ///   - keepShown: keep detail view on screen
     ///   - showMaster: add the master view back if it was hidden
-    func closeFullWidthDetailView(animator: UIViewPropertyAnimator, keepShown: Bool, showMaster: Bool) {
+    func closeFullWidthDetailView(animator: UIViewPropertyAnimator, keepShown: Bool, showMaster: Bool, masterOffset: CGFloat) {
         let detailView = self.view(for: .detail)
         let masterView = self.view(for: .master)
 
         var detailViewOffset: CGFloat = 0
         if showMaster {
+            if !keepShown {
+                // If we remove the detail view from hierarchy than means it is compact mode.
+                // There is a chance that changed the window width.
+                masterView.frame.size.width = detailView.frame.width - masterOffset
+            }
             prepareForShowing(masterView, at: StackViewItem.master.hierarchyIndex)
-            detailViewOffset += masterView.frame.width
+            detailViewOffset = masterView.frame.width
         }
 
         let detailNewFrame: CGRect
@@ -186,7 +191,7 @@ class MasterDetailContentViewController: UIViewController {
             detailNewFrame = .zero
             prepareForShowing(detailView, at: StackViewItem.detail.hierarchyIndex, pushRight: true)
         } else {
-            detailNewFrame = prepareForHiding(detailView, to: masterView.frame.width)
+            detailNewFrame = prepareForHiding(detailView, to: detailViewOffset)
         }
         animator.addAnimations {
             if showMaster {

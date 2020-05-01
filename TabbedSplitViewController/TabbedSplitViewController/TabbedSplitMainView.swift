@@ -122,13 +122,15 @@ class PKTabbedSplitView: UIView {
 
         stackView.removeArrangedSubview(tabBarView)
         stackView.insertSubview(tabBarView, at: item.hierarchyIndex)
+        // Without the next line the tab bar somehow loses its width
+        tabBarView.layoutIfNeeded()
 
         let placeholderView = makeStackViewPlaceholderView(for: tabBarView, index: item.index)
         placeholderView.isHidden = true
 
         tabBarView.translatesAutoresizingMaskIntoConstraints = true
         tabBarView.frame.size.height = stackView.frame.height
-        tabBarView.frame.origin.x = -tabBarView.frame.width
+        tabBarView.frame.origin = CGPoint(x: -tabBarView.frame.width, y: 0)
         tabBarView.isHidden = false
 
         animator.addAnimations {
@@ -188,9 +190,12 @@ class PKTabbedSplitView: UIView {
 
     func addNavigationBar(_ sideBarView: UIView) {
         logger?.log("Entered")
-        tabBarView.removeFromSuperview()
 
+        let animator = UIViewPropertyAnimator()
+        hideTabBar(animator: animator)
         addSideBar(sideBarView)
+
+        animator.startAnimation()
     }
 
     func addSideBar(_ sideBarView: UIView, width: CGFloat? = nil, leftOffset: CGFloat = 0, willOpen: (() -> Void)? = nil, willClose: (() -> Void)? = nil) {
@@ -242,10 +247,9 @@ class PKTabbedSplitView: UIView {
     /// After removing a navigation side bar
     ///   we need to put the tab bar back to the stack view
     func putTabBarBack(keepHidden: Bool) {
+        tabBarView.isHidden = keepHidden
+        tabBarView.translatesAutoresizingMaskIntoConstraints = false
 
-        if !keepHidden {
-            tabBarView.isHidden = false
-        }
         stackView.insertSubview(tabBarView, at: StackViewItem.tabBar.hierarchyIndex)
         stackView.insertArrangedSubview(tabBarView, at: StackViewItem.tabBar.index)
     }
