@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -27,6 +24,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="140" y="133"/>
         </scene>
         <!--Default Detail View Controller-->
         <scene sceneID="Z1I-w6-F29">
@@ -46,19 +44,19 @@
                                 <state key="normal" title="Do Something! (That Button Does Nothing)"/>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pFs-9T-rD4">
-                                <rect key="frame" x="37" y="104" width="300" height="125.5"/>
+                                <rect key="frame" x="37.5" y="102.5" width="300" height="128.5"/>
                                 <attributedString key="attributedText">
                                     <fragment>
                                         <string key="content">Welcome to the
 </string>
                                         <attributes>
-                                            <font key="NSFont" size="28" name=".SFNSDisplay"/>
+                                            <font key="NSFont" metaFont="system" size="28"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1.25" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
                                     <fragment content="TabbedSplitViewController">
                                         <attributes>
-                                            <font key="NSFont" size="24" name=".SFNSDisplay"/>
+                                            <font key="NSFont" metaFont="system" size="24"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1.25" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -67,13 +65,13 @@
 Cg
 </string>
                                         <attributes>
-                                            <font key="NSFont" size="28" name=".SFNSDisplay"/>
+                                            <font key="NSFont" metaFont="system" size="28"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1.25" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
                                     <fragment content="Demo App">
                                         <attributes>
-                                            <font key="NSFont" size="34" name=".SFNSDisplay"/>
+                                            <font key="NSFont" metaFont="system" size="34"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural" lineHeightMultiple="1.25" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -93,7 +91,96 @@ Cg
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JCn-m7-qZz" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1423" y="55"/>
+            <point key="canvasLocation" x="1044" y="133"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="WuI-aF-QK0">
+            <objects>
+                <viewController storyboardIdentifier="MasterViewController" id="qJu-Tf-m1d" customClass="ViewController" customModule="TabbedSplitViewControllerDemo" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="1CX-Bx-rhn"/>
+                        <viewControllerLayoutGuide type="bottom" id="4yP-Qa-kFS"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="oKc-eO-vhr">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Hpx-fo-K75">
+                                <rect key="frame" x="20" y="54" width="335" height="252"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OIj-bA-KBt">
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="24"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" tag="24" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K6n-e5-wmo">
+                                        <rect key="frame" x="0.0" y="32" width="335" height="30"/>
+                                        <state key="normal" title="Open Detail 1"/>
+                                        <connections>
+                                            <action selector="detailButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="pSm-GI-6fJ"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="25" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hVF-8t-ggw">
+                                        <rect key="frame" x="0.0" y="70" width="335" height="30"/>
+                                        <state key="normal" title="Open Detail 2"/>
+                                        <connections>
+                                            <action selector="detailButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="xjY-Co-wvf"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7gE-jg-EuQ">
+                                        <rect key="frame" x="0.0" y="108" width="335" height="30"/>
+                                        <state key="normal" title="Open Table View Controller Detail"/>
+                                        <connections>
+                                            <action selector="detailTVCButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="SNi-mn-CnL"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="34" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hoh-e5-2LX">
+                                        <rect key="frame" x="0.0" y="146" width="335" height="30"/>
+                                        <state key="normal" title="Switch to the other tab"/>
+                                        <connections>
+                                            <action selector="switchButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="Wo5-9I-vBm"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="35" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RL4-3K-EGx">
+                                        <rect key="frame" x="0.0" y="184" width="335" height="30"/>
+                                        <state key="normal" title="Insert a tab on index 1"/>
+                                        <connections>
+                                            <action selector="addTabBarItemButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="A7O-Ij-0vB"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="35" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVo-43-L1I">
+                                        <rect key="frame" x="0.0" y="222" width="335" height="30"/>
+                                        <state key="normal" title="Remove a tab on index 1"/>
+                                        <connections>
+                                            <action selector="removeTabBarItemButtonPressed:" destination="qJu-Tf-m1d" eventType="touchUpInside" id="Doq-9L-sdU"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="Hpx-fo-K75" firstAttribute="leading" secondItem="oKc-eO-vhr" secondAttribute="leading" constant="20" symbolic="YES" id="SNQ-It-IdR"/>
+                            <constraint firstAttribute="trailing" secondItem="Hpx-fo-K75" secondAttribute="trailing" constant="20" symbolic="YES" id="ZCK-dh-7EO"/>
+                            <constraint firstItem="Hpx-fo-K75" firstAttribute="centerX" secondItem="oKc-eO-vhr" secondAttribute="centerX" id="oo7-v0-vgM"/>
+                            <constraint firstItem="Hpx-fo-K75" firstAttribute="top" secondItem="1CX-Bx-rhn" secondAttribute="bottom" constant="10" id="qb2-d4-GPA"/>
+                        </constraints>
+                    </view>
+                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+                    <connections>
+                        <outlet property="addTabBarItemButton" destination="RL4-3K-EGx" id="cwg-44-9EL"/>
+                        <outlet property="detailButton1" destination="K6n-e5-wmo" id="FTi-kj-6Bu"/>
+                        <outlet property="detailButton2" destination="hVF-8t-ggw" id="WbD-Pf-ckS"/>
+                        <outlet property="detailTVCButton" destination="7gE-jg-EuQ" id="zug-FL-S1i"/>
+                        <outlet property="label" destination="OIj-bA-KBt" id="6Ps-10-Lqb"/>
+                        <outlet property="removeTabBarItemButton" destination="jVo-43-L1I" id="kEI-Vm-KS1"/>
+                        <outlet property="switchButton" destination="hoh-e5-2LX" id="GOI-Me-o9z"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Chf-c1-TQU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1881" y="133"/>
         </scene>
     </scenes>
 </document>

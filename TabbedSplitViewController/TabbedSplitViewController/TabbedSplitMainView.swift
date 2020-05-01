@@ -73,7 +73,7 @@ class PKTabbedSplitView: UIView {
             let constraints = [
                 stackView.leftAnchor.constraint(equalTo: leftAnchor),
                 stackView.topAnchor.constraint(equalTo: topAnchor),
-                stackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
+                stackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor).then { $0.priority = UILayoutPriority(999) },
                 stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
             ]
             NSLayoutConstraint.activate(constraints)
@@ -113,6 +113,7 @@ class PKTabbedSplitView: UIView {
         }
         animator.addCompletion { _ in
             self.tabBarView.isHidden = true
+            self.tabBarView.translatesAutoresizingMaskIntoConstraints = false
             placeholderView.removeFromSuperview()
         }
     }

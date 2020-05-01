@@ -12,90 +12,68 @@ import TabbedSplitViewController
 class ViewController: UIViewController {
 
     var onButtonPressed: ((_ text: String) -> Void)?
+    var onTableButtonPressed: ((_ text: String) -> Void)?
     var onSwitchTabButtonPressed: ((_ text: String) -> Void)?
     var onInsertTabButtonPressed: ((_ text: String) -> Void)?
     var onRemoveTabButtonPressed: ((_ text: String) -> Void)?
 
-    private lazy var label = UILabel()
+    @IBOutlet private weak var label: UILabel!
+    @IBOutlet private weak var detailButton1: UIButton!
+    @IBOutlet private weak var detailButton2: UIButton!
+    @IBOutlet private weak var detailTVCButton: UIButton!
+    @IBOutlet private weak var switchButton: UIButton!
+    @IBOutlet private weak var addTabBarItemButton: UIButton!
+    @IBOutlet private weak var removeTabBarItemButton: UIButton!
 
     var screenText: String = "" {
         didSet {
-            self.label.text = screenText
+            self.updateButtonsText()
         }
+    }
+
+    private init() {
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        edgesForExtendedLayout = []
+        self.updateButtonsText()
+        self.enableButtons()
+    }
+
+    private func updateButtonsText() {
         title = screenText
 
-        view.addSubview(label)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.topAnchor.constraint(equalTo: view.topAnchor, constant: 10).isActive = true
-        label.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        let button1 = UIButton(type: .system)
-        button1.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
-        button1.tag = 24
-        button1.setTitle("\(screenText) – Open Detail 1", for: .normal)
-        button1.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button1)
-
-        button1.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 10).isActive = true
-        button1.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        let button2 = UIButton(type: .system)
-        button2.addTarget(self, action: #selector(buttonPressed(_:)), for: .touchUpInside)
-        button2.tag = 25
-        button2.setTitle("\(screenText) – Open Detail 2", for: .normal)
-        button2.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button2)
-
-        button2.topAnchor.constraint(equalTo: button1.bottomAnchor, constant: 10).isActive = true
-        button2.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        let button3 = UIButton(type: .system)
-        button3.addTarget(self, action: #selector(button2Pressed(_:)), for: .touchUpInside)
-        button3.tag = 34
-        button3.setTitle("Switch to the other tab", for: .normal)
-        button3.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button3)
-
-        button3.topAnchor.constraint(equalTo: button2.bottomAnchor, constant: 10).isActive = true
-        button3.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        let button4 = UIButton(type: .system)
-        button4.addTarget(self, action: #selector(button3Pressed(_:)), for: .touchUpInside)
-        button4.tag = 35
-        button4.setTitle("Insert a tab on index 1", for: .normal)
-        button4.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button4)
-
-        button4.topAnchor.constraint(equalTo: button3.bottomAnchor, constant: 10).isActive = true
-        button4.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-
-        let button5 = UIButton(type: .system)
-        button5.addTarget(self, action: #selector(button4Pressed(_:)), for: .touchUpInside)
-        button5.tag = 35
-        button5.setTitle("Remove a tab on index 1", for: .normal)
-        button5.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(button5)
-
-        button5.topAnchor.constraint(equalTo: button4.bottomAnchor, constant: 10).isActive = true
-        button5.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        self.label?.text = screenText
+        detailButton1?.setTitle("\(screenText) – Open Detail 1", for: .normal)
+        detailButton2?.setTitle("\(screenText) – Open Detail 2", for: .normal)
+    }
+    private func enableButtons() {
+        self.detailButton1?.isEnabled = onButtonPressed != nil
+        self.detailButton2?.isEnabled = onButtonPressed != nil
+        self.detailTVCButton?.isEnabled = onTableButtonPressed != nil
+        self.switchButton?.isEnabled = onSwitchTabButtonPressed != nil
+        self.addTabBarItemButton?.isEnabled = onInsertTabButtonPressed != nil
+        self.removeTabBarItemButton?.isEnabled = onRemoveTabButtonPressed != nil
     }
 
-    @objc private func buttonPressed(_ button: UIButton) {
+    @IBAction private func detailButtonPressed(_ button: UIButton) {
         onButtonPressed?(button.title(for: .normal)!)
     }
-    @objc private func button2Pressed(_ button: UIButton) {
+    @IBAction private func detailTVCButtonPressed(_ button: UIButton) {
+        onTableButtonPressed?(button.title(for: .normal)!)
+    }
+    @IBAction private func switchButtonPressed(_ button: UIButton) {
         onSwitchTabButtonPressed?(button.title(for: .normal)!)
     }
-    @objc private func button3Pressed(_ button: UIButton) {
+    @IBAction private func addTabBarItemButtonPressed(_ button: UIButton) {
         onInsertTabButtonPressed?(button.title(for: .normal)!)
     }
-    @objc private func button4Pressed(_ button: UIButton) {
+    @IBAction private func removeTabBarItemButtonPressed(_ button: UIButton) {
         onRemoveTabButtonPressed?(button.title(for: .normal)!)
     }
 
