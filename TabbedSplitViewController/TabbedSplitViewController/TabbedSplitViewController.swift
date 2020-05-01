@@ -506,8 +506,9 @@ public class TabbedSplitViewController: UIViewController {
         }
 
         self.masterDetailVC.closeFullWidthDetailView(animator: animator,
-                                                  keepShown: keepShown,
-                                                  showMaster: !state.masterHidden)
+                                                     keepShown: keepShown,
+                                                     showMaster: !state.masterHidden,
+                                                     masterOffset: state.tabBarHidden ? 0 : self.config.tabBarWidth)
         mainView.setSideBarGestureRecognizerEnabled(true)
 
         animator.startAnimation()

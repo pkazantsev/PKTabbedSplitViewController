@@ -20,7 +20,7 @@ class DemoConfigTests: XCTestCase {
 
             // iPhones, portrait:
             ("iPhone 4\" Portrait",     320, .compact,  true, false,  true, .phone), // 4s/5/5s/SE
-            ("iPhone 4.7\" Portrait",   375, .compact, false, false,  true, .phone), // 6/6s/7/8/X/Xs
+            ("iPhone 4.7\" Portrait",   375, .compact,  true, false,  true, .phone), // 6/6s/7/8/X/Xs
             ("iPhone 5.5\" Portrait",   414, .compact, false, false,  true, .phone), // *Plus/XR/Xs Max
             // iPhones, landscape:
             ("iPhone 4s Landscape",     480, .compact, false, false,  true, .phone), // 4s
@@ -32,7 +32,7 @@ class DemoConfigTests: XCTestCase {
 
             // iPads, 1/3 (lanscape, portrait):
             ("iPad 9.7\"/ 1/3 screen",  320, .compact,  true, false,  true, .pad), // The same for 10.5" and 11" portrait
-            ("iPad 12.9\" 1/3 screen",  375, .compact, false, false,  true, .pad), // The same for 11" in landscape
+            ("iPad 12.9\" 1/3 screen",  375, .compact,  true, false,  true, .pad), // The same for 11" in landscape
             // iPads, full-screen, portrait:
             ("iPad 9.7\" Portrait",     768, .regular, false,  true, false, .pad),
             ("iPad 10.5\" Portrait",    834, .regular, false,  true, false, .pad), // The same for 11"
