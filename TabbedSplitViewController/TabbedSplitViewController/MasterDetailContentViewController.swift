@@ -183,7 +183,7 @@ class MasterDetailContentViewController: UIViewController {
                 masterView.frame.size.width = detailView.frame.width - masterOffset
             }
             prepareForShowing(masterView, at: StackViewItem.master.hierarchyIndex)
-            detailViewOffset = masterView.frame.width
+            detailViewOffset = +masterView.frame.width
         }
 
         let detailNewFrame: CGRect
