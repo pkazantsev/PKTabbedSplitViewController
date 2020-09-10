@@ -349,13 +349,8 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        var hideDetail = false
-        var hideMaster = false
-        var hideTabBar = false
-
-        var updateDetail = false
-        var updateMaster = false
-        var updateTabBar = false
+        var (hideDetail, hideMaster, hideTabBar) = (false, false, false)
+        var (updateDetail, updateMaster, updateTabBar) = (false, false, false)
 
         coordinator.animate(alongsideTransition: { _ in
             // Only here we could get our hand on the correct safe area values, not earlier
