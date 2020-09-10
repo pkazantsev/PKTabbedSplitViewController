@@ -27,7 +27,11 @@ class DetailController: UIViewController {
         super.viewDidLoad()
 
         title = text
-        view.backgroundColor = .white
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
 
         if onCloseButtonPressed != nil {
             navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Close", style: .plain, target: self, action: #selector(closeDetail(_:)))
@@ -51,12 +55,14 @@ class DetailController: UIViewController {
         button.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8).isActive = true
         button.addTarget(self, action: #selector(openModalScreen), for: .touchUpInside)
+
+        print("DemoDetail \(#function) view width: \(self.view.frame.width)")
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
 
-        print("viewDidLayoutSubviews(): Detail view width: \(view.frame.width)")
+        print("DemoDetail \(#function) view width: \(view.frame.width)")
     }
 
     @objc private func closeDetail(_ sender: UIBarButtonItem) {
@@ -80,10 +86,10 @@ class DetailController: UIViewController {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        print("DetailController.viewWillTransition(to:with:)")
+        print("DemoDetail \(#function) \(size)")
 
         coordinator.animate(alongsideTransition: nil) { _ in
-            print("self.bounds after transition: \(self.view.bounds)")
+            print("DemoDetail \(#function) self.bounds.size after transition: \(self.view.bounds.size)")
         }
     }
 

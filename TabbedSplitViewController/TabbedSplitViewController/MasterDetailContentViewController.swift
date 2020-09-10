@@ -138,7 +138,7 @@ class MasterDetailContentViewController: UIViewController {
     /// - Parameters:
     ///   - animator: the main animator that will animate the whole view
     ///   - hideMaster: hide the master view it it isn't already hidden
-    func presentFullWidthDetailView(animator: UIViewPropertyAnimator, hideMaster: Bool) {
+    func presentFullWidthDetailView(animator: UIViewPropertyAnimator, hideMaster: Bool, initialOffset: CGFloat) {
         let detailView = self.view(for: .detail)
         // Just add as a subview, will add to arranged after the animation
         stackView.insertSubview(detailView, at: StackViewItem.detail.hierarchyIndex)
@@ -146,7 +146,9 @@ class MasterDetailContentViewController: UIViewController {
         let masterView = self.view(for: .master)
         let newMasterViewFrame = hideMaster ? prepareForHiding(masterView) : nil
 
+        detailView.translatesAutoresizingMaskIntoConstraints = true
         detailView.frame.origin.x = stackView.frame.maxX
+        detailView.frame.size.width = stackView.frame.width + initialOffset
         detailView.isHidden = false
 
         animator.addAnimations {
@@ -266,12 +268,12 @@ class MasterDetailContentViewController: UIViewController {
 
     private func addArrangedView(_ item: StackViewItem) {
         let view = self.view(for: item)
-        view.translatesAutoresizingMaskIntoConstraints = false
         if item.index >= stackView.arrangedSubviews.count {
             stackView.addArrangedSubview(view)
         } else {
             stackView.insertArrangedSubview(view, at: item.index)
         }
+        view.translatesAutoresizingMaskIntoConstraints = false
     }
 
     private func updateConfig(from oldConfig: TabbedSplitViewController.Configuration) {

@@ -18,6 +18,7 @@ extension UIViewController {
         view.addChildView(childView, leading: leading, top: top, trailing: trailing, bottom: bottom)
     }
     func addChildViewCentered(_ childView: UIView) {
+        childView.frame.size = view.frame.size
         childView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(childView)
 
