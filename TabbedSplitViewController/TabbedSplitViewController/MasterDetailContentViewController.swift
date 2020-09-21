@@ -249,7 +249,7 @@ class MasterDetailContentViewController: UIViewController {
         let item = StackViewItem.detail
         let view = self.view(for: item)
 
-        view.isHidden = true
+        view.frame = CGRect(origin: .zero, size: view.frame.size)
         stackView.insertSubview(view, at: item.hierarchyIndex)
         addArrangedView(item)
         view.isHidden = false

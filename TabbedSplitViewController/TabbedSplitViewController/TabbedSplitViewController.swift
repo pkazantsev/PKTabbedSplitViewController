@@ -404,11 +404,16 @@ public class TabbedSplitViewController: UIViewController {
                     self.masterDetailVC.putMasterBack()
                 }
             }
-            if updateDetail, !hideDetail {
-                if self.config.detailAsModalShouldStayInPlace {
-                    self.hideDetailAsModalInPlace()
+            if updateDetail {
+                if hideDetail {
+                    self.masterDetailVC.removeDetailView(removeFromViewHierarchy: true)
                 }
-                self.masterDetailVC.addDetailView()
+                else {
+                    if self.config.detailAsModalShouldStayInPlace {
+                        self.hideDetailAsModalInPlace()
+                    }
+                    self.masterDetailVC.addDetailView()
+                }
             }
             // Then, removing from the stack view
             if updateTabBar, hideTabBar {
