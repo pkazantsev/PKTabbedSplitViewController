@@ -1,11 +1,3 @@
-//
-//  extensions.swift
-//  TabbedSplitViewController
-//
-//  Created by Pavel Kazantsev on 1/27/17.
-//  Copyright © 2017 PaKaz.net. All rights reserved.
-//
-
 import UIKit
 
 extension UIViewController {

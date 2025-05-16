@@ -1,7 +1,3 @@
-//
-//  SideBarGestureRecognizerHelper.swift
-//
-
 import UIKit
 
 let sideBarAnimationDuration: TimeInterval = 0.35

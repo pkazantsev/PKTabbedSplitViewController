@@ -1,11 +1,3 @@
-//
-//  VerticalSeparatorView.swift
-//  TabbedSplitViewController
-//
-//  Created by Pavel Kazantsev on 10/27/18.
-//  Copyright © 2018 PaKaz.net. All rights reserved.
-//
-
 import UIKit
 
 final class VerticalSeparatorView: UIView {

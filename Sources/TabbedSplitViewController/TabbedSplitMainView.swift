@@ -1,7 +1,3 @@
-//
-//  TabbedSplitMainView.swift
-//
-
 import UIKit
 
 private enum StackViewItem: Int {

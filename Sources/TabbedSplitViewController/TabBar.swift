@@ -1,11 +1,3 @@
-//
-//  TabBar.swift
-//  TabbedSplitViewController
-//
-//  Created by Pavel Kazantsev on 9/9/18.
-//  Copyright © 2018 PaKaz.net. All rights reserved.
-//
-
 import UIKit
 
 private let pkTabBarItemCellIdentifier = "PkTabBarItemCellIdentifier"

@@ -7,7 +7,7 @@ Inspired by [SMTabbedSplitViewController](https://github.com/sergik-ru/SMTabbedS
 
 Currently is work in progress.
 
-If you're interested in the project, you can create an issue or add a PR. You can find all currently planned changes and known bugs in the [TODO.txt](TabbedSplitViewControllerDemo/TODO.txt) file and in the GitHub Issues. 
+If you're interested in the project, you can create an issue or add a PR. You can find all currently planned changes and known bugs in GitHub Issues. 
 
 ### Screenshot from the current Demo app:
 #### Full screen
@@ -18,3 +18,6 @@ If you're interested in the project, you can create an issue or add a PR. You ca
 1/3 and 2/3 screen:
 
 <img src="Screenshots/Screenshot1.png" width="256"> | <img src="Screenshots/Screenshot2.png" width="555">
+
+Migrated to SPM. 
+To build a dynamic framework, you can use the `./build_dynamic_framework.sh` script in the root of this repository.

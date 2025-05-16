@@ -1,17 +1,10 @@
-//
-//  TabbedSplitViewController.swift
-//
-//  Created by Pavel Kazantsev on 29/06/15.
-//  Copyright (c) 2015 Pavel Kazantsev. All rights reserved.
-//
-
 import UIKit
 
 public typealias TabBarAction = () -> Void
 /**
- * vc: UIViewController instance to be displayed
+ * `vc: UIViewController` -  instance to be displayed
  *
- * isFullWidth: declares that the tab opens a screen that takes all the space
+ * `isFullWidth: Bool` -  declares that the tab opens a screen that takes all the space
  *   beside the tab bar that otherwise would show master and detail screens.
  */
 public typealias TabBarScreenConfiguration = (vc: UIViewController, isFullWidth: Bool)
