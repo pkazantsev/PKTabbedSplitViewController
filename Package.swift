@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "PKTabbedSplitViewController",
     platforms: [
-        .iOS(.v15)
+        .iOS(.v14)
     ],
     products: [
         .library(
