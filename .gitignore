@@ -17,5 +17,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 
-Pods
-Carthage
+.DS_Store
+.swiftpm
+.build
