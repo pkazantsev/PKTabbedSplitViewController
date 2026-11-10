@@ -106,4 +106,26 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
         #expect(controller.config.masterViewWidth == 240)
         #expect(navigation.view.bounds.width == 280)
     }
+
+    /// A text size change that changes the master width asks the layout callbacks again, with the
+    /// new width in the configuration, so a wider master view can collapse the detail view.
+    @Test func reevaluatesTheLayoutWhenTheTextSizeChangesTheWidth() {
+        let recorder = Recorder()
+        let controller = makeController(recorder: recorder)
+        var masterWidthsSeen: [CGFloat] = []
+        var config = controller.config
+        config.showDetailAsModalWithSizeChange = { _, _, config in
+            masterWidthsSeen.append(config.masterViewWidth)
+            return false
+        }
+        controller.config = config
+        let parent = present(controller)
+        #expect(masterWidthsSeen == [358])
+
+        let largeText = UITraitCollection(preferredContentSizeCategory: .accessibilityLarge)
+        parent.setOverrideTraitCollection(largeText, forChild: controller)
+        parent.view.layoutIfNeeded()
+
+        #expect(masterWidthsSeen == [358, 430])
+    }
 }

@@ -354,7 +354,20 @@ public class TabbedSplitViewController: UIViewController {
               traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory else {
             return
         }
-        updateMasterViewWidth(for: view.bounds.size, traits: traitCollection)
+        guard updateMasterViewWidth(for: view.bounds.size, traits: traitCollection) else {
+            return
+        }
+        // A wider or narrower master view can change what fits, e.g. whether the detail view collapses.
+        let realSize = view.bounds.size.adjustedForSafeArea(of: view, logger)
+        guard let changes = layoutChanges(for: realSize, traits: traitCollection) else {
+            return
+        }
+        UIView.animate(withDuration: sideBarAnimationDuration, animations: {
+            changes.animations()
+            self.view.layoutIfNeeded()
+        }, completion: { _ in
+            changes.completion()
+        })
     }
 
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -366,13 +379,7 @@ public class TabbedSplitViewController: UIViewController {
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
 
-        var hideDetail = false
-        var hideMaster = false
-        var hideTabBar = false
-
-        var updateDetail = false
-        var updateMaster = false
-        var updateTabBar = false
+        var completion: (() -> Void)?
 
         coordinator.animate(alongsideTransition: { _ in
             // Only here we could get our hand on the correct safe area values, not earlier
@@ -382,29 +389,53 @@ public class TabbedSplitViewController: UIViewController {
 
             let traits = self.futureTraits ?? self.traitCollection
             self.updateMasterViewWidth(for: size, traits: traits)
-            if let hideDetailFunc = self.config.showDetailAsModalWithSizeChange {
-                hideDetail = hideDetailFunc(realSize, traits, self.config)
-                self.logger?.log("hide detail view: \(hideDetail)")
+            if let changes = self.layoutChanges(for: realSize, traits: traits) {
+                changes.animations()
+                completion = changes.completion
             }
-            if let hideMasterFunc = self.config.showMasterAsSideBarWithSizeChange {
-                hideMaster = hideMasterFunc(realSize, traits, self.config)
-                self.logger?.log("hide master view: \(hideMaster)")
-            }
-            if hideDetail && hideMaster {
-                self.logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
-            }
-            else if let hideTabBarFunc = self.config.showTabBarAsSideBarWithSizeChange {
-                hideTabBar = hideTabBarFunc(realSize, traits, self.config)
-                self.logger?.log("hide Tab Bar: \(hideTabBar)")
-            }
-            updateDetail = self.masterDetailVC.hideDetailView != hideDetail
-            updateMaster = self.masterDetailVC.hideMasterView != hideMaster
-            updateTabBar = self.mainView.hideTabBarView != hideTabBar
+        }, completion: { _ in
+            completion?()
+        })
 
-            self.state = (hideTabBar, hideMaster, hideDetail)
+        futureTraits = nil
+    }
 
-            guard updateDetail || updateMaster || updateTabBar else { return }
+    /// Asks the size callbacks how to lay out the view at `realSize` and returns the changes to make:
+    /// `animations` to run inside an animation (a size transition's or a text size change's) and
+    /// `completion` to run when it ends. Returns nil when nothing changes.
+    private func layoutChanges(for realSize: CGSize, traits: UITraitCollection) -> (animations: () -> Void, completion: () -> Void)? {
+        var hideDetail = false
+        var hideMaster = false
+        var hideTabBar = false
 
+        var updateDetail = false
+        var updateMaster = false
+        var updateTabBar = false
+
+        if let hideDetailFunc = self.config.showDetailAsModalWithSizeChange {
+            hideDetail = hideDetailFunc(realSize, traits, self.config)
+            self.logger?.log("hide detail view: \(hideDetail)")
+        }
+        if let hideMasterFunc = self.config.showMasterAsSideBarWithSizeChange {
+            hideMaster = hideMasterFunc(realSize, traits, self.config)
+            self.logger?.log("hide master view: \(hideMaster)")
+        }
+        if hideDetail && hideMaster {
+            self.logger?.log("We can't hide master and details at the same time!", level: .error, #function, #line)
+        }
+        else if let hideTabBarFunc = self.config.showTabBarAsSideBarWithSizeChange {
+            hideTabBar = hideTabBarFunc(realSize, traits, self.config)
+            self.logger?.log("hide Tab Bar: \(hideTabBar)")
+        }
+        updateDetail = self.masterDetailVC.hideDetailView != hideDetail
+        updateMaster = self.masterDetailVC.hideMasterView != hideMaster
+        updateTabBar = self.mainView.hideTabBarView != hideTabBar
+
+        self.state = (hideTabBar, hideMaster, hideDetail)
+
+        guard updateDetail || updateMaster || updateTabBar else { return nil }
+
+        let animations = {
             if updateMaster, !hideMaster {
                 self.masterDetailVC.hideMasterView = false
             }
@@ -443,7 +474,8 @@ public class TabbedSplitViewController: UIViewController {
                     self.sideBarViewController = sideBar
                 }
             }
-        }, completion: { _ in
+        }
+        let completion = {
             if updateMaster, hideMaster, !hideDetail {
                 self.masterDetailVC.hideMasterView = true
             }
@@ -456,22 +488,22 @@ public class TabbedSplitViewController: UIViewController {
                     self.presentDetailAsModal()
                 }
             }
-        })
-
-        futureTraits = nil
+        }
+        return (animations, completion)
     }
 
     // MARK: - Private functions
 
     /// Asks `masterViewWidthWithSizeChange` for the master view width and applies it
     /// to the master view and, when the master view is shown as a side bar, to the side bar.
-    private func updateMasterViewWidth(for size: CGSize, traits: UITraitCollection) {
+    @discardableResult
+    private func updateMasterViewWidth(for size: CGSize, traits: UITraitCollection) -> Bool {
         guard let widthFunc = config.masterViewWidthWithSizeChange else {
-            return
+            return false
         }
         let width = widthFunc(size, traits, config)
         guard width != config.masterViewWidth else {
-            return
+            return false
         }
         logger?.log("master view width: \(width)")
         config.masterViewWidth = width
@@ -480,6 +512,7 @@ public class TabbedSplitViewController: UIViewController {
         if masterDetailVC.hideMasterView, sideBarViewController != nil {
             mainView.updateSideBarWidth(width)
         }
+        return true
     }
 
     private func addMasterSideBar(_ sideBar: UIViewController) {
