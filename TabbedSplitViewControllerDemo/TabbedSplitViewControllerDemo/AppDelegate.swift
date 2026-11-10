@@ -38,10 +38,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.showDetailAsModalWithSizeChange = { size, traits, config in
                 logger.log("hideDetail: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
                 logger.log("hideDetail: size.width = \(size.width)")
-                /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                let should = traits.horizontalSizeClass == .compact
-                            // iPhone X/Xs Landscape
-                            && size.width < (tabBarWidth + masterWidth + minDetailWidth)
+                /// Hide when the detail view would be narrower than its minimum: in compact width
+                /// (iPad in compact mode, iPhone except Plus/Max models in landscape), and in regular width
+                /// whenever the master view is inline, since a wider master at a large text size can leave
+                /// too little room (iPhone Plus in landscape). Uses the current master width, which
+                /// `masterViewWidthWithSizeChange` sets before this callback runs.
+                let masterIsSideBar = config.showMasterAsSideBarWithSizeChange?(size, traits, config) ?? false
+                let detailTooNarrow = size.width < (tabBarWidth + config.masterViewWidth + minDetailWidth)
+                let should = detailTooNarrow && (traits.horizontalSizeClass == .compact || !masterIsSideBar)
                 logger.log("hideDetail: \(should)")
                 return should
             }

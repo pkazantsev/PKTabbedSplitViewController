@@ -64,7 +64,10 @@ class DemoConfigTests: XCTestCase {
         guard let splitVC = delegate?.window?.rootViewController as? TabbedSplitViewController else {
             return XCTFail("Split view controller not found")
         }
-        let config = splitVC.config
+        // The table assumes the regular-text master width; the live config has the width the
+        // callback computed for the test host's screen.
+        var config = splitVC.config
+        config.masterViewWidth = 320
 
         for size in testCases {
             let (title, width, sizeClass, shouldTabHidden, shouldMasterHidden, shouldDetailHidden, idiom) = size

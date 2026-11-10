@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C8A0439A2F00000000000008 /* DemoDetailCollapseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A0439A2F00000000000007 /* DemoDetailCollapseTests.swift */; };
 		C8A0439A2F00000000000006 /* PKTabbedSplitViewController in Frameworks */ = {isa = PBXBuildFile; productRef = C8A0439A2F00000000000005 /* PKTabbedSplitViewController */; };
 		9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50951B1B417592009D40C1 /* AppDelegate.swift */; };
 		9D50951E1B417592009D40C1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50951D1B417592009D40C1 /* ViewController.swift */; };
@@ -47,6 +48,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C8A0439A2F00000000000007 /* DemoDetailCollapseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDetailCollapseTests.swift; sourceTree = "<group>"; };
 		9D5095161B417592009D40C1 /* TabbedSplitViewControllerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TabbedSplitViewControllerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D50951A1B417592009D40C1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D50951B1B417592009D40C1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				9D5095311B417592009D40C1 /* DemoConfigTests.swift */,
+				C8A0439A2F00000000000007 /* DemoDetailCollapseTests.swift */,
 				9D50952F1B417592009D40C1 /* Supporting Files */,
 			);
 			path = TabbedSplitViewControllerDemoTests;
@@ -302,6 +305,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D5095321B417592009D40C1 /* DemoConfigTests.swift in Sources */,
+				C8A0439A2F00000000000008 /* DemoDetailCollapseTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
