@@ -61,6 +61,7 @@ extension PKTabBarItem where T == TabBarScreenConfiguration {
 public class TabbedSplitViewController: UIViewController {
 
     public typealias SizeChangedCallback = ((CGSize, UITraitCollection, Configuration) -> Bool)
+    public typealias WidthForSizeCallback = ((CGSize, UITraitCollection, Configuration) -> CGFloat)
 
     public struct Configuration {
         /// Width of a vertical TabBar. **Default – 70**.
@@ -106,6 +107,16 @@ public class TabbedSplitViewController: UIViewController {
         ///
         /// **Should not return true when** `showMasterAsSideBarWithSizeChange` **callback returns true!**
         public var showDetailAsModalWithSizeChange: SizeChangedCallback?
+        /// Called when either size or traits collection of the view is changed,
+        ///   including the preferred content size category, to get the master view width.
+        ///   The result replaces `masterViewWidth` before the other callbacks run,
+        ///   so they see the new width in the configuration they get.
+        ///   It also sets the width of the master view shown as a side bar.
+        ///   Unlike the other callbacks, it gets the full size of the view, not reduced by the safe area,
+        ///   so the result doesn't change with the status bar or home indicator on rotation.
+        ///
+        /// When `nil`, `masterViewWidth` stays as set.
+        public var masterViewWidthWithSizeChange: WidthForSizeCallback?
 
         fileprivate func widthChanged(old oldValue: Configuration) -> Bool {
             return tabBarWidth != oldValue.tabBarWidth
@@ -286,6 +297,8 @@ public class TabbedSplitViewController: UIViewController {
         let screenSize = view.frame.size.adjustedForSafeAreaInitially(logger)
         let traits = futureTraits ?? traitCollection
 
+        updateMasterViewWidth(for: view.frame.size, traits: traits)
+
         var state: State = (tabBarHidden: true, masterHidden: true, detailHidden: true)
 
         if let hideTabBar = config.showTabBarAsSideBarWithSizeChange?(screenSize, traits, config) {
@@ -333,6 +346,17 @@ public class TabbedSplitViewController: UIViewController {
         configured = true
     }
 
+    public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        // Size changes are handled in viewWillTransition(to:with:); a text size change comes only here.
+        guard configured,
+              traitCollection.preferredContentSizeCategory != previousTraitCollection?.preferredContentSizeCategory else {
+            return
+        }
+        updateMasterViewWidth(for: view.bounds.size, traits: traitCollection)
+    }
+
     public override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
         super.willTransition(to: newCollection, with: coordinator)
 
@@ -357,6 +381,7 @@ public class TabbedSplitViewController: UIViewController {
             self.futureSize = realSize
 
             let traits = self.futureTraits ?? self.traitCollection
+            self.updateMasterViewWidth(for: size, traits: traits)
             if let hideDetailFunc = self.config.showDetailAsModalWithSizeChange {
                 hideDetail = hideDetailFunc(realSize, traits, self.config)
                 self.logger?.log("hide detail view: \(hideDetail)")
@@ -438,8 +463,25 @@ public class TabbedSplitViewController: UIViewController {
 
     // MARK: - Private functions
 
+    /// Asks `masterViewWidthWithSizeChange` for the master view width and applies it
+    /// to the master view and, when the master view is shown as a side bar, to the side bar.
+    private func updateMasterViewWidth(for size: CGSize, traits: UITraitCollection) {
+        guard let widthFunc = config.masterViewWidthWithSizeChange else {
+            return
+        }
+        let width = widthFunc(size, traits, config)
+        guard width != config.masterViewWidth else {
+            return
+        }
+        logger?.log("master view width: \(width)")
+        config.masterViewWidth = width
+        if sideBarViewController != nil {
+            mainView.updateSideBarWidth(width)
+        }
+    }
+
     private func addMasterSideBar(_ sideBar: UIViewController) {
-        mainView.addSideBar(sideBar.view, leftOffset: config.tabBarWidth, willOpen: { [weak self] in
+        mainView.addSideBar(sideBar.view, width: config.masterViewWidth, leftOffset: config.tabBarWidth, willOpen: { [weak self] in
             self?.tabBarVC.tabBar.isOpen = true
         }, willClose: { [weak self] in
             self?.tabBarVC.tabBar.isOpen = false

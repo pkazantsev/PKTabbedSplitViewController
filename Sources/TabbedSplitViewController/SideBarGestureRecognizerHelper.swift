@@ -9,7 +9,7 @@ class SideBarGestureRecognizerHelper {
     private let sourceView: UIView
     private let targetView: UIView
     private let xConstraint: NSLayoutConstraint
-    private let viewWidth: CGFloat
+    private var viewWidth: CGFloat
     private let leftOffset: CGFloat
 
     private let openViewRec: UIGestureRecognizer
@@ -24,6 +24,16 @@ class SideBarGestureRecognizerHelper {
         didSet {
             openViewRec.isEnabled = isEnabled
             closeViewRec.isEnabled = isEnabled
+        }
+    }
+
+    /// Changes the side bar width, keeping it open or closed.
+    /// While closed, the side bar is moved left by the change so it stays out of sight.
+    func updateWidth(_ width: CGFloat, isClosed: Bool) {
+        let delta = width - viewWidth
+        viewWidth = width
+        if isClosed {
+            xConstraint.constant -= delta
         }
     }
 

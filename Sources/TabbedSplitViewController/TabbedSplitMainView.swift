@@ -234,6 +234,12 @@ class PKTabbedSplitView: UIView {
         sideBarGestRecHelper = helper
     }
 
+    /// Changes the width of the side bar that is currently added, open or closed.
+    func updateSideBarWidth(_ width: CGFloat) {
+        navigationBarWidthConstraint?.constant = width
+        sideBarGestRecHelper?.updateWidth(width, isClosed: sideBarIsHidden)
+    }
+
     /// Removed the side bar view from the view hierarchy
     func removeSideBar(_ view: UIView) {
         logger?.log("\(view)")
