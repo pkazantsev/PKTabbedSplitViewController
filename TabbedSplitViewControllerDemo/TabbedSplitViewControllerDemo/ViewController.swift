@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import TabbedSplitViewController
+import PKTabbedSplitViewController
 
 class ViewController: UIViewController {
 

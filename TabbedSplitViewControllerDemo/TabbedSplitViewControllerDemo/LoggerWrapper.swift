@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import TabbedSplitViewController
+import PKTabbedSplitViewController
 
 class Logger: DebugLogger {
 

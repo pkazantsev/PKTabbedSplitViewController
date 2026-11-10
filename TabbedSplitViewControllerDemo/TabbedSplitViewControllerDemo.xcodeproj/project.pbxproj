@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C8A0439A2F00000000000006 /* PKTabbedSplitViewController in Frameworks */ = {isa = PBXBuildFile; productRef = C8A0439A2F00000000000005 /* PKTabbedSplitViewController */; };
 		9D50951C1B417592009D40C1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50951B1B417592009D40C1 /* AppDelegate.swift */; };
 		9D50951E1B417592009D40C1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D50951D1B417592009D40C1 /* ViewController.swift */; };
 		9D5095211B417592009D40C1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D50951F1B417592009D40C1 /* Main.storyboard */; };
@@ -14,8 +15,8 @@
 		9D5095261B417592009D40C1 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9D5095241B417592009D40C1 /* LaunchScreen.xib */; };
 		9D5095321B417592009D40C1 /* DemoConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D5095311B417592009D40C1 /* DemoConfigTests.swift */; };
 		C82BE58C1FB897380082CA63 /* LoggerWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */; };
-		C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; };
-		C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C8A0439A2F00000000000003 /* PKTabbedSplitViewController in Frameworks */ = {isa = PBXBuildFile; productRef = C8A0439A2F00000000000002 /* PKTabbedSplitViewController */; };
+		C8A0439A2F00000000000004 /* PKTabbedSplitViewController in Embed Frameworks */ = {isa = PBXBuildFile; productRef = C8A0439A2F00000000000002 /* PKTabbedSplitViewController */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C8CF86D81E104535000D2B4B /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CF86D71E104535000D2B4B /* DetailController.swift */; };
 		C8DBED162308212E0096D870 /* FullWidthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DBED152308212E0096D870 /* FullWidthViewController.swift */; };
 		C8E573861E11CE6700534598 /* TODO.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E573851E11CE6700534598 /* TODO.txt */; };
@@ -38,7 +39,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C89ABD971FB84CA20059CA7A /* TabbedSplitViewController.framework in Embed Frameworks */,
+				C8A0439A2F00000000000004 /* PKTabbedSplitViewController in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -58,7 +59,6 @@
 		9D5095311B417592009D40C1 /* DemoConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoConfigTests.swift; sourceTree = "<group>"; };
 		C82BE58B1FB897380082CA63 /* LoggerWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerWrapper.swift; sourceTree = "<group>"; };
 		C85A27151D98284600C57331 /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
-		C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TabbedSplitViewController.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8CF86D71E104535000D2B4B /* DetailController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		C8DBED152308212E0096D870 /* FullWidthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullWidthViewController.swift; sourceTree = "<group>"; };
 		C8E573851E11CE6700534598 /* TODO.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.txt; sourceTree = "<group>"; };
@@ -69,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C89ABD961FB84CA20059CA7A /* TabbedSplitViewController.framework in Frameworks */,
+				C8A0439A2F00000000000003 /* PKTabbedSplitViewController in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8A0439A2F00000000000006 /* PKTabbedSplitViewController in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,7 +149,6 @@
 		C85A274B1D9864E800C57331 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C89ABD951FB84CA20059CA7A /* TabbedSplitViewController.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -171,6 +171,9 @@
 			dependencies = (
 			);
 			name = TabbedSplitViewControllerDemo;
+			packageProductDependencies = (
+				C8A0439A2F00000000000002 /* PKTabbedSplitViewController */,
+			);
 			productName = TabbedSplitViewControllerDemo;
 			productReference = 9D5095161B417592009D40C1 /* TabbedSplitViewControllerDemo.app */;
 			productType = "com.apple.product-type.application";
@@ -189,6 +192,9 @@
 				9D50952D1B417592009D40C1 /* PBXTargetDependency */,
 			);
 			name = TabbedSplitViewControllerDemoTests;
+			packageProductDependencies = (
+				C8A0439A2F00000000000005 /* PKTabbedSplitViewController */,
+			);
 			productName = TabbedSplitViewControllerDemoTests;
 			productReference = 9D50952B1B417592009D40C1 /* TabbedSplitViewControllerDemoTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -218,7 +224,7 @@
 				};
 			};
 			buildConfigurationList = 9D5095111B417592009D40C1 /* Build configuration list for PBXProject "TabbedSplitViewControllerDemo" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -227,6 +233,9 @@
 				Base,
 			);
 			mainGroup = 9D50950D1B417592009D40C1;
+			packageReferences = (
+				C8A0439A2F00000000000001 /* XCLocalSwiftPackageReference ".." */,
+			);
 			productRefGroup = 9D5095171B417592009D40C1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -372,12 +381,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -421,11 +430,11 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -442,7 +451,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -456,7 +465,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -472,7 +481,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TabbedSplitViewControllerDemo.app/TabbedSplitViewControllerDemo";
 			};
 			name = Debug;
@@ -485,7 +494,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "ru.pakaz.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TabbedSplitViewControllerDemo.app/TabbedSplitViewControllerDemo";
 			};
 			name = Release;
@@ -521,6 +530,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		C8A0439A2F00000000000001 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C8A0439A2F00000000000002 /* PKTabbedSplitViewController */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PKTabbedSplitViewController;
+		};
+		C8A0439A2F00000000000005 /* PKTabbedSplitViewController */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PKTabbedSplitViewController;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9D50950E1B417592009D40C1 /* Project object */;
 }
