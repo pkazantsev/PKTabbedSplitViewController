@@ -39,10 +39,10 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
         return controller
     }
 
-    /// Embeds the controller in a parent sized like an 11" iPad in landscape and makes it appear.
-    private func present(_ controller: UIViewController) -> UIViewController {
+    /// Embeds the controller in a parent (by default sized like an 11" iPad in landscape) and makes it appear.
+    private func present(_ controller: UIViewController, size: CGSize? = nil) -> UIViewController {
         let parent = UIViewController()
-        parent.view.frame = CGRect(origin: .zero, size: size)
+        parent.view.frame = CGRect(origin: .zero, size: size ?? self.size)
         parent.addChild(controller)
         controller.view.frame = parent.view.bounds
         parent.view.addSubview(controller.view)
@@ -81,5 +81,30 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
 
         #expect(recorder.categories.last == .accessibilityLarge)
         #expect(controller.config.masterViewWidth == 430)
+    }
+
+    /// The navigation side bar (the tab bar collapsed into a side bar) keeps its own width
+    /// when the master width changes; only the master side bar follows it.
+    @Test func leavesTheNavigationSideBarWidthAlone() throws {
+        let recorder = Recorder()
+        let controller = makeController(recorder: recorder)
+        var config = controller.config
+        config.showTabBarAsSideBarWithSizeChange = { _, _, _ in true }
+        controller.config = config
+        let navigation = UIViewController()
+        controller.configureNavigationBar = { _, _, _, _, _ in navigation }
+
+        let parent = present(controller, size: CGSize(width: 375, height: 667))
+        parent.view.layoutIfNeeded()
+        let initialWidth = navigation.view.bounds.width
+        #expect(initialWidth == 280)
+
+        let largeText = UITraitCollection(preferredContentSizeCategory: .accessibilityLarge)
+        parent.setOverrideTraitCollection(largeText, forChild: controller)
+        parent.view.layoutIfNeeded()
+
+        // The callback ran (240 = 30% of 667, ×1.2), but the navigation side bar didn't follow it.
+        #expect(controller.config.masterViewWidth == 240)
+        #expect(navigation.view.bounds.width == initialWidth)
     }
 }

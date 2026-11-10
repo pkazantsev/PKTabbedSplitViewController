@@ -475,7 +475,8 @@ public class TabbedSplitViewController: UIViewController {
         }
         logger?.log("master view width: \(width)")
         config.masterViewWidth = width
-        if sideBarViewController != nil {
+        // `sideBarViewController` also holds the navigation side bar, which keeps its own width.
+        if masterDetailVC.hideMasterView, sideBarViewController != nil {
             mainView.updateSideBarWidth(width)
         }
     }
