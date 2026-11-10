@@ -83,9 +83,9 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
         #expect(controller.config.masterViewWidth == 430)
     }
 
-    /// The navigation side bar (the tab bar collapsed into a side bar) keeps its own width
-    /// when the master width changes; only the master side bar follows it.
-    @Test func leavesTheNavigationSideBarWidthAlone() throws {
+    /// The navigation side bar (the tab bar collapsed into a side bar) follows the master width
+    /// when it changes, like the master side bar.
+    @Test func resizesTheNavigationSideBarWithTheMasterWidth() throws {
         let recorder = Recorder()
         let controller = makeController(recorder: recorder)
         var config = controller.config
@@ -96,15 +96,14 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
 
         let parent = present(controller, size: CGSize(width: 375, height: 667))
         parent.view.layoutIfNeeded()
-        let initialWidth = navigation.view.bounds.width
-        #expect(initialWidth == 280)
+        #expect(navigation.view.bounds.width == 280)
 
         let largeText = UITraitCollection(preferredContentSizeCategory: .accessibilityLarge)
         parent.setOverrideTraitCollection(largeText, forChild: controller)
         parent.view.layoutIfNeeded()
 
-        // The callback ran (240 = 30% of 667, ×1.2), but the navigation side bar didn't follow it.
+        // 240 = 30% of 667, ×1.2 at the accessibility size.
         #expect(controller.config.masterViewWidth == 240)
-        #expect(navigation.view.bounds.width == initialWidth)
+        #expect(navigation.view.bounds.width == 240)
     }
 }
