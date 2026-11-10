@@ -53,6 +53,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 logger.log("hideTabBar: \(should)")
                 return should
             }
+            config.masterViewWidthWithSizeChange = { size, traits, config in
+                /// 30% of the window's longer side, at least 320 pt, and wider at accessibility text sizes.
+                /// Gets the full size of the view, so the width doesn't change with rotation.
+                let base = max(masterWidth, (max(size.width, size.height) * 0.3).rounded())
+                let width = traits.preferredContentSizeCategory.isAccessibilityCategory ? (base * 1.2).rounded() : base
+                logger.log("masterWidth: \(width) for \(size), \(traits.preferredContentSizeCategory.rawValue)")
+                return width
+            }
             config.tabBarBackgroundColor = .purple
             config.detailBackgroundColor = .blue
             config.verticalSeparatorColor = .orange
