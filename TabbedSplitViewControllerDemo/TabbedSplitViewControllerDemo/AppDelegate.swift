@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import TabbedSplitViewController
+import PKTabbedSplitViewController
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -183,6 +183,7 @@ extension UIUserInterfaceIdiom: CustomStringConvertible {
         case .pad: return ".pad"
         case .tv: return ".tv"
         case .carPlay: return ".carPlay"
+        @unknown default: return ".unknown(\(rawValue))"
         }
     }
 }
@@ -194,6 +195,7 @@ extension UIUserInterfaceSizeClass: CustomStringConvertible {
         case .unspecified: return ".unspecified"
         case .compact: return ".compact"
         case .regular: return ".regular"
+        @unknown default: return ".unknown(\(rawValue))"
         }
     }
 }

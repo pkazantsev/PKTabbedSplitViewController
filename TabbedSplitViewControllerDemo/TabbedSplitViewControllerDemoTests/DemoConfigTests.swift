@@ -1,7 +1,7 @@
 import UIKit
 import XCTest
 @testable import TabbedSplitViewControllerDemo
-import TabbedSplitViewController
+import PKTabbedSplitViewController
 
 class DemoConfigTests: XCTestCase {
     
