@@ -38,10 +38,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             config.showDetailAsModalWithSizeChange = { size, traits, config in
                 logger.log("hideDetail: traits.horizontalSizeClass = \(traits.horizontalSizeClass)")
                 logger.log("hideDetail: size.width = \(size.width)")
-                /// Use on iPad in compact mode and on iPhone except Plus models in landscape
-                let should = traits.horizontalSizeClass == .compact
-                            // iPhone X/Xs Landscape
-                            && size.width < (tabBarWidth + masterWidth + minDetailWidth)
+                /// Hide when the detail view would be narrower than its minimum: in compact width
+                /// (iPad in compact mode, iPhone except Plus/Max models in landscape), and in regular width
+                /// whenever the master view is inline, since a wider master at a large text size can leave
+                /// too little room (iPhone Plus in landscape). Uses the current master width, which
+                /// `masterViewWidthWithSizeChange` sets before this callback runs.
+                let masterIsSideBar = config.showMasterAsSideBarWithSizeChange?(size, traits, config) ?? false
+                let detailTooNarrow = size.width < (tabBarWidth + config.masterViewWidth + minDetailWidth)
+                let should = detailTooNarrow && (traits.horizontalSizeClass == .compact || !masterIsSideBar)
                 logger.log("hideDetail: \(should)")
                 return should
             }
@@ -52,6 +56,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let should = traits.horizontalSizeClass == .compact && size.width <= 375 /* Regular iPhone width */
                 logger.log("hideTabBar: \(should)")
                 return should
+            }
+            config.masterViewWidthWithSizeChange = { size, traits, config in
+                /// 30% of the window's longer side, at least 320 pt, and wider at accessibility text sizes.
+                /// Gets the full size of the view, so the width doesn't change with rotation.
+                let base = max(masterWidth, (max(size.width, size.height) * 0.3).rounded())
+                let width = traits.preferredContentSizeCategory.isAccessibilityCategory ? (base * 1.2).rounded() : base
+                logger.log("masterWidth: \(width) for \(size), \(traits.preferredContentSizeCategory.rawValue)")
+                return width
             }
             config.tabBarBackgroundColor = .purple
             config.detailBackgroundColor = .blue

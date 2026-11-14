@@ -20,7 +20,12 @@ let package = Package(
     targets: [
         .target(
             name: "PKTabbedSplitViewController",
-            dependencies: []
+            dependencies: [],
+            path: "Sources/TabbedSplitViewController"
+        ),
+        .testTarget(
+            name: "PKTabbedSplitViewControllerTests",
+            dependencies: ["PKTabbedSplitViewController"]
         ),
     ],
     swiftLanguageModes: [.v5]

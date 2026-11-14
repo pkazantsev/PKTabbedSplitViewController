@@ -9,7 +9,7 @@ class SideBarGestureRecognizerHelper {
     private let sourceView: UIView
     private let targetView: UIView
     private let xConstraint: NSLayoutConstraint
-    private let viewWidth: CGFloat
+    private var viewWidth: CGFloat
     private let leftOffset: CGFloat
 
     private let openViewRec: UIGestureRecognizer
@@ -24,6 +24,20 @@ class SideBarGestureRecognizerHelper {
         didSet {
             openViewRec.isEnabled = isEnabled
             closeViewRec.isEnabled = isEnabled
+        }
+    }
+
+    /// Whether the side bar is open or heading there. `open(withDuration:)` and `close(withDuration:)`
+    /// set it as they set the destination constraint, before their animations finish.
+    private var isOpenOrOpening = false
+
+    /// Changes the side bar width, keeping it open or closed, also while it animates.
+    /// While closed or closing, the side bar is moved left by the change so it ends out of sight.
+    func updateWidth(_ width: CGFloat) {
+        let delta = width - viewWidth
+        viewWidth = width
+        if !isOpenOrOpening {
+            xConstraint.constant -= delta
         }
     }
 
@@ -119,6 +133,7 @@ class SideBarGestureRecognizerHelper {
     }
 
     func close(withDuration duration: TimeInterval, animated: Bool = true, wasClosing: Bool = true) {
+        isOpenOrOpening = false
         xConstraint.constant = -viewWidth + leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
         willClose?()
@@ -135,6 +150,7 @@ class SideBarGestureRecognizerHelper {
         }
     }
     func open(withDuration duration: TimeInterval, animated: Bool = true, wasOpening: Bool = true) {
+        isOpenOrOpening = true
         showShadow(true)
         xConstraint.constant = leftOffset
         logger?.log("Constant: \(self.xConstraint.constant)")
