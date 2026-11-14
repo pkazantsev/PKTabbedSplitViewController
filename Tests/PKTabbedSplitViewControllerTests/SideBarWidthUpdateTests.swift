@@ -2,7 +2,7 @@ import UIKit
 import Testing
 @testable import PKTabbedSplitViewController
 
-/// `SideBarGestureRecognizerHelper.updateWidth(_:)` (MPL-439) keeps the side bar where it's heading,
+/// `SideBarGestureRecognizerHelper.updateWidth(_:)` keeps the side bar where it's heading,
 /// also when the width changes while an open or close animation is still running.
 @MainActor
 @Suite struct SideBarWidthUpdateTests {

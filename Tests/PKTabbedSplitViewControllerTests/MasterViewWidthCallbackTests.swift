@@ -8,7 +8,7 @@ private func masterWidth(for size: CGSize, traits: UITraitCollection) -> CGFloat
     return traits.preferredContentSizeCategory.isAccessibilityCategory ? (base * 1.2).rounded() : base
 }
 
-/// `Configuration.masterViewWidthWithSizeChange` (MPL-439): the controller asks it for the
+/// `Configuration.masterViewWidthWithSizeChange`: the controller asks it for the
 /// master view width when it appears and when the text size changes, and applies the result.
 ///
 /// Package tests run in a bare `xctest` process with no `UIApplication`, so the tests drive

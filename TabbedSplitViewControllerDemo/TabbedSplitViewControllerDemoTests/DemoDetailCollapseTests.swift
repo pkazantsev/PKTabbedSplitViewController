@@ -3,7 +3,7 @@ import Testing
 @testable import TabbedSplitViewControllerDemo
 import PKTabbedSplitViewController
 
-/// The demo's detail-collapse rule follows the current master width (MPL-439): a master view
+/// The demo's detail-collapse rule follows the current master width: a master view
 /// widened for a large text size can leave the detail view too narrow even in regular width.
 @MainActor
 @Suite struct DemoDetailCollapseTests {

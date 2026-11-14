@@ -364,8 +364,8 @@ private class PKTabBarItemTableViewCell: UITableViewCell {
         titleLabel.textColor = isSelected ? self.tintColor : .black
     }
 
-    private lazy var openArrowImage = UIImage(named: "Tab Bar Arrow Open", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
-    private lazy var closeArrowImage = UIImage(named: "Tab Bar Arrow Close", in: Bundle(for: PKTabBarItemTableViewCell.self), compatibleWith: nil)
+    private lazy var openArrowImage = TabBarImages.openArrow
+    private lazy var closeArrowImage = TabBarImages.closeArrow
 
     fileprivate override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -486,4 +486,15 @@ private class PKSideTabBarItemTableViewCell: PKTabBarItemTableViewCell {
         NSLayoutConstraint.activate(constraints.flatMap { $0 })
     }
 
+}
+
+/// The arrow a tab shows when its master view is a side bar. The images are package resources, which live
+/// in a bundle of their own (`Bundle.module`), not in the framework that holds the code.
+enum TabBarImages {
+    static var openArrow: UIImage? {
+        UIImage(named: "Tab Bar Arrow Open", in: .module, compatibleWith: nil)
+    }
+    static var closeArrow: UIImage? {
+        UIImage(named: "Tab Bar Arrow Close", in: .module, compatibleWith: nil)
+    }
 }
